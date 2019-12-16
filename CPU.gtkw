@@ -1,0 +1,115 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Fri Dec 13 12:43:40 2019
+[*]
+[dumpfile] "/Users/mats/Documents/Projects/PDP8-X/verilog/CPU.vcd"
+[dumpfile_mtime] "Fri Dec 13 09:20:44 2019"
+[dumpfile_size] 15777274
+[savefile] "/Users/mats/Documents/Projects/PDP8-X/verilog/CPU.gtkw"
+[timestart] 0
+[size] 1531 600
+[pos] -1 -1
+*-12.848866 3050000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] CPU_tb.
+[treeopen] CPU_tb.dut.
+[sst_width] 193
+[signals_width] 227
+[sst_expanded] 1
+[sst_vpaned_height] 167
+@28
+CPU_tb.dut.SYSCLK
+CPU_tb.dut.theSEQUENCER.CLK
+@22
+CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
+@28
+CPU_tb.dut.theSEQUENCER.CLEAR
+@c00200
+-RUNHALT
+@28
+CPU_tb.dut.theSEQUENCER.running
+CPU_tb.dut.sw_RUN
+CPU_tb.dut.theSEQUENCER.wfRUN
+CPU_tb.dut.sw_HALT
+CPU_tb.dut.theSEQUENCER.wfHALT
+@1401200
+-RUNHALT
+@c00200
+-CK_
+@28
+CPU_tb.dut.theSEQUENCER.CK_FETCH
+CPU_tb.dut.theSEQUENCER.CK_AUTOINC1
+CPU_tb.dut.theSEQUENCER.CK_AUTOINC2
+CPU_tb.dut.theSEQUENCER.CK_INDIRECT
+CPU_tb.dut.theSEQUENCER.CK_1
+CPU_tb.dut.theSEQUENCER.CK_2
+CPU_tb.dut.theSEQUENCER.CK_3
+CPU_tb.dut.theSEQUENCER.CK_4
+CPU_tb.dut.theSEQUENCER.CK_5
+CPU_tb.dut.theSEQUENCER.CK_6
+@1401200
+-CK_
+@c00200
+-STEP
+@28
+CPU_tb.dut.theSEQUENCER.STEPM
+CPU_tb.dut.theSEQUENCER.wfSTEPM
+CPU_tb.dut.theSEQUENCER.run1m
+CPU_tb.dut.theSEQUENCER.STEPI
+CPU_tb.dut.theSEQUENCER.wfSTEPI
+CPU_tb.dut.theSEQUENCER.run1i
+@1401200
+-STEP
+@c00200
+-OPR
+@28
+CPU_tb.dut.theOPRDECODER.OPR
+CPU_tb.dut.theOPRDECODER.opr1
+CPU_tb.dut.theOPRDECODER.opr2
+CPU_tb.dut.theOPRDECODER.opr3
+CPU_tb.dut.theOPRDECODER.oprASL
+CPU_tb.dut.theOPRDECODER.oprCLA1
+CPU_tb.dut.theOPRDECODER.oprCLA2
+CPU_tb.dut.theOPRDECODER.oprCLA_3
+CPU_tb.dut.theOPRDECODER.oprCLL
+CPU_tb.dut.theOPRDECODER.oprCMA
+CPU_tb.dut.theOPRDECODER.oprCML
+CPU_tb.dut.theOPRDECODER.oprDVI
+CPU_tb.dut.theOPRDECODER.oprHLT
+CPU_tb.dut.theOPRDECODER.oprIAC
+CPU_tb.dut.theOPRDECODER.oprLEFT
+CPU_tb.dut.theOPRDECODER.oprLSR
+CPU_tb.dut.theOPRDECODER.oprMQA
+CPU_tb.dut.theOPRDECODER.oprMQL
+CPU_tb.dut.theOPRDECODER.oprMUY
+CPU_tb.dut.theOPRDECODER.oprNMI
+CPU_tb.dut.theOPRDECODER.oprNOP
+CPU_tb.dut.theOPRDECODER.oprNOP0
+CPU_tb.dut.theOPRDECODER.oprOSR
+CPU_tb.dut.theOPRDECODER.oprRIGHT
+CPU_tb.dut.theOPRDECODER.oprSCA
+CPU_tb.dut.theOPRDECODER.oprSCL
+CPU_tb.dut.theOPRDECODER.oprSHL
+CPU_tb.dut.theOPRDECODER.oprSMASPA
+CPU_tb.dut.theOPRDECODER.oprSNLSZL
+CPU_tb.dut.theOPRDECODER.oprSWP
+CPU_tb.dut.theOPRDECODER.oprSZASNA
+CPU_tb.dut.theOPRDECODER.oprTSTINV
+CPU_tb.dut.theOPRDECODER.oprX2
+CPU_tb.dut.theOPRDECODER.NOP
+@1401200
+-OPR
+@c00200
+-Instructions
+@28
+CPU_tb.dut.theIRDECODER.AAND
+CPU_tb.dut.theIRDECODER.TAD
+CPU_tb.dut.theIRDECODER.ISZ
+CPU_tb.dut.theIRDECODER.DCA
+CPU_tb.dut.theIRDECODER.JMS
+CPU_tb.dut.theIRDECODER.JMP
+CPU_tb.dut.theIRDECODER.IOT
+CPU_tb.dut.theIRDECODER.OPR
+@1401200
+-Instructions
+[pattern_trace] 1
+[pattern_trace] 0

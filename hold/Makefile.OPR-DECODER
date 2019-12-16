@@ -1,0 +1,54 @@
+DIR			= $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+DOCKER 		= docker run --rm -it -w /root -v$(DIR):/root 
+ICESTORM	= $(DOCKER) cranphin/icestorm
+ICARUS 		= $(DOCKER) cranphin/iverilog
+VERILATOR  	= $(DOCKER) antonkrug/verilator-slim
+
+PROJ = OPR-DECODER
+DEVICE = hx1k
+PACKAGE = vq100
+
+all: $(PROJ).rpt $(PROJ).bin 
+
+%.json: %.v
+#	@$(ICESTORM) yosys -p 'synth_ice40 -top top -json $@' $<
+	@$(ICESTORM) yosys -p 'synth_ice40 -json $@' $<
+
+%.asc: %.json
+	@$(ICESTORM) nextpnr-ice40 --$(DEVICE) --package $(PACKAGE) --pcf $(PROJ).pcf --json $< --asc $@ > $(PROJ).tmp
+	@cat $(PROJ).tmp 
+
+%.bin: %.asc
+	@$(ICESTORM) icepack $< $@
+
+%.rpt: %.asc
+	@$(ICESTORM) icetime -d $(DEVICE) -mtr $@ $<
+	@cat $(PROJ).tmp | /usr/bin/sed -ne '/^Info: Device utilisation:/,$$ p' | /usr/bin/sed -n '/^[[:space:]]*$$/q;p'
+
+image: 
+	@$(ICESTORM) yosys -p "prep; show -stretch -prefix $(PROJ) -format dot" $(PROJ).v
+	@$(ICESTORM) dot -Tpng $(PROJ).dot -o $(PROJ).png
+
+prog: $(PROJ).bin
+	@../upload/iceflash /dev/cu.usbmodem48065801 -e -w $< -t -g
+
+tb:
+	$(ICARUS) iverilog -o $(PROJ).vvp $(PROJ).v $(PROJ)_tb.v
+	$(ICARUS) vvp $(PROJ).vvp
+
+lint:
+	$(VERILATOR) verilator --lint-only --top-module IRDECODER2  $(PROJ).v 
+
+clean:
+	@rm -f \
+		$(PROJ).tmp \
+		$(PROJ).blif \
+		$(PROJ).asc \
+		$(PROJ).bin \
+		$(PROJ).rpt \
+		$(PROJ).dot \
+		$(PROJ).png \
+		$(PROJ).json \
+		$(PROJ).vvp
+
+.PHONY: all image prog tb lint clean

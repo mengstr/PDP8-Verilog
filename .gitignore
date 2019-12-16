@@ -1,0 +1,21 @@
+# MacOS specific files
+.DS_Store
+
+# History files
+.*_history
+
+# Editor backup files 
+*~
+*.tmp
+
+# verilog
+*.blif
+*.asc
+*.bin
+*.rpt
+*.dot
+*.json
+*.vvp
+*.vcd
+
+upload

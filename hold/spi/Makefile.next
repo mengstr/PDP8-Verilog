@@ -1,0 +1,35 @@
+DIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+RUNICE = docker run --rm -it -w /root -v$(DIR):/root cranphin/icestorm
+
+PROJ = spi2
+PIN_DEF = ice40hx1k-evb.pcf
+DEVICE = hx1k
+PACKAGE = vq100
+
+all: $(PROJ).rpt $(PROJ).bin 
+
+%.json: %.v
+	@$(RUNICE) yosys -p 'synth_ice40 -top top -json $@' $<
+
+%.asc: %.json
+	@$(RUNICE) nextpnr-ice40 --$(DEVICE) --package $(PACKAGE) --pcf $(PIN_DEF) --json $< --asc $@ > /tmp/$(PROJ).tmp
+	@cat /tmp/$(PROJ).tmp 
+
+%.bin: %.asc
+	@$(RUNICE) icepack $< $@
+
+%.rpt: %.asc
+	@$(RUNICE) icetime -d $(DEVICE) -mtr $@ $<
+	@cat /tmp/spi2.tmp | /usr/bin/sed -ne '/^Info: Device utilisation:/,$$ p' | /usr/bin/sed -n '/^[[:space:]]*$$/q;p'
+
+image: 
+	@$(RUNICE) yosys -p "prep; show -stretch -prefix $(PROJ) -format dot" $(PROJ).v
+	@$(RUNICE) dot -Tpng $(PROJ).dot -o $(PROJ).png
+
+prog: $(PROJ).bin
+	@../upload/iceflash /dev/cu.usbmodem48065801 -e -w $< -t -g
+
+clean:
+	@rm -f $(PROJ).blif $(PROJ).asc $(PROJ).bin $(PROJ).rpt $(PROJ).dot $(PROJ).png $(PROJ).json
+
+.PHONY: all image prog clean
