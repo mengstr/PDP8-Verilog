@@ -6,20 +6,27 @@
 
 module MULTILATCH (
     input [11:0] in,
-    input clear,latch,
+    input clear,hold,latch,
     input oe1,oe2,
     output [11:0] out1, out2
 );
 
     reg [11:0] data;
+    reg [11:0] holdreg;
+
     assign out1=oe1?data:12'bz;
     assign out2=oe2?data:12'bz;
+
+    always @* begin
+        if (clear) holdreg=0;
+        if (!hold) holdreg=in;
+    end
 
     always @(posedge latch or posedge clear) begin
         if (clear) begin
             data<=0;
         end else begin 
-            data<=in;
+            data<=holdreg;
         end
     end
 endmodule

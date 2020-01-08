@@ -40,7 +40,7 @@ module CPU(
   assign pInstIOT=instIOT;
   assign pInstOPR=instOPR;
 
-  // The main buses
+  // The buses
 wire [11:0] busReg;
 reg [11:0] busIR;
 wire [11:0] busData;
@@ -111,15 +111,17 @@ PROGRAMCOUNTER thePC(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ RAM MEMORY █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-
-assign busRamA=ckFetch?busLatPC:12'bz;
+wire ram_oe;
+or(ram_oe,ram_oe_1,ram_oe_2);
+reg ram_oe_1=0, ram_oe_2=0;
+reg ram_we=0;
 
 RAM theRAM(
   .clk(SYSCLK),
-  .oe(1'b1),
-  .we(1'b0),
+  .oe(ram_oe),
+  .we(ram_we),
   .addr(busRamA), 
-  .dataI(12'h123), 
+  .dataI(busRamD), 
   .dataO(busRamD)
 );
 
@@ -153,22 +155,78 @@ IRDECODER theIRDECODER(
 
 // OPR DECODER outputs
 wire opr1,opr2,opr3;
-wire oprIAC, oprX2, oprLEFT, oprRIGHT, oprCML, oprCMA, oprCLL, oprCLA1; // OPR 1
-wire oprHLT, oprOSR, oprTSTINV, oprSNLSZL, oprSZASNA, oprSMASPA, oprCLA2; // OPR 2
-wire oprMQL, oprSWP, oprMQA, oprSCA, oprCLA_3; // OPR 3 
-wire oprNOP0, oprSCL, oprMUY, oprDVI, oprNMI, oprSHL, oprASL, oprLSR; // OPR 3
+wire oprIAC, oprX2, oprLEFT, oprRIGHT, oprCML, oprCMA, oprCLL; // OPR 1
+wire oprHLT, oprOSR, oprTSTINV, oprSNLSZL, oprSZASNA, oprSMASPA; // OPR 2
+wire oprMQL, oprSWP, oprMQA, oprSCA; // OPR 3 
+wire oprSCL, oprMUY, oprDVI, oprNMI, oprSHL, oprASL, oprLSR; // OPR 3
 wire oprNOP;
+wire oprCLA;
 
 OPRDECODER  theOPRDECODER(
   .IR(busIR),
   .OPR(instOPR),
   .opr1(opr1), .opr2(opr2), .opr3(opr3),
-  .oprIAC(oprIAC), .oprX2(oprX2), .oprLEFT(oprLEFT), .oprRIGHT(oprRIGHT), .oprCML(oprCML), .oprCMA(oprCMA), .oprCLL(oprCLL), .oprCLA1(oprCLA1), // OPR 1
-  .oprHLT(oprHLT), .oprOSR(oprOSR), .oprTSTINV(oprTSTINV), .oprSNLSZL(oprSNLSZL), .oprSZASNA(oprSZASNA), .oprSMASPA(oprSMASPA), .oprCLA2(oprCLA2), // OPR 2
-  .oprMQL(oprMQL), .oprSWP(oprSWP), .oprMQA(oprMQA), .oprSCA(oprSCA), .oprCLA_3(oprCLA_3), // OPR 3 
-  .oprNOP0(oprNOP0), .oprSCL(oprSCL), .oprMUY(oprMUY), .oprDVI(oprDVI), .oprNMI(oprNMI), .oprSHL(oprSHL), .oprASL(oprASL), .oprLSR(oprLSR), // OPR 3
-  .oprNOP(oprNOP)
+  .oprIAC(oprIAC), .oprX2(oprX2), .oprLEFT(oprLEFT), .oprRIGHT(oprRIGHT), .oprCML(oprCML), .oprCMA(oprCMA), .oprCLL(oprCLL), // OPR 1
+  .oprHLT(oprHLT), .oprOSR(oprOSR), .oprTSTINV(oprTSTINV), .oprSNLSZL(oprSNLSZL), .oprSZASNA(oprSZASNA), .oprSMASPA(oprSMASPA),  // OPR 2
+  .oprMQL(oprMQL), .oprSWP(oprSWP), .oprMQA(oprMQA), .oprSCA(oprSCA), // OPR 3 
+  .oprSCL(oprSCL), .oprMUY(oprMUY), .oprDVI(oprDVI), .oprNMI(oprNMI), .oprSHL(oprSHL), .oprASL(oprASL), .oprLSR(oprLSR), // OPR 3
+  .oprCLA(oprCLA),  // OPR 1,2,3
+  .oprNOP(oprNOP)   // OPR x,3
 );
+
+
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ SKIP █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+wire doSkip;
+
+SKIP theSKIP(
+  .AC(accout1),
+  .LINK(link),
+  .SZASNA(oprSZASNA),
+  .SMASPA(oprSMASPA),
+  .SNLSZL(oprSNLSZL),
+  .TSTINV(oprTSTINV),
+  .OUT(doSkip)
+);
+
+
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ MQ █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+reg mq_clr=0;
+wire [11:0] mqout1;
+wire [11:0] mqout2;
+MULTILATCH theMQ(
+    .in(accout1),
+    .clear(sw_CLEAR | mq_clr),
+    .latch(mq_ck), // & oprMQL),
+    .hold(mq_hold),
+    .oe1(oprMQA),
+    .oe2(1'b1),
+    .out1(mqout1), 
+    .out2(mqout2)
+);
+
+
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ LINK █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+wire link;
+wire rotaterLI;
+
+LINK theLINK(
+  .SYSCLK(SYSCLK),
+  .CLEAR(sw_CLEAR),
+  .LINK_CK(link_ck),
+  .CLL(oprCLL),
+  .CML((oprCML ^ (incC & oprIAC)) | (andaddC & instTAD)),
+  .SET(oprLEFT|oprRIGHT),
+   .FROM_ROTATER(rotaterLO),
+  .L(link),
+  .TO_ROTATER(rotaterLI)
+);
+
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ADD/AND █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -189,19 +247,38 @@ ADDAND theADDAND(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ACCUMULATOR █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
+// CLA      7200  clear AC                                      1
+// CLL      7100  clear link                            1
+
+// CMA      7040  complement AC                                   2
+// CML      7020  complement link                                 2
+
+// IAC      7001  increment AC                                      3
+
+// RAR      7010  rotate AC and link right one          4
+// RAL      7004  rotate AC and link left one           4
+// RTR      7012  rotate AC and link right two          4
+// RTL      7006  rotate AC and link left two           4
+// BSW      7002  swap bytes in AC                      4
+
 wire [11:0] accIn;
 wire [11:0] accout1;
 MULTILATCH theACC(
     .in(accIn),
     .clear(sw_CLEAR),
     .latch(ac_ck),
+    .hold(1'b0),
     .oe1(1'b1),
     .oe2(ac2ramd),
     .out1(accout1), 
     .out2(busData)
 );
 
-assign busORacc=0;
+assign busORacc=
+  (oprOSR ? 12'o7777 : 12'o0000) |
+  (oprMQA ? mqout1   : 12'o0000)
+
+;
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ACC CLORIN █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -210,9 +287,9 @@ assign busORacc=0;
 wire [11:0] clorinOut;
 CLORIN theCLORIN(
   .IN(accout1),
-  .CLR(8'b00000000),
+  .CLR({oprCLA, oprMQL, dcaCLA, 5'b00000}),
   .DOR(busORacc),
-  .INV(1'b0),
+  .INV(oprCMA),
   .OUT(clorinOut)
 );
 
@@ -239,7 +316,7 @@ wire rotaterLO;
 ROTATER theRotater(
   .OP({oprRIGHT,oprLEFT,oprX2}),
   .AI(incOut),
-  .LI(1'b0),
+  .LI(rotaterLI),
   .OE(rot2ac),
   .AO(accIn),
   .LO(rotaterLO)
@@ -251,10 +328,13 @@ reg ir2pc=0, ir2rama=0;
 reg pc_ld=0, pc_ck=0;
 reg ramd2ac_and=0,ramd2ac_add=0;
 reg ac2ramd=0;
-reg ram_oe=0;
 reg ac_ck=0;
 reg link_ck=0;
+reg mq_ck=0;
+reg mq_hold=0;
 reg rot2ac=0;
+
+
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ BUS INTERCONNECTS █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -263,79 +343,206 @@ reg rot2ac=0;
 //wire [11:0] irzp= { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]};
 assign busPCin=ir2pc ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // First OC12 module
 assign busRamA=ir2rama ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // Second OC12 module
+assign busRamA=ckFetch ? busLatPC : 12'bzzzzzzzzzzzz;
+assign busRamD=ram_we ? busData : 12'bzzzzzzzzzzzz;
 
 
 always @* begin
-  pc_ck<=stbFetch;
+  pc_ck=stbFetch;
+  ram_oe_2=ckFetch;
 end
 
 
 // AND 0xxx
 always @* begin
-  if (instAND ) begin
-    done<=ck1;
+  if (instAND && instIsDIR) begin
+    ir2rama=ck1;
+    ramd2ac_and=ck1;
+    ram_oe_1=ck1;
+    ac_ck=stb1;
+    done=ck2;
   end
 end
 
 // TAD 1xx
 always @* begin
   if (instTAD && instIsDIR) begin
-    ir2rama<=ck1;
-    ramd2ac_add<=ck1;
-    ram_oe<=ck1;
+    ir2rama=ck1;
+    ramd2ac_add=ck1;
+    ram_oe_1=ck1;
 
-    ac_ck<=stb1;
-    link_ck<=stb1;
+    ac_ck=stb1;
+    link_ck=stb1;
 
-    done<=ck2;
+    done=ck2;
   end
 end
 
 // ISZ 2xx
 always @* begin
   if (instISZ ) begin
-    done<=ck1;
+    done=ck1;
   end
 end
 
 // DCA 3xx
+reg dcaCLA=0;
 always @* begin
-  if (instDCA ) begin
-    done<=ck1;
+  if (instDCA && instIsDIR) begin
+    ir2rama=(ck1|ck1);
+    ac2ramd=ck1;
+    ram_we=stb1;
+
+    dcaCLA=ck2;
+//    ir2rama=ck2;
+    ram_oe_1=ck2;
+    rot2ac=ck2;
+    ac_ck=stb2;
+
+    done=ck3;
   end
 end
 
 // JMS 4xx
 always @* begin
   if (instJMS ) begin
-    done<=ck1;
+    done=ck1;
   end
 end
 
 // JMP 5xx DIRECT
 always @* begin
   if (instJMP && instIsDIR) begin
-    ir2pc<=ck1; 
-    pc_ld<=ck1;
-    pc_ck<=stb1;
-    done<=ck2;
+    ir2pc=ck1; 
+    pc_ld=ck1;
+    pc_ck=stb1;
+    done=ck2;
   end
 end
 
 // IOT 6xx
 always @* begin
   if (instIOT ) begin
-    done<=ck1;
+    done=ck1;
   end
 end
 
 // OPR 7xx
 always @* begin
-  if (instOPR ) begin
-    done<=ck1;
+  if (instOPR & opr1) begin
+    rot2ac=ck1;
+    ac_ck=stb1;
+    link_ck=stb1;
+    done=ck2;
   end
+  if (instOPR & opr2) begin
+    rot2ac=(ck1|ck2);
+    pc_ck=(stb1&doSkip);
+//    rot2ac=ck2;
+ //   mq_ck=ck2;
+    ac_ck=stb2;
+    done=ck3;
+  end
+
+
+//  1--CLA
+//  2--MQA, MQL
+//  3--ALL OTHERS
+
+//
+// NOP        7401    no operation                      ()
+// CLA        7601    clear AC                          (CLA)
+// MQL        7421    load MQ from AC then clear AC     (MQL)
+// MQA        7501    inclusive OR the MQ with the AC   (MQA)
+// CAM        7621    clear AC and MQ                   (CLA, MQL)
+// SWP        7521    swap AC and MQ                    (MQL,MQA,SWP)
+// ACL        7701    load MQ into AC                   (CLA,MQA)
+// CLA, SWP   7721    load AC from MQ then clear MQ     (CLA,MQL,MQA,SWP)
+//
+
+// Tests from INSTR#1
+// 4746 MQ test1  7601 CLAE
+// 4753 MQ test2  7401 NOPE
+// 4761 MQ test3  7421 MQL
+// 4766 MQ test4  7421 MQL 7501 MQA
+// 4776 MQ test5  7421 MQL 7501 MQA
+// 5005 MQ test6  7421 MQL 7501 MQA
+// 5015 MQ test7  7621 CAM 7421 MQL 7501 MQA
+// 5027 MQ test8  7701 ACL 7421 MQL 7501 MQA
+// 5040 MQ test9  7701 ACL 7421 MQL 7501 MQA
+// 5052 MQ test10 7701 ACL 7421 MQL 7501 MQA
+// 5070 MQ test11 7701 ACL 7421 MQL 7501 MQA
+// 5106 MQ test12 7621 CAM 7521 SWP 7701 ACL
+// 5117 MQ test13 7621 CAM 7521 SWP 7701 ACL
+// 5131 MQ test14
+// 5147 MQ test15
+// 5165 MQ test16
+// 5175 MQ test17
+// 5207 MQ test18
+
+
+
+  if (instOPR & opr3) begin
+    if (oprCLA | (oprMQA & !oprMQL)) begin
+      rot2ac=ck1;
+      ac_ck=stb1;
+      done=ck2;
+    end
+    if (!oprCLA & (!oprMQA & oprMQL)) begin
+      rot2ac=ck1|ck2;
+      mq_ck=stb1;
+      ac_ck=stb2;
+      done=ck3;
+    end
+    if (oprCLA & (!oprMQA & oprMQL)) begin
+      rot2ac=ck1|ck2;
+      mq_ck=stb2;
+      ac_ck=stb1;
+      done=ck3;
+    end
+    if (!oprCLA & (oprMQA & oprMQL)) begin
+      rot2ac=ck1|ck2;
+      mq_hold=stb1;
+      ac_ck=stb2;
+      mq_ck=stb2;
+      done=ck3;
+    end
+    if (oprCLA & (oprMQA & oprMQL)) begin
+      rot2ac=ck1|ck2;
+      //mq_hold=stb1;
+      ac_ck=stb2;
+      mq_clr=stb2;
+      done=ck3;
+    end
+//    rot2ac=(ck1|ck2);
+//    mq_ck=stb1 & oprMQL;
+//    ac_ck=stb2;
+//    done=ck3;
+  end
+
+//   if (instOPR & opr3 & (~oprSWP)) begin
+//     rot2ac=(ck1|ck2);
+//     if (!oprCLA) begin
+//       mq_ck=stb1;
+//       ac_ck=stb2;
+//     end else begin
+//       mq_ck=stb2;
+//       ac_ck=stb1;
+//     end
+// //    rot2ac=ck2;
+//     done=ck3;
+//   end
+
+//   if (instOPR & opr3 & (oprSWP)) begin
+//     rot2ac=(ck1|ck2);
+//     ac_ck=(stb1 & oprCLA);
+//     mq_ck=stb2;
+//     ac_ck=stb2;
+//     done=ck3;
+//   end
+
 end
 
-
-
 endmodule
+
+

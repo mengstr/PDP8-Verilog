@@ -13,8 +13,9 @@ module ADDAND (
 wire [12:0] sum;
 
 assign sum=A+B+{12'b0,CI};
-assign S=(OE_ADD==1) ? sum[11:0] : (OE_AND==1) ? A&B : 12'bzzzzzzzzzzzz;
-assign CO=(OE_ADD==0 ? 1'bz : sum[12]);
+assign S=OE_ADD ? sum[11:0] : OE_AND ? A&B : 12'bzzzzzzzzzzzz;
+//assign CO=(OE_ADD==0 ? 1'bz : sum[12]);
+assign CO=OE_ADD ? sum[12] : 1'b0;
 
 endmodule
 

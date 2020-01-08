@@ -1,28 +1,55 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Fri Dec 13 12:43:40 2019
+[*] Fri Dec 20 22:12:41 2019
 [*]
 [dumpfile] "/Users/mats/Documents/Projects/PDP8-X/verilog/CPU.vcd"
-[dumpfile_mtime] "Fri Dec 13 09:20:44 2019"
-[dumpfile_size] 15777274
+[dumpfile_mtime] "Fri Dec 20 22:08:25 2019"
+[dumpfile_size] 227639
 [savefile] "/Users/mats/Documents/Projects/PDP8-X/verilog/CPU.gtkw"
-[timestart] 0
-[size] 1531 600
+[timestart] 741740
+[size] 1666 902
 [pos] -1 -1
-*-12.848866 3050000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-12.745053 754900 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] CPU_tb.
 [treeopen] CPU_tb.dut.
 [sst_width] 193
-[signals_width] 227
+[signals_width] 311
 [sst_expanded] 1
-[sst_vpaned_height] 167
+[sst_vpaned_height] 274
 @28
 CPU_tb.dut.SYSCLK
 CPU_tb.dut.theSEQUENCER.CLK
-@22
+@c00022
 CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
 @28
-CPU_tb.dut.theSEQUENCER.CLEAR
+(0)CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
+(1)CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
+(2)CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
+(3)CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
+(4)CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
+@1401200
+-group_end
+@28
+[color] 3
+CPU_tb.dut.theSEQUENCER.CK_FETCH
+@30
+[color] 7
+CPU_tb.dut.thePC.PCLAT[11:0]
+[color] 6
+CPU_tb.dut.busIR[11:0]
+@200
+-
+@30
++{ACC} CPU_tb.dut.theACC.data[11:0]
+@28
+CPU_tb.dut.ac_ck
+[color] 2
+CPU_tb.dut.theLINK.L
+CPU_tb.dut.link_ck
+@30
++{MQ} CPU_tb.dut.theMQ.data[11:0]
+@28
+CPU_tb.dut.mq_ck
 @c00200
 -RUNHALT
 @28
@@ -33,6 +60,17 @@ CPU_tb.dut.sw_HALT
 CPU_tb.dut.theSEQUENCER.wfHALT
 @1401200
 -RUNHALT
+@c00200
+-STEP
+@28
+CPU_tb.dut.theSEQUENCER.STEPM
+CPU_tb.dut.theSEQUENCER.wfSTEPM
+CPU_tb.dut.theSEQUENCER.run1m
+CPU_tb.dut.theSEQUENCER.STEPI
+CPU_tb.dut.theSEQUENCER.wfSTEPI
+CPU_tb.dut.theSEQUENCER.run1i
+@1401200
+-STEP
 @c00200
 -CK_
 @28
@@ -48,28 +86,33 @@ CPU_tb.dut.theSEQUENCER.CK_5
 CPU_tb.dut.theSEQUENCER.CK_6
 @1401200
 -CK_
-@c00200
--STEP
+@800200
+-Instructions
 @28
-CPU_tb.dut.theSEQUENCER.STEPM
-CPU_tb.dut.theSEQUENCER.wfSTEPM
-CPU_tb.dut.theSEQUENCER.run1m
-CPU_tb.dut.theSEQUENCER.STEPI
-CPU_tb.dut.theSEQUENCER.wfSTEPI
-CPU_tb.dut.theSEQUENCER.run1i
-@1401200
--STEP
+CPU_tb.dut.theIRDECODER.AAND
+@30
+CPU_tb.dut.theIRDECODER.TAD
+@28
+CPU_tb.dut.theIRDECODER.ISZ
+CPU_tb.dut.theIRDECODER.DCA
+CPU_tb.dut.theIRDECODER.JMS
+CPU_tb.dut.theIRDECODER.JMP
+CPU_tb.dut.theIRDECODER.IOT
+CPU_tb.dut.theIRDECODER.OPR
+CPU_tb.dut.theIRDECODER.MP
+CPU_tb.dut.theIRDECODER.DIR
+CPU_tb.dut.theIRDECODER.IND
+CPU_tb.dut.theIRDECODER.PPIND
+@1000200
+-Instructions
 @c00200
 -OPR
 @28
-CPU_tb.dut.theOPRDECODER.OPR
 CPU_tb.dut.theOPRDECODER.opr1
 CPU_tb.dut.theOPRDECODER.opr2
 CPU_tb.dut.theOPRDECODER.opr3
+CPU_tb.dut.theOPRDECODER.oprCLA
 CPU_tb.dut.theOPRDECODER.oprASL
-CPU_tb.dut.theOPRDECODER.oprCLA1
-CPU_tb.dut.theOPRDECODER.oprCLA2
-CPU_tb.dut.theOPRDECODER.oprCLA_3
 CPU_tb.dut.theOPRDECODER.oprCLL
 CPU_tb.dut.theOPRDECODER.oprCMA
 CPU_tb.dut.theOPRDECODER.oprCML
@@ -83,7 +126,6 @@ CPU_tb.dut.theOPRDECODER.oprMQL
 CPU_tb.dut.theOPRDECODER.oprMUY
 CPU_tb.dut.theOPRDECODER.oprNMI
 CPU_tb.dut.theOPRDECODER.oprNOP
-CPU_tb.dut.theOPRDECODER.oprNOP0
 CPU_tb.dut.theOPRDECODER.oprOSR
 CPU_tb.dut.theOPRDECODER.oprRIGHT
 CPU_tb.dut.theOPRDECODER.oprSCA
@@ -95,21 +137,85 @@ CPU_tb.dut.theOPRDECODER.oprSWP
 CPU_tb.dut.theOPRDECODER.oprSZASNA
 CPU_tb.dut.theOPRDECODER.oprTSTINV
 CPU_tb.dut.theOPRDECODER.oprX2
-CPU_tb.dut.theOPRDECODER.NOP
 @1401200
 -OPR
 @c00200
--Instructions
+-theACC
+@22
+CPU_tb.dut.theACC.data[11:0]
+CPU_tb.dut.theACC.in[11:0]
 @28
-CPU_tb.dut.theIRDECODER.AAND
-CPU_tb.dut.theIRDECODER.TAD
-CPU_tb.dut.theIRDECODER.ISZ
-CPU_tb.dut.theIRDECODER.DCA
-CPU_tb.dut.theIRDECODER.JMS
-CPU_tb.dut.theIRDECODER.JMP
-CPU_tb.dut.theIRDECODER.IOT
-CPU_tb.dut.theIRDECODER.OPR
+CPU_tb.dut.theACC.latch
+CPU_tb.dut.theACC.oe1
+CPU_tb.dut.theACC.oe2
+@22
+CPU_tb.dut.theACC.out1[11:0]
+CPU_tb.dut.theACC.out2[11:0]
 @1401200
--Instructions
+-theACC
+@c00200
+-theADDAND
+@30
+CPU_tb.dut.theADDAND.A[11:0]
+CPU_tb.dut.theADDAND.B[11:0]
+@28
+CPU_tb.dut.theADDAND.CI
+CPU_tb.dut.theADDAND.CO
+CPU_tb.dut.theADDAND.OE_ADD
+CPU_tb.dut.theADDAND.OE_AND
+@30
+CPU_tb.dut.theADDAND.S[11:0]
+CPU_tb.dut.theADDAND.sum[12:0]
+@1401200
+-theADDAND
+@c00200
+-theLINK
+@28
+CPU_tb.dut.theLINK.CLL
+CPU_tb.dut.theLINK.CML
+CPU_tb.dut.theLINK.SET
+CPU_tb.dut.theLINK.FROM_ROTATER
+CPU_tb.dut.theLINK.TO_ROTATER
+CPU_tb.dut.theLINK.L
+@1401200
+-theLINK
+@c00200
+-theCLORIN
+@30
+CPU_tb.dut.theCLORIN.IN[11:0]
+CPU_tb.dut.theCLORIN.OUT[11:0]
+CPU_tb.dut.theCLORIN.CLR[7:0]
+CPU_tb.dut.theCLORIN.DOR[11:0]
+@28
+CPU_tb.dut.theCLORIN.INV
+@1401200
+-theCLORIN
+@c00200
+-theROTATER
+@28
+CPU_tb.dut.theRotater.OP[2:0]
+@30
+CPU_tb.dut.theRotater.AI[11:0]
+CPU_tb.dut.theRotater.AO[11:0]
+@28
+CPU_tb.dut.theRotater.LI
+CPU_tb.dut.theRotater.LO
+CPU_tb.dut.theRotater.OE
+@1401200
+-theROTATER
+@800200
+-busses
+@30
+CPU_tb.dut.busData[11:0]
+CPU_tb.dut.busIR[11:0]
+CPU_tb.dut.busLatPC[11:0]
+CPU_tb.dut.busORacc[11:0]
+CPU_tb.dut.busPC[11:0]
+CPU_tb.dut.busPCin[11:0]
+CPU_tb.dut.busRamA[11:0]
+CPU_tb.dut.busRamD[11:0]
+CPU_tb.dut.pBusPC[11:0]
+@1000200
+-busses
 [pattern_trace] 1
 [pattern_trace] 0

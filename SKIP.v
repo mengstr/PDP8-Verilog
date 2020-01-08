@@ -7,25 +7,23 @@ module SKIP (
   input SMASPA,
   input SNLSZL,
   input TSTINV,
-  input SK1,
-  input SK2,
-  input SK3,
-  output reg OUT
+  output OUT
 );
 
-  always @* begin
-    if (
-      (TSTINV==0 && (AC==0 && SZASNA) || (AC[11]==1 && SMASPA) || (LINK && SNLSZL) )
-      ||
-      (TSTINV==1 && (AC!=0 && SZASNA) || (AC[11]!=1 && SMASPA) || (!LINK && SNLSZL) )
-      ||
-      (SK1 || SK2 || SK3) 
-    ) begin
-        OUT=1;
-      end else begin
-        OUT=0;
-      end
-  end
+
+  assign OUT = ((((1'b1 ^ (AC!=0 | AC[11])) & SZASNA) | (AC[11] & SMASPA) | (LINK & SNLSZL)) ^ TSTINV);
+
+  // always @* begin
+  //   if (
+  //     (TSTINV==0 && (AC==0 && SZASNA) || (AC[11]==1 && SMASPA) || (LINK && SNLSZL) )
+  //     ||
+  //     (TSTINV==1 && (AC!=0 && SZASNA) || (AC[11]!=1 && SMASPA) || (!LINK && SNLSZL) )
+  //   ) begin
+  //       OUT=1;
+  //     end else begin
+  //       OUT=0;
+  //     end
+  // end
 
 endmodule
 
