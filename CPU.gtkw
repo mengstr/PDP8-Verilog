@@ -1,55 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Fri Dec 20 22:12:41 2019
+[*] Wed Jan 15 22:27:16 2020
 [*]
 [dumpfile] "/Users/mats/Documents/Projects/PDP8-X/verilog/CPU.vcd"
-[dumpfile_mtime] "Fri Dec 20 22:08:25 2019"
-[dumpfile_size] 227639
+[dumpfile_mtime] "Wed Jan 15 22:18:24 2020"
+[dumpfile_size] 4578390
 [savefile] "/Users/mats/Documents/Projects/PDP8-X/verilog/CPU.gtkw"
-[timestart] 741740
+[timestart] 9756590
 [size] 1666 902
 [pos] -1 -1
-*-12.745053 754900 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-12.686283 9782100 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] CPU_tb.
 [treeopen] CPU_tb.dut.
 [sst_width] 193
 [signals_width] 311
 [sst_expanded] 1
-[sst_vpaned_height] 274
-@28
-CPU_tb.dut.SYSCLK
-CPU_tb.dut.theSEQUENCER.CLK
-@c00022
-CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
-@28
-(0)CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
-(1)CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
-(2)CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
-(3)CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
-(4)CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
-@1401200
--group_end
-@28
-[color] 3
-CPU_tb.dut.theSEQUENCER.CK_FETCH
-@30
-[color] 7
-CPU_tb.dut.thePC.PCLAT[11:0]
-[color] 6
-CPU_tb.dut.busIR[11:0]
-@200
--
-@30
-+{ACC} CPU_tb.dut.theACC.data[11:0]
-@28
-CPU_tb.dut.ac_ck
-[color] 2
-CPU_tb.dut.theLINK.L
-CPU_tb.dut.link_ck
-@30
-+{MQ} CPU_tb.dut.theMQ.data[11:0]
-@28
-CPU_tb.dut.mq_ck
+[sst_vpaned_height] 449
 @c00200
 -RUNHALT
 @28
@@ -71,22 +37,55 @@ CPU_tb.dut.theSEQUENCER.wfSTEPI
 CPU_tb.dut.theSEQUENCER.run1i
 @1401200
 -STEP
+@28
+CPU_tb.dut.SYSCLK
+CPU_tb.dut.theSEQUENCER.CLK
+@800022
+CPU_tb.dut.theSEQUENCER.stepCnt[4:0]
+@1001200
+-group_end
+@28
+[color] 3
+CPU_tb.dut.theSEQUENCER.CK_FETCH
+@30
+[color] 7
+CPU_tb.dut.thePC.PCLAT[11:0]
+[color] 6
+CPU_tb.dut.busIR[11:0]
+@200
+-
+@29
+[color] 2
+CPU_tb.dut.theLINK.L
+@30
++{ACC} CPU_tb.dut.theACC.data[11:0]
++{MQ} CPU_tb.dut.theMQ.data[11:0]
 @c00200
 -CK_
 @28
 CPU_tb.dut.theSEQUENCER.CK_FETCH
+CPU_tb.dut.theSEQUENCER.STB_FETCH
 CPU_tb.dut.theSEQUENCER.CK_AUTOINC1
+CPU_tb.dut.theSEQUENCER.STB_AUTOINC1
 CPU_tb.dut.theSEQUENCER.CK_AUTOINC2
+CPU_tb.dut.theSEQUENCER.STB_AUTOINC2
 CPU_tb.dut.theSEQUENCER.CK_INDIRECT
+CPU_tb.dut.theSEQUENCER.STB_INDIRECT
 CPU_tb.dut.theSEQUENCER.CK_1
+CPU_tb.dut.theSEQUENCER.STB_1
 CPU_tb.dut.theSEQUENCER.CK_2
+CPU_tb.dut.theSEQUENCER.STB_2
 CPU_tb.dut.theSEQUENCER.CK_3
+CPU_tb.dut.theSEQUENCER.STB_3
 CPU_tb.dut.theSEQUENCER.CK_4
+CPU_tb.dut.theSEQUENCER.STB_4
 CPU_tb.dut.theSEQUENCER.CK_5
+CPU_tb.dut.theSEQUENCER.STB_5
 CPU_tb.dut.theSEQUENCER.CK_6
+CPU_tb.dut.theSEQUENCER.STB_6
 @1401200
 -CK_
-@800200
+@c00200
 -Instructions
 @28
 CPU_tb.dut.theIRDECODER.AAND
@@ -103,7 +102,7 @@ CPU_tb.dut.theIRDECODER.MP
 CPU_tb.dut.theIRDECODER.DIR
 CPU_tb.dut.theIRDECODER.IND
 CPU_tb.dut.theIRDECODER.PPIND
-@1000200
+@1401200
 -Instructions
 @c00200
 -OPR
@@ -139,19 +138,17 @@ CPU_tb.dut.theOPRDECODER.oprTSTINV
 CPU_tb.dut.theOPRDECODER.oprX2
 @1401200
 -OPR
-@c00200
+@800200
 -theACC
-@22
+@30
 CPU_tb.dut.theACC.data[11:0]
 CPU_tb.dut.theACC.in[11:0]
-@28
 CPU_tb.dut.theACC.latch
 CPU_tb.dut.theACC.oe1
 CPU_tb.dut.theACC.oe2
-@22
 CPU_tb.dut.theACC.out1[11:0]
 CPU_tb.dut.theACC.out2[11:0]
-@1401200
+@1000200
 -theACC
 @c00200
 -theADDAND
@@ -168,6 +165,20 @@ CPU_tb.dut.theADDAND.S[11:0]
 CPU_tb.dut.theADDAND.sum[12:0]
 @1401200
 -theADDAND
+@800200
+-theMQ
+@30
+CPU_tb.dut.theMQ.in[11:0]
+CPU_tb.dut.theMQ.hold
+CPU_tb.dut.theMQ.holdreg[11:0]
+CPU_tb.dut.theMQ.data[11:0]
+CPU_tb.dut.theMQ.latch
+CPU_tb.dut.theMQ.oe1
+CPU_tb.dut.theMQ.oe2
+CPU_tb.dut.theMQ.out1[11:0]
+CPU_tb.dut.theMQ.out2[11:0]
+@1000200
+-theMQ
 @c00200
 -theLINK
 @28
@@ -203,10 +214,32 @@ CPU_tb.dut.theRotater.LO
 CPU_tb.dut.theRotater.OE
 @1401200
 -theROTATER
-@800200
+@c00200
+-theIndReg
+@22
+CPU_tb.dut.theIndReg.in[11:0]
+@28
+CPU_tb.dut.theIndReg.clear
+CPU_tb.dut.theIndReg.hold
+@22
+CPU_tb.dut.theIndReg.holdreg[11:0]
+CPU_tb.dut.theIndReg.data[11:0]
+@28
+CPU_tb.dut.theIndReg.latch
+CPU_tb.dut.theIndReg.oe1
+CPU_tb.dut.theIndReg.oe2
+@22
+CPU_tb.dut.theIndReg.out1[11:0]
+CPU_tb.dut.theIndReg.out2[11:0]
+@1401200
+-theIndReg
+@c00200
 -busses
 @30
 CPU_tb.dut.busData[11:0]
+@22
+CPU_tb.dut.busReg[11:0]
+@30
 CPU_tb.dut.busIR[11:0]
 CPU_tb.dut.busLatPC[11:0]
 CPU_tb.dut.busORacc[11:0]
@@ -215,7 +248,28 @@ CPU_tb.dut.busPCin[11:0]
 CPU_tb.dut.busRamA[11:0]
 CPU_tb.dut.busRamD[11:0]
 CPU_tb.dut.pBusPC[11:0]
-@1000200
+@1401200
 -busses
+@800200
+-OP3
+@28
+CPU_tb.dut.O3a
+CPU_tb.dut.O3b
+CPU_tb.dut.O3c
+CPU_tb.dut.O3d
+CPU_tb.dut.O3e
+CPU_tb.dut.O3f
+CPU_tb.dut.O3g
+CPU_tb.dut.O3h
+CPU_tb.dut.O3i
+CPU_tb.dut.O3j
+CPU_tb.dut.O3k
+CPU_tb.dut.O3l
+CPU_tb.dut.O3m
+CPU_tb.dut.O3n
+CPU_tb.dut.O3o
+CPU_tb.dut.O3p
+@1000200
+-OP3
 [pattern_trace] 1
 [pattern_trace] 0

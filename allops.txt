@@ -3598,22 +3598,22 @@
 7015		
 7016		
 7017		
-7020	CML 	Complement L
+7020	CML	Complement L
 7021	CML IAC	Complement L, Increment AC
 7022	CML BSW	Complement L, Byte Swap AC
-7023	CML 	Complement L
+7023	CML	Complement L
 7024	CML RAL	Complement L, Rotate  AC & L left
-7025	CML 	Complement L
+7025	CML	Complement L
 7026	CML RTL	Complement L, Rotate  AC & L left twice
-7027	CML 	Complement L
+7027	CML	Complement L
 7030	CML RAR	Complement L, Rotate  AC & L right
-7031	CML 	Complement L
+7031	CML	Complement L
 7032	CML RTR	Complement L, Rotate AC & L right twice
-7033	CML 	Complement L
-7034	CML 	Complement L
-7035	CML 	Complement L
-7036	CML 	Complement L
-7037	CML 	Complement L
+7033	CML	Complement L
+7034	CML	Complement L
+7035	CML	Complement L
+7036	CML	Complement L
+7037	CML	Complement L
 7040	CMA	Complement AC
 7041	CIA	2's Complement AC
 7042		
@@ -3632,84 +3632,84 @@
 7057		
 7060	CML CMA	Complement L, Complement AC
 7061	CML CIA	Complement L, 2's Complement AC
-7062	CML 	Complement L
-7063	CML 	Complement L
-7064	CML 	Complement L
-7065	CML 	Complement L
-7066	CML 	Complement L
-7067	CML 	Complement L
-7070	CML 	Complement L
-7071	CML 	Complement L
-7072	CML 	Complement L
-7073	CML 	Complement L
-7074	CML 	Complement L
-7075	CML 	Complement L
-7076	CML 	Complement L
-7077	CML 	Complement L
-7100	CLL 	Clear L
+7062	CML	Complement L
+7063	CML	Complement L
+7064	CML	Complement L
+7065	CML	Complement L
+7066	CML	Complement L
+7067	CML	Complement L
+7070	CML	Complement L
+7071	CML	Complement L
+7072	CML	Complement L
+7073	CML	Complement L
+7074	CML	Complement L
+7075	CML	Complement L
+7076	CML	Complement L
+7077	CML	Complement L
+7100	CLL	Clear L
 7101	CLL IAC	Clear L, Increment AC
 7102	CLL BSW	Clear L, Byte Swap AC
-7103	CLL 	Clear L
+7103	CLL	Clear L
 7104	CLL RAL	Clear L, Rotate  AC & L left
-7105	CLL 	Clear L
+7105	CLL	Clear L
 7106	CLL RTL	Clear L, Rotate  AC & L left twice
-7107	CLL 	Clear L
+7107	CLL	Clear L
 7110	CLL RAR	Clear L, Rotate  AC & L right
-7111	CLL 	Clear L
+7111	CLL	Clear L
 7112	CLL RTR	Clear L, Rotate AC & L right twice
-7113	CLL 	Clear L
-7114	CLL 	Clear L
-7115	CLL 	Clear L
-7116	CLL 	Clear L
-7117	CLL 	Clear L
-7120	STL 	Set L
+7113	CLL	Clear L
+7114	CLL	Clear L
+7115	CLL	Clear L
+7116	CLL	Clear L
+7117	CLL	Clear L
+7120	STL	Set L
 7121	STL IAC	Set L, Increment AC
 7122	STL BSW	Set L, Byte Swap AC
-7123	STL 	Set L
+7123	STL	Set L
 7124	STL RAL	Set L, Rotate  AC & L left
-7125	STL 	Set L
+7125	STL	Set L
 7126	STL RTL	Set L, Rotate  AC & L left twice
-7127	STL 	Set L
+7127	STL	Set L
 7130	STL RAR	Set L, Rotate  AC & L right
-7131	STL 	Set L
+7131	STL	Set L
 7132	STL RTR	Set L, Rotate AC & L right twice
-7133	STL 	Set L
-7134	STL 	Set L
-7135	STL 	Set L
-7136	STL 	Set L
-7137	STL 	Set L
+7133	STL	Set L
+7134	STL	Set L
+7135	STL	Set L
+7136	STL	Set L
+7137	STL	Set L
 7140	CLL CMA	Clear L, Complement AC
 7141	CLL CIA	Clear L, 2's Complement AC
-7142	CLL 	Clear L
-7143	CLL 	Clear L
-7144	CLL 	Clear L
-7145	CLL 	Clear L
-7146	CLL 	Clear L
-7147	CLL 	Clear L
-7150	CLL 	Clear L
-7151	CLL 	Clear L
-7152	CLL 	Clear L
-7153	CLL 	Clear L
-7154	CLL 	Clear L
-7155	CLL 	Clear L
-7156	CLL 	Clear L
-7157	CLL 	Clear L
+7142	CLL	Clear L
+7143	CLL	Clear L
+7144	CLL	Clear L
+7145	CLL	Clear L
+7146	CLL	Clear L
+7147	CLL	Clear L
+7150	CLL	Clear L
+7151	CLL	Clear L
+7152	CLL	Clear L
+7153	CLL	Clear L
+7154	CLL	Clear L
+7155	CLL	Clear L
+7156	CLL	Clear L
+7157	CLL	Clear L
 7160	STL CMA	Set L, Complement AC
 7161	STL CIA	Set L, 2's Complement AC
-7162	STL 	Set L
-7163	STL 	Set L
-7164	STL 	Set L
-7165	STL 	Set L
-7166	STL 	Set L
-7167	STL 	Set L
-7170	STL 	Set L
-7171	STL 	Set L
-7172	STL 	Set L
-7173	STL 	Set L
-7174	STL 	Set L
-7175	STL 	Set L
-7176	STL 	Set L
-7177	STL 	Set L
+7162	STL	Set L
+7163	STL	Set L
+7164	STL	Set L
+7165	STL	Set L
+7166	STL	Set L
+7167	STL	Set L
+7170	STL	Set L
+7171	STL	Set L
+7172	STL	Set L
+7173	STL	Set L
+7174	STL	Set L
+7175	STL	Set L
+7176	STL	Set L
+7177	STL	Set L
 7200	CLA	Clear AC
 7201	CLA IAC	Set AC to 0001
 7202	CLA BSW	Clear AC
@@ -3738,10 +3738,10 @@
 7231	CML CLA IAC RAR	Complement L, Set AC to 0001, Rotate AC & L right
 7232	CML CLA RTR	Complement L, Move L into AC bit 1
 7233	CML CLA IAC RTR	Complement L, Set AC to 0001, Rotate AC & L right twice
-7234	CML 	Complement L
-7235	CML 	Complement L
-7236	CML 	Complement L
-7237	CML 	Complement L
+7234	CML	Complement L
+7235	CML	Complement L
+7236	CML	Complement L
+7237	CML	Complement L
 7240	STA	Set AC to 7777
 7241	CLA CMA IAC	Set AC to 0, set L
 7242	CLA CMA BSW	Set AC to 7777, Byte swap AC
@@ -3770,10 +3770,10 @@
 7271	CML CLA CMA IAC RAR	Complement L, Move L into AC bit 0
 7272	CML CLA CMA RTR	Complement L, Set AC to 7777, rotate AC & L right twice
 7273	CML CLA CMA IAC RTR	Complement L, Move L into AC bit 1
-7274	CML 	Complement L
-7275	CML 	Complement L
-7276	CML 	Complement L
-7277	CML 	Complement L
+7274	CML	Complement L
+7275	CML	Complement L
+7276	CML	Complement L
+7277	CML	Complement L
 7300	CLL CLA	Clear L, Clear AC
 7301	CLL CLA IAC	Clear L, Set AC to 0001
 7302	CLL CLA BSW	Clear L, Clear AC
@@ -3786,10 +3786,10 @@
 7311	CLL CLA IAC RAR	Clear L, Set AC to 0001, Rotate AC & L right
 7312	CLL CLA RTR	Clear L, Move L into AC bit 1
 7313	CLL CLA IAC RTR	Clear L, Set AC to 0001, Rotate AC & L right twice
-7314	CLL 	Clear L
-7315	CLL 	Clear L
-7316	CLL 	Clear L
-7317	CLL 	Clear L
+7314	CLL	Clear L
+7315	CLL	Clear L
+7316	CLL	Clear L
+7317	CLL	Clear L
 7320	STL CLA	Set L, Clear AC
 7321	STL CLA IAC	Set L, Set AC to 0001
 7322	STL CLA BSW	Set L, Clear AC
@@ -3802,10 +3802,10 @@
 7331	STL CLA IAC RAR	Set L, Set AC to 0001, Rotate AC & L right
 7332	STL CLA RTR	Set L, Move L into AC bit 1
 7333	STL CLA IAC RTR	Set L, Set AC to 0001, Rotate AC & L right twice
-7334	STL 	Set L
-7335	STL 	Set L
-7336	STL 	Set L
-7337	STL 	Set L
+7334	STL	Set L
+7335	STL	Set L
+7336	STL	Set L
+7337	STL	Set L
 7340	CLL STA	Clear L, Set AC to 7777
 7341	CLL CLA CMA IAC	Clear L, Set AC to 0, set L
 7342	CLL CLA CMA BSW	Clear L, Set AC to 7777, Byte swap AC
@@ -3818,10 +3818,10 @@
 7351	CLL CLA CMA IAC RAR	Clear L, Move L into AC bit 0
 7352	CLL CLA CMA RTR	Clear L, Set AC to 7777, rotate AC & L right twice
 7353	CLL CLA CMA IAC RTR	Clear L, Move L into AC bit 1
-7354	CLL 	Clear L
-7355	CLL 	Clear L
-7356	CLL 	Clear L
-7357	CLL 	Clear L
+7354	CLL	Clear L
+7355	CLL	Clear L
+7356	CLL	Clear L
+7357	CLL	Clear L
 7360	STL STA	Set L, Set AC to 7777
 7361	STL CLA CMA IAC	Set L, Set AC to 0, set L
 7362	STL CLA CMA BSW	Set L, Set AC to 7777, Byte swap AC
@@ -3834,263 +3834,263 @@
 7371	STL CLA CMA IAC RAR	Set L, Move L into AC bit 0
 7372	STL CLA CMA RTR	Set L, Set AC to 7777, rotate AC & L right twice
 7373	STL CLA CMA IAC RTR	Set L, Move L into AC bit 1
-7374	STL 	Set L
-7375	STL 	Set L
-7376	STL 	Set L
-7377	STL 	Set L
+7374	STL	Set L
+7375	STL	Set L
+7376	STL	Set L
+7377	STL	Set L
 7400	NOP	No Operation
 7401	NOP	Group 3 NOP
 7402	HLT	Halt
 7403	SCL	Step counter load (depends on mode)
-7404	OSR 	OR Switch Register with AC
+7404	OSR	OR Switch Register with AC
 7405	MUY	Multiply
 7406	OSR HLT	OR Switch Register with AC, Halt
 7407	DVI	Divide
-7410	SKP 	Skip unconditionally
+7410	SKP	Skip unconditionally
 7411	NMI	Normalize
 7412	SKP HLTNMI	Skip unconditionally, HaltNormalize
 7413	SHL	Shift left
-7414	SKP OSR 	Skip unconditionally, OR Switch Register with AC
+7414	SKP OSR	Skip unconditionally, OR Switch Register with AC
 7415	ASR	Arithmetic shift right
 7416	SKP OSR HLT	Skip unconditionally, OR Switch Register with AC, Halt
 7417	LSR	Logical shift right
-7420	SNL 	Skip on L <> 0
+7420	SNL	Skip on L <> 0
 7421	MQL	Load MQ from AC then clear AC
 7422	SNL HLT	Skip on L <> 0, Halt
 7423	MQL SCL	Load MQ from AC then clear AC, Step counter load
-7424	SNL OSR 	Skip on L <> 0, OR Switch Register with AC
+7424	SNL OSR	Skip on L <> 0, OR Switch Register with AC
 7425	MQL MUY	Load MQ from AC then clear AC, Multiply
 7426	SNL OSR HLT	Skip on L <> 0, OR Switch Register with AC, Halt
 7427	MQL DVI	Load MQ from AC then clear AC, Divide
-7430	SZL 	Skip on L = 0
+7430	SZL	Skip on L = 0
 7431	SWAB	Switch mode from A to B
 7432	SZL HLT	Skip on L = 0, Halt
 7433	MQL SHL	Shift left
-7434	SZL OSR 	Skip on L = 0, OR Switch Register with AC
+7434	SZL OSR	Skip on L = 0, OR Switch Register with AC
 7435	MQL ASR	Arithmetic shift right
 7436	SZL OSR HLT	Skip on L = 0, OR Switch Register with AC, Halt
 7437	MQL LSR	Logical shift right
-7440	SZA 	Skip on AC = 0
+7440	SZA	Skip on AC = 0
 7441	SCA	OR step counter with AC
 7442	SZA HLT	Skip on AC = 0, Halt
 7443	DAD	Double precision add (Mode B)
-7444	SZA OSR 	Skip on AC = 0, OR Switch Register with AC
+7444	SZA OSR	Skip on AC = 0, OR Switch Register with AC
 7445	DST	Double precision store (Mode B)
 7446	SZA OSR HLT	Skip on AC = 0, OR Switch Register with AC, Halt
 7447	SWBA	Switch mode from B to A
-7450	SNA 	Skip on AC <> 0
+7450	SNA	Skip on AC <> 0
 7451	DPSZ	Double precision skip if zero (Mode B)
 7452	SNA HLT	Skip on AC <> 0, Halt
 7453	UNKNOWN!	**Unknown**
-7454	SNA OSR 	Skip on AC <> 0, OR Switch Register with AC
+7454	SNA OSR	Skip on AC <> 0, OR Switch Register with AC
 7455	UNKNOWN!	**Unknown**
 7456	SNA OSR HLT	Skip on AC <> 0, OR Switch Register with AC, Halt
 7457	SAM	Subtract AC from MQ
-7460	SZA SNL 	Skip on AC = 0 or L <> 0
+7460	SZA SNL	Skip on AC = 0 or L <> 0
 7461	UNKNOWN!	**Unknown**
 7462	SZA SNL HLT	Skip on AC = 0 or L <> 0, Halt
 7463	UNKNOWN!	**Unknown**
-7464	SZA SNL OSR 	Skip on AC = 0 or L <> 0, OR Switch Register with AC
+7464	SZA SNL OSR	Skip on AC = 0 or L <> 0, OR Switch Register with AC
 7465	UNKNOWN!	**Unknown**
 7466	SZA SNL OSR HLT	Skip on AC = 0 or L <> 0, OR Switch Register with AC, Halt
 7467	UNKNOWN!	**Unknown**
-7470	SNA SZL 	Skip on AC <> 0 and L = 0
+7470	SNA SZL	Skip on AC <> 0 and L = 0
 7471	UNKNOWN!	ILLEGAL!
 7472	SNA SZL HLT	Skip on AC <> 0 and L = 0, Halt
 7473	UNKNOWN!	**Unknown**
-7474	SNA SZL OSR 	Skip on AC <> 0 and L = 0, OR Switch Register with AC
+7474	SNA SZL OSR	Skip on AC <> 0 and L = 0, OR Switch Register with AC
 7475	UNKNOWN!	**Unknown**
 7476	SNA SZL OSR HLT	Skip on AC <> 0 and L = 0, OR Switch Register with AC, Halt
 7477	UNKNOWN!	**Unknown**
-7500	SMA  	Skip on AC < 0
+7500	SMA 	Skip on AC < 0
 7501	MQA	OR MQ with AC
 7502	SMA  HLT	Skip on AC < 0, Halt
 7503	MQA SCL	OR MQ with AC, Step counter load
-7504	SMA  OSR 	Skip on AC < 0, OR Switch Register with AC
+7504	SMA  OSR	Skip on AC < 0, OR Switch Register with AC
 7505	MQA MUY	OR MQ with AC, Multiply
 7506	SMA  OSR HLT	Skip on AC < 0, OR Switch Register with AC, Halt
 7507	MQA DVI	OR MQ with AC, Divide
-7510	SPA 	Skip on AC >= 0
+7510	SPA	Skip on AC >= 0
 7511	UNKNOWN!	ILLEGAL!
 7512	SPA HLT	Skip on AC >= 0, Halt
 7513	MQA SHL	OR MQ with AC, Shift left
-7514	SPA OSR 	Skip on AC >= 0, OR Switch Register with AC
+7514	SPA OSR	Skip on AC >= 0, OR Switch Register with AC
 7515	MQA ASR	OR MQ with AC, Arithmetic shift right
 7516	SPA OSR HLT	Skip on AC >= 0, OR Switch Register with AC, Halt
 7517	MQA LSR	OR MQ with AC, Logical shift right
-7520	SMA SNL 	Skip on AC < 0 or L <> 0
+7520	SMA SNL	Skip on AC < 0 or L <> 0
 7521	SWP	Swap MQ and AC
 7522	SMA SNL HLT	Skip on AC < 0 or L <> 0, Halt
 7523	SWP SCL	Swap AC and MQ, Step counter load
-7524	SMA SNL OSR 	Skip on AC < 0 or L <> 0, OR Switch Register with AC
+7524	SMA SNL OSR	Skip on AC < 0 or L <> 0, OR Switch Register with AC
 7525	SWP MUY	Swap AC and MQ, Multiply
 7526	SMA SNL OSR HLT	Skip on AC < 0 or L <> 0, OR Switch Register with AC, Halt
 7527	SWP DVI	Swap AC and MQ, Divide
-7530	SPA SZL 	Skip on AC >= 0 and L = 0
+7530	SPA SZL	Skip on AC >= 0 and L = 0
 7531	UNKNOWN!	ILLEGAL!
 7532	SPA SZL HLT	Skip on AC >= 0 and L = 0, Halt
 7533	SWP SHL	Swap AC and MQ, Shift left
-7534	SPA SZL OSR 	Skip on AC >= 0 and L = 0, OR Switch Register with AC
+7534	SPA SZL OSR	Skip on AC >= 0 and L = 0, OR Switch Register with AC
 7535	SWP ASR	Swap AC and MQ, Arithmetic shift right
 7536	SPA SZL OSR HLT	Skip on AC >= 0 and L = 0, OR Switch Register with AC, Halt
 7537	SWP LSR	Swap AC and MQ, Logical shift right
-7540	SMA SZA 	Skip on AC <= 0
+7540	SMA SZA	Skip on AC <= 0
 7541	UNKNOWN!	**Unknown**
 7542	SMA SZA HLT	Skip on AC <= 0, Halt
 7543	UNKNOWN!	**Unknown**
-7544	SMA SZA OSR 	Skip on AC <= 0, OR Switch Register with AC
+7544	SMA SZA OSR	Skip on AC <= 0, OR Switch Register with AC
 7545	UNKNOWN!	**Unknown**
 7546	SMA SZA OSR HLT	Skip on AC <= 0, OR Switch Register with AC, Halt
 7547	UNKNOWN!	**Unknown**
-7550	SPA SNA 	Skip on AC > 0
+7550	SPA SNA	Skip on AC > 0
 7551	UNKNOWN!	ILLEGAL!
 7552	SPA SNA HLT	Skip on AC > 0, Halt
 7553	UNKNOWN!	**Unknown**
-7554	SPA SNA OSR 	Skip on AC > 0, OR Switch Register with AC
+7554	SPA SNA OSR	Skip on AC > 0, OR Switch Register with AC
 7555	UNKNOWN!	**Unknown**
 7556	SPA SNA OSR HLT	Skip on AC > 0, OR Switch Register with AC, Halt
 7557	UNKNOWN!	**Unknown**
-7560	SMA SZA SNL 	Skip on AC <= 0 or L <> 0
+7560	SMA SZA SNL	Skip on AC <= 0 or L <> 0
 7561	UNKNOWN!	**Unknown**
 7562	SMA SZA SNL HLT	Skip on AC <= 0 or L <> 0, Halt
 7563	UNKNOWN!	**Unknown**
-7564	SMA SZA SNL OSR 	Skip on AC <= 0 or L <> 0, OR Switch Register with AC
+7564	SMA SZA SNL OSR	Skip on AC <= 0 or L <> 0, OR Switch Register with AC
 7565	UNKNOWN!	**Unknown**
 7566	SMA SZA SNL OSR HLT	Skip on AC <= 0 or L <> 0, OR Switch Register with AC, Halt
 7567	UNKNOWN!	**Unknown**
-7570	SPA SNA SZL 	Skip on AC > 0 and L=0
+7570	SPA SNA SZL	Skip on AC > 0 and L=0
 7571	UNKNOWN!	ILLEGAL!
 7572	SPA SNA SZL HLT	Skip on AC > 0 and L=0, Halt
 7573	DPIC	Double precision increment (Mode B)
-7574	SPA SNA SZL OSR 	Skip on AC > 0 and L=0, OR Switch Register with AC
+7574	SPA SNA SZL OSR	Skip on AC > 0 and L=0, OR Switch Register with AC
 7575	DCM	Double precision complement (Mode B)
 7576	SPA SNA SZL OSR HLT	Skip on AC > 0 and L=0, OR Switch Register with AC, Halt
 7577	UNKNOWN!	**Unknown**
-7600	CLA 	Clear AC
+7600	CLA	Clear AC
 7601	CLA	Clear AC
 7602	CLA HLT	Clear AC, Halt
 7603	CLA SCL	Clear AC, Step counter load
-7604	LAS 	Load AC from the Switch Register
+7604	LAS	Load AC from the Switch Register
 7605	CLA MUY	Clear AC, Multiply
 7606	LAS HLT	Load AC from the Switch Register, Halt
 7607	CLA DVI	Clear AC, Divide
-7610	SKP CLA 	Skip unconditionally, Clear AC
+7610	SKP CLA	Skip unconditionally, Clear AC
 7611	UNKNOWN!	ILLEGAL!
 7612	SKP CLA HLT	Skip unconditionally, Clear AC, Halt
 7613	CLA SHL	Clear AC, Shift left
-7614	SKP LAS 	Skip unconditionally, Load AC from the Switch Register
+7614	SKP LAS	Skip unconditionally, Load AC from the Switch Register
 7615	CLA ASR	Clear AC, Arithmetic shift right
 7616	SKP LAS HLT	Skip unconditionally, Load AC from the Switch Register, Halt
 7617	CLA LSR	Clear AC, Logical shift right
-7620	SNL CLA 	Skip on L <> 0, Clear AC
+7620	SNL CLA	Skip on L <> 0, Clear AC
 7621	CAM	Clear AC and MQ
 7622	SNL CLA HLT	Skip on L <> 0, Clear AC, Halt
 7623	 CAM SCL	Clear AC and MQ, Step counter load
-7624	SNL LAS 	Skip on L <> 0, Load AC from the Switch Register
+7624	SNL LAS	Skip on L <> 0, Load AC from the Switch Register
 7625	 CAM MUY	Clear AC and MQ, Multiply
 7626	SNL LAS HLT	Skip on L <> 0, Load AC from the Switch Register, Halt
 7627	 CAM DVI	Clear AC and MQ, Divide
-7630	SZL CLA 	Skip on L = 0, Clear AC
+7630	SZL CLA	Skip on L = 0, Clear AC
 7631	UNKNOWN!	ILLEGAL!
 7632	SZL CLA HLT	Skip on L = 0, Clear AC, Halt
 7633	 CAM SHL	Clear AC and MQ, Shift left
-7634	SZL LAS 	Skip on L = 0, Load AC from the Switch Register
+7634	SZL LAS	Skip on L = 0, Load AC from the Switch Register
 7635	 CAM ASR	Clear AC and MQ, Arithmetic shift right
 7636	SZL LAS HLT	Skip on L = 0, Load AC from the Switch Register, Halt
 7637	 CAM LSR	Clear AC and MQ, Logical shift right
-7640	SZA CLA 	Skip on AC = 0, Clear AC
+7640	SZA CLA	Skip on AC = 0, Clear AC
 7641	CLA SCA	Step counter to AC
 7642	SZA CLA HLT	Skip on AC = 0, Clear AC, Halt
 7643	CLA DAD	Clear AC, Double precision add (Mode B)
-7644	SZA LAS 	Skip on AC = 0, Load AC from the Switch Register
+7644	SZA LAS	Skip on AC = 0, Load AC from the Switch Register
 7645	CLA DST	Clear AC, Double precision store (Mode B)
 7646	SZA LAS HLT	Skip on AC = 0, Load AC from the Switch Register, Halt
 7647	CLA SWBA	Clear AC, Switch mode from B to A
-7650	SNA CLA 	Skip on AC <> 0, Clear AC
+7650	SNA CLA	Skip on AC <> 0, Clear AC
 7651	UNKNOWN!	ILLEGAL!
 7652	SNA CLA HLT	Skip on AC <> 0, Clear AC, Halt
 7653	UNKNOWN!	**Unknown**
-7654	SNA LAS 	Skip on AC <> 0, Load AC from the Switch Register
+7654	SNA LAS	Skip on AC <> 0, Load AC from the Switch Register
 7655	UNKNOWN!	**Unknown**
 7656	SNA LAS HLT	Skip on AC <> 0, Load AC from the Switch Register, Halt
 7657	CLA SAM	Clear AC, Subtract AC from MQ
-7660	SZA SNL CLA 	Skip on AC = 0 or L <> 0, Clear AC
+7660	SZA SNL CLA	Skip on AC = 0 or L <> 0, Clear AC
 7661	UNKNOWN!	**Unknown**
 7662	SZA SNL CLA HLT	Skip on AC = 0 or L <> 0, Clear AC, Halt
 7663	UNKNOWN!	**Unknown**
-7664	SZA SNL LAS 	Skip on AC = 0 or L <> 0, Load AC from the Switch Register
+7664	SZA SNL LAS	Skip on AC = 0 or L <> 0, Load AC from the Switch Register
 7665	UNKNOWN!	**Unknown**
 7666	SZA SNL LAS HLT	Skip on AC = 0 or L <> 0, Load AC from the Switch Register, Halt
 7667	UNKNOWN!	**Unknown**
-7670	SNA SZL CLA 	Skip on AC <> 0 and L = 0, Clear AC
+7670	SNA SZL CLA	Skip on AC <> 0 and L = 0, Clear AC
 7671	UNKNOWN!	ILLEGAL!
 7672	SNA SZL CLA HLT	Skip on AC <> 0 and L = 0, Clear AC, Halt
 7673	UNKNOWN!	**Unknown**
-7674	SNA SZL LAS 	Skip on AC <> 0 and L = 0, Load AC from the Switch Register
+7674	SNA SZL LAS	Skip on AC <> 0 and L = 0, Load AC from the Switch Register
 7675	UNKNOWN!	**Unknown**
 7676	SNA SZL LAS HLT	Skip on AC <> 0 and L = 0, Load AC from the Switch Register, Halt
 7677	UNKNOWN!	**Unknown**
-7700	SMA  CLA 	Skip on AC < 0, Clear AC
+7700	SMA  CLA	Skip on AC < 0, Clear AC
 7701	ACL	Load MQ into AC
 7702	SMA  CLA HLT	Skip on AC < 0, Clear AC, Halt
 7703	 ACL SCL	Load MQ into AC, Step counter load
-7704	SMA  LAS 	Skip on AC < 0, Load AC from the Switch Register
+7704	SMA  LAS	Skip on AC < 0, Load AC from the Switch Register
 7705	 ACL MUY	Load MQ into AC, Multiply
 7706	SMA  LAS HLT	Skip on AC < 0, Load AC from the Switch Register, Halt
 7707	 ACL DVI	Load MQ into AC, Divide
-7710	SPA CLA 	Skip on AC >= 0, Clear AC
+7710	SPA CLA	Skip on AC >= 0, Clear AC
 7711	UNKNOWN!	ILLEGAL!
 7712	SPA CLA HLT	Skip on AC >= 0, Clear AC, Halt
 7713	 ACL SHL	Load MQ into AC, Shift left
-7714	SPA LAS 	Skip on AC >= 0, Load AC from the Switch Register
+7714	SPA LAS	Skip on AC >= 0, Load AC from the Switch Register
 7715	 ACL ASR	Load MQ into AC, Arithmetic shift right
 7716	SPA LAS HLT	Skip on AC >= 0, Load AC from the Switch Register, Halt
 7717	 ACL LSR	Load MQ into AC, Logical shift right
-7720	SMA SNL CLA 	Skip on AC < 0 or L <> 0, Clear AC
+7720	SMA SNL CLA	Skip on AC < 0 or L <> 0, Clear AC
 7721	CLA SWP	Load AC from MQ then clear MQ
 7722	SMA SNL CLA HLT	Skip on AC < 0 or L <> 0, Clear AC, Halt
 7723	 CLA SWP SCL	Load AC from MQ then clear MQ, Step counter load
-7724	SMA SNL LAS 	Skip on AC < 0 or L <> 0, Load AC from the Switch Register
+7724	SMA SNL LAS	Skip on AC < 0 or L <> 0, Load AC from the Switch Register
 7725	 CLA SWP MUY	Load AC from MQ then clear MQ, Multiply
 7726	SMA SNL LAS HLT	Skip on AC < 0 or L <> 0, Load AC from the Switch Register, Halt
 7727	 CLA SWP DVI	Load AC from MQ then clear MQ, Divide
-7730	SPA SZL CLA 	Skip on AC >= 0 and L = 0, Clear AC
+7730	SPA SZL CLA	Skip on AC >= 0 and L = 0, Clear AC
 7731	UNKNOWN!	ILLEGAL!
 7732	SPA SZL CLA HLT	Skip on AC >= 0 and L = 0, Clear AC, Halt
 7733	 CLA SWP SHL	Load AC from MQ then clear MQ, Shift left
-7734	SPA SZL LAS 	Skip on AC >= 0 and L = 0, Load AC from the Switch Register
+7734	SPA SZL LAS	Skip on AC >= 0 and L = 0, Load AC from the Switch Register
 7735	 CLA SWP ASR	Load AC from MQ then clear MQ, Arithmetic shift right
 7736	SPA SZL LAS HLT	Skip on AC >= 0 and L = 0, Load AC from the Switch Register, Halt
 7737	 CLA SWP LSR	Load AC from MQ then clear MQ, Logical shift right
-7740	SMA SZA CLA 	Skip on AC <= 0, Clear AC
+7740	SMA SZA CLA	Skip on AC <= 0, Clear AC
 7741	UNKNOWN!	**Unknown**
 7742	SMA SZA CLA HLT	Skip on AC <= 0, Clear AC, Halt
 7743	UNKNOWN!	**Unknown**
-7744	SMA SZA LAS 	Skip on AC <= 0, Load AC from the Switch Register
+7744	SMA SZA LAS	Skip on AC <= 0, Load AC from the Switch Register
 7745	UNKNOWN!	**Unknown**
 7746	SMA SZA LAS HLT	Skip on AC <= 0, Load AC from the Switch Register, Halt
 7747	UNKNOWN!	**Unknown**
-7750	SPA SNA CLA 	Skip on AC > 0, Clear AC
+7750	SPA SNA CLA	Skip on AC > 0, Clear AC
 7751	UNKNOWN!	ILLEGAL!
 7752	SPA SNA CLA HLT	Skip on AC > 0, Clear AC, Halt
 7753	UNKNOWN!	**Unknown**
-7754	SPA SNA LAS 	Skip on AC > 0, Load AC from the Switch Register
+7754	SPA SNA LAS	Skip on AC > 0, Load AC from the Switch Register
 7755	UNKNOWN!	**Unknown**
 7756	SPA SNA LAS HLT	Skip on AC > 0, Load AC from the Switch Register, Halt
 7757	UNKNOWN!	**Unknown**
-7760	SMA SZA SNL CLA 	Skip on AC <= 0 or L <> 0, Clear AC
+7760	SMA SZA SNL CLA	Skip on AC <= 0 or L <> 0, Clear AC
 7761	UNKNOWN!	**Unknown**
 7762	SMA SZA SNL CLA HLT	Skip on AC <= 0 or L <> 0, Clear AC, Halt
 7763	DLD	Double precision load (Mode B)
-7764	SMA SZA SNL LAS 	Skip on AC <= 0 or L <> 0, Load AC from the Switch Register
+7764	SMA SZA SNL LAS	Skip on AC <= 0 or L <> 0, Load AC from the Switch Register
 7765	UNKNOWN!	**Unknown**
 7766	SMA SZA SNL LAS HLT	Skip on AC <= 0 or L <> 0, Load AC from the Switch Register, Halt
 7767	UNKNOWN!	**Unknown**
-7770	SPA SNA SZL CLA 	Skip on AC > 0 and L=0, Clear AC
+7770	SPA SNA SZL CLA	Skip on AC > 0 and L=0, Clear AC
 7771	UNKNOWN!	ILLEGAL!
 7772	SPA SNA SZL CLA HLT	Skip on AC > 0 and L=0, Clear AC, Halt
 7773	CLA DPIC	Clear AC, Double precision increment (Mode B)
-7774	SPA SNA SZL LAS 	Skip on AC > 0 and L=0, Load AC from the Switch Register
+7774	SPA SNA SZL LAS	Skip on AC > 0 and L=0, Load AC from the Switch Register
 7775	CLA DCM	Clear AC, Double precision complement (Mode B)
 7776	SPA SNA SZL LAS HLT	Skip on AC > 0 and L=0, Load AC from the Switch Register, Halt
 7777	UNKNOWN!	**Unknown**

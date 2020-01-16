@@ -18,7 +18,7 @@ module RAM(
 reg [11:0] mem [0:4095];
 reg [11:0] DO;
 
-initial $readmemh("RAM.initial.Inst1", mem);
+initial $readmemh("RAM.initial", mem);
  
 always @(posedge clk) begin
     if (we) mem[addr] <= dataI;

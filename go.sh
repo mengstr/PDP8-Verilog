@@ -9,11 +9,10 @@ DR="docker run --rm --log-driver=none  -a stdout -a stderr -w /root -v/Users/mat
 PCF=dummy.pcf
 PACKAGE=vq100
 
-if [ "$1" != "test" ]; then
 
     echo --LINTING
-    #$DR antonkrug/verilator-slim /bin/sh -c "verilator -Wall -DNOTOP --top-module top --lint-only top.v $FILES"
-    #if [ $? != 0 ]; then exit 1; fi
+    $DR antonkrug/verilator-slim /bin/sh -c "verilator -Wall -Wno-UNUSED -DNOTOP --top-module top --lint-only top.v $FILES"
+#    if [ $? != 0 ]; then exit 1; fi
     # $DR cranphin/iverilog iverilog -i -DNOTOP $FILE.v 
     # if [ $? != 0 ]; then exit 1; fi
     # if [ -f tb/${FILE}_tb.v ]; then 
@@ -21,6 +20,7 @@ if [ "$1" != "test" ]; then
     #     if [ $? != 0 ]; then exit 1; fi
     # fi
 
+if [ "$1" != "test" ]; then
 
     echo --YOSYSING
     echo cranphin/icestorm yosys -p "synth_ice40 -top top -json $FILE.json" $FILE.v $FILES
@@ -29,9 +29,9 @@ if [ "$1" != "test" ]; then
 
     echo --PLACEING
     echo cranphin/icestorm nextpnr-ice40 --ignore-loops --hx1k --package $PACKAGE --pcf $PCF --json $FILE.json --asc $FILE.asc
-    $DR cranphin/icestorm nextpnr-ice40 --ignore-loops --hx1k --package $PACKAGE --pcf $PCF --json $FILE.json --asc $FILE.asc > $FILE.nextpnr.tmp 
+    $DR cranphin/icestorm nextpnr-ice40 --ignore-loops --hx1k --package $PACKAGE --pcf $PCF --json $FILE.json --asc $FILE.asc > $FILE.nextpnr.tmp 2> $FILE.nextpnr.tmp2 
     if [ $? != 0 ]; then cat $FILE.nextpnr.tmp; exit 1; fi
-    cat $FILE.nextpnr.tmp | sed -ne '/^Info: Device utilisation:/,$ p' | sed '1d' | sed 's/        //g' | sed -n '/^[[:space:]]*$/q;p' | sed 's/Info: //g'
+    cat $FILE.nextpnr.tmp2 | sed -ne '/^Info: Device utilisation:/,$ p' | sed '1d' | sed 's/        //g' | sed -n '/^[[:space:]]*$/q;p' | sed 's/Info: //g'
 
     echo --TIMING
     echo cranphin/icestorm icetime -d hx1k -P $PACKAGE -p $PCF -m $FILE.asc

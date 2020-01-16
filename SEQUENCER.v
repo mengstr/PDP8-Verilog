@@ -8,9 +8,8 @@ module SEQUENCER (
     input HALT,             // Rising edge halts at next instruction
     input STEPM,            // Rising edge executes one microstep
     input STEPI,            // Rising edge executes one instruction
-    input NOAUTO,           // If set at step2 then skip the "autoIncrement"-handling microsteps
-    input NOIND,            // If set at step2 then skip the "indirect"-handling microsteps
-    output PH1,PH2,PH3,
+    input [1:0] SEQTYPE,           // ({instIsPPIND,instIsIND}),
+    output PH1,PH2,
     output CK_FETCH,
     output CK_AUTOINC1, CK_AUTOINC2,
     output CK_INDIRECT,
@@ -27,7 +26,7 @@ module SEQUENCER (
     reg wfRUN=0, wfHALT=0;      // FF's to capture short pulses from the RUN and HALT switches
     reg wfSTEPM=0, wfSTEPI=0;   // FF's to capture short pulses from the two STEP switches
     
-    always @(posedge CLK or posedge CLEAR) begin
+    always @(posedge CLK) begin // or posedge CLEAR) begin
         if (CLEAR) begin
             stepCnt<=0;
             run1i<=0;
@@ -42,39 +41,40 @@ module SEQUENCER (
             if (wfSTEPI==1) begin wfSTEPI<=0; run1i<=1; end
             if (running || run1m || run1i) begin
                 run1m<=0;
-                if (stepCnt==31) run1i<=0;
-                if (stepCnt==2) begin
-                    if (NOIND) stepCnt<=stepCnt+10;
-                    else if (NOAUTO) stepCnt<=stepCnt+7;
-                end else begin
-                    stepCnt<=stepCnt+1;
-                end
+                if (stepCnt==20) run1i<=0;
+                if (stepCnt==1) begin
+                    case (SEQTYPE)
+                        2'b00: stepCnt<=stepCnt+7;
+                        2'b01: stepCnt<=stepCnt+5;
+                        2'b10: stepCnt<=stepCnt+1; 
+                        2'b11: stepCnt<=stepCnt+1;
+                    endcase
+                end else stepCnt<=stepCnt+1;
             end
         end
     end
-
-    assign PH1=((stepCnt%3)==0);
-    assign PH2=((stepCnt%3)==1);
-    assign PH3=((stepCnt%3)==2);
+ 
+    assign PH1=(stepCnt%2==0);
+    assign PH2=!(stepCnt%2==1);
     assign STB_FETCH=(stepCnt==1);
-    assign STB_AUTOINC1=(stepCnt==1+3*1);
-    assign STB_AUTOINC2=(stepCnt==1+3*2);
-    assign STB_INDIRECT=(stepCnt==1+3*3);
-    assign STB_1=(stepCnt==1+3*4);
-    assign STB_2=(stepCnt==1+3*5);
-    assign STB_3=(stepCnt==1+3*6);
-    assign STB_4=(stepCnt==1+3*7);
-    assign STB_5=(stepCnt==1+3*8);
-    assign STB_6=(stepCnt==1+3*9);
-    assign CK_FETCH=(stepCnt==0 || stepCnt==1 || stepCnt==2);
-    assign CK_AUTOINC1=(stepCnt==3 ||stepCnt==4 || stepCnt==5);
-    assign CK_AUTOINC2=(stepCnt==6 || stepCnt==7 || stepCnt==8);
-    assign CK_INDIRECT=(stepCnt==9 || stepCnt==10 || stepCnt==11);
-    assign CK_1=(stepCnt==12 || stepCnt==13 || stepCnt==14);
-    assign CK_2=(stepCnt==15 || stepCnt==16 || stepCnt==17);
-    assign CK_3=(stepCnt==18 || stepCnt==19 || stepCnt==20);
-    assign CK_4=(stepCnt==21 || stepCnt==22 || stepCnt==23);
-    assign CK_5=(stepCnt==24 || stepCnt==25 || stepCnt==26);
-    assign CK_6=(stepCnt==27 || stepCnt==28 || stepCnt==29);
-
+    assign STB_AUTOINC1=(stepCnt==3);
+    assign STB_AUTOINC2=(stepCnt==5);
+    assign STB_INDIRECT=(stepCnt==7);
+    assign STB_1=(stepCnt==9);
+    assign STB_2=(stepCnt==11);
+    assign STB_3=(stepCnt==13);
+    assign STB_4=(stepCnt==15);
+    assign STB_5=(stepCnt==17);
+    assign STB_6=(stepCnt==19);
+    assign CK_FETCH=(stepCnt==0 || stepCnt==1 );
+    assign CK_AUTOINC1=(stepCnt==2 ||stepCnt==3);
+    assign CK_AUTOINC2=(stepCnt==4 || stepCnt==5);
+    assign CK_INDIRECT=(stepCnt==6 || stepCnt==7);
+    assign CK_1=(stepCnt==8 || stepCnt==9);
+    assign CK_2=(stepCnt==10 || stepCnt==11);
+    assign CK_3=(stepCnt==12 || stepCnt==13);
+    assign CK_4=(stepCnt==14 || stepCnt==15);
+    assign CK_5=(stepCnt==16 || stepCnt==17);
+    assign CK_6=(stepCnt==18 || stepCnt==19);
 endmodule
+

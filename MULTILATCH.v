@@ -5,17 +5,18 @@
 //
 
 module MULTILATCH (
+    input CLK, 
     input [11:0] in,
     input clear,hold,latch,
     input oe1,oe2,
     output [11:0] out1, out2
 );
 
-    reg [11:0] data;
-    reg [11:0] holdreg;
+    reg [11:0] data=0;
+    reg [11:0] holdreg=0;
 
-    assign out1=oe1?data:12'bz;
-    assign out2=oe2?data:12'bz;
+    assign out1=oe1 ? data : 12'bz;
+    assign out2=oe2 ? data : 12'bz;
 
     always @* begin
         if (clear) holdreg=0;

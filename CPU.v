@@ -56,7 +56,6 @@ reg [1:0] CLKdivider=0;
 reg CLK;
 always @(posedge SYSCLK) begin
   CLKdivider<=CLKdivider+1;
-//  CLK<=(CLKdivider==0);
   CLK<=CLKdivider[1];
 end
 
@@ -65,7 +64,7 @@ end
 //
 
 // Signals from the sequencer
-wire ph1,ph2,ph3;
+wire ph1,ph2;
 wire ckFetch;
 wire ckAutoinc1, ckAutoinc2; 
 wire ckIndirect;
@@ -75,12 +74,16 @@ wire stbAutoinc1, stbAutoinc2;
 wire stbIndirect;
 wire stb1, stb2, stb3, stb4, stb5, stb6;
 
+wire done_;
+wire doneAND1, doneAND2, doneTAD1, doneTAD2, doneISZ1, doneISZ2, doneDCA1, doneDCA2, doneJMP1, doneJMP2, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L;
+or(done_, doneAND1, doneAND2, doneTAD1, doneTAD2, doneISZ1, doneISZ2, doneDCA1, doneDCA2, doneJMP1, doneJMP2, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L);
+
 SEQUENCER theSEQUENCER(
     .SYSCLK(SYSCLK),
     .CLK(CLK),
-    .CLEAR(sw_CLEAR || done), .RUN(sw_RUN), .HALT(sw_HALT), .STEPM(sw_STEPM), .STEPI(sw_STEPI),
-    .NOAUTO(1'b1), .NOIND(1'b1),
-    .PH1(ph1), .PH2(ph2), .PH3(ph3),
+    .CLEAR(sw_CLEAR || done_), .RUN(sw_RUN), .HALT(sw_HALT), .STEPM(sw_STEPM), .STEPI(sw_STEPI),
+    .SEQTYPE({instIsPPIND,instIsIND}),
+    .PH1(ph1), .PH2(ph2),
     .CK_FETCH(ckFetch),
     .CK_AUTOINC1(ckAutoinc1), .CK_AUTOINC2(ckAutoinc2), 
     .CK_INDIRECT(ckIndirect),
@@ -96,11 +99,20 @@ SEQUENCER theSEQUENCER(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ PROGRAM COUNTER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
+wire pc_ld_;
+wire pc_ldJMP1, pc_ldJMP2;
+or(pc_ld_, pc_ldJMP1, pc_ldJMP2);
+
+wire pc_ck_;
+wire pc_ckFETCH, pc_ckISZ1, pc_ckISZ2, pc_ckJMP1, pc_ckJMP2, pc_ckOPR2;
+or(pc_ck_, pc_ckFETCH, pc_ckISZ1, pc_ckISZ2, pc_ckJMP1, pc_ckJMP2, pc_ckOPR2);
+
+
 PROGRAMCOUNTER thePC(
   .IN(busPCin),
   .CLR(sw_CLEAR),
-  .LD(pc_ld),
-  .CLK(pc_ck),
+  .LD(pc_ld_),
+  .CLK(pc_ck_),
   .LATCH1(ckFetch & ph1),
   .LATCH2(1'b0),
   .PC(busPC),
@@ -111,15 +123,18 @@ PROGRAMCOUNTER thePC(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ RAM MEMORY █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-wire ram_oe;
-or(ram_oe,ram_oe_1,ram_oe_2);
-reg ram_oe_1=0, ram_oe_2=0;
-reg ram_we=0;
+wire ram_oe_;
+wire ram_oeFETCH, ram_oeIND, ram_oePPIND, ram_oeAND1, ram_oeAND2, ram_oeTAD1, ram_oeTAD2, ram_oeISZ1, ram_oeISZ2;
+or(ram_oe_,ram_oeFETCH, ram_oeIND, ram_oePPIND, ram_oeAND1, ram_oeAND2, ram_oeTAD1, ram_oeTAD2, ram_oeISZ1, ram_oeISZ2);
+
+wire ram_we_;
+wire ram_wePPIND, ram_weISZ1, ram_weISZ2, ram_weDCA1, ram_weDCA2;
+or(ram_we_, ram_wePPIND, ram_weISZ1, ram_weISZ2, ram_weDCA1, ram_weDCA2);
 
 RAM theRAM(
   .clk(SYSCLK),
-  .oe(ram_oe),
-  .we(ram_we),
+  .oe(ram_oe_),
+  .we(ram_we_),
   .addr(busRamA), 
   .dataI(busRamD), 
   .dataO(busRamD)
@@ -127,7 +142,7 @@ RAM theRAM(
 
 
 assign busData=ckFetch?busRamD:12'bz;
-assign busData=ram_oe?busRamD:12'bz;
+assign busData=ram_oe_?busRamD:12'bz;
 always @(posedge CLK) begin
   if (ckFetch) busIR<=busData;
 end
@@ -194,15 +209,28 @@ SKIP theSKIP(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ MQ █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-reg mq_clr=0;
+
+wire mq_ck_;
+wire  mq_ckOPR3I, mq_ckOPR3J, mq_ckOPR3K, mq_ckOPR3L;
+or (mq_ck_, mq_ckOPR3I, mq_ckOPR3J, mq_ckOPR3K, mq_ckOPR3L);
+
+wire mq_hold_;
+wire mq_holdOPR3K, mq_holdOPR3L;
+or (mq_hold_, mq_holdOPR3K, mq_holdOPR3L);
+
+wire mq2orbus_;
+wire mq2orbusOPR3C, mq2orbusOPR3D, mq2orbusOPR3K, mq2orbusOPR3L;
+or (mq2orbus_, mq2orbusOPR3C, mq2orbusOPR3D, mq2orbusOPR3K, mq2orbusOPR3L);
+
 wire [11:0] mqout1;
 wire [11:0] mqout2;
 MULTILATCH theMQ(
+    .CLK(CLK),
     .in(accout1),
-    .clear(sw_CLEAR | mq_clr),
-    .latch(mq_ck), // & oprMQL),
-    .hold(mq_hold),
-    .oe1(oprMQA),
+    .clear(sw_CLEAR),
+    .latch(mq_ck_), 
+    .hold(mq_hold_),
+    .oe1(mq2orbus_), 
     .oe2(1'b1),
     .out1(mqout1), 
     .out2(mqout2)
@@ -212,13 +240,18 @@ MULTILATCH theMQ(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ LINK █ ▇ ▆ ▅ ▄ ▂ ▁
 //
+
+wire link_ck_;
+wire link_ckTAD1, link_ckTAD2, link_ckOPR1;
+or(link_ck_, link_ckTAD1, link_ckTAD2, link_ckOPR1);
+
 wire link;
 wire rotaterLI;
 
 LINK theLINK(
   .SYSCLK(SYSCLK),
   .CLEAR(sw_CLEAR),
-  .LINK_CK(link_ck),
+  .LINK_CK(link_ck_),
   .CLL(oprCLL),
   .CML((oprCML ^ (incC & oprIAC)) | (andaddC & instTAD)),
   .SET(oprLEFT|oprRIGHT),
@@ -232,13 +265,20 @@ LINK theLINK(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ADD/AND █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
+wire ramd2ac_add_, ramd2ac_and_;
+wire ramd2ac_andAND1, ramd2ac_andAND2;
+wire ramd2ac_addTAD1, ramd2ac_addTAD2;
+
+or(ramd2ac_and_, ramd2ac_andAND1, ramd2ac_andAND2);
+or(ramd2ac_add_, ramd2ac_addTAD1, ramd2ac_addTAD2);
+
 wire andaddC;
 ADDAND theADDAND(
   .A(accout1),
   .B(busData),
   .CI(1'b0),
-  .OE_ADD(ramd2ac_add),
-  .OE_AND(ramd2ac_and),
+  .OE_ADD(ramd2ac_add_),
+  .OE_AND(ramd2ac_and_),
   .S(accIn),
   .CO(andaddC)
 );
@@ -261,22 +301,47 @@ ADDAND theADDAND(
 // RTL      7006  rotate AC and link left two           4
 // BSW      7002  swap bytes in AC                      4
 
+//
+//             +--------------------> theADDAND -->--------------->+
+//             ^                                                   v
+//             +--> theSkip                                        v
+//             ^                                                   v
+//             +--> theMQ-+                                        v
+//             ^          v                                        v
+// +--> theAcc +--> theCLORIN --> theIncrementer --> theRotater -->+
+// |                                                               v
+// +-<---------------------------<------------------------------<--+
+//
+//
+//      ac2ramd     (perm)        (perm)            rot2ac
+//
+//
+
+wire ac_ck_;
+wire ac_ckAND1, ac_ckAND2, ac_ckTAD1, ac_ckTAD2, ac_ckDCA1, ac_ckDCA2, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L;
+or (ac_ck_, ac_ckAND1, ac_ckAND2, ac_ckTAD1, ac_ckTAD2, ac_ckDCA1, ac_ckDCA2, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L);
+
+wire ac2ramd_;
+wire ac2ramdDCA1, ac2ramdDCA2;
+or (ac2ramd_, ac2ramdDCA1, ac2ramdDCA2);
+
 wire [11:0] accIn;
 wire [11:0] accout1;
 MULTILATCH theACC(
+    .CLK(CLK),
     .in(accIn),
     .clear(sw_CLEAR),
-    .latch(ac_ck),
+    .latch(ac_ck_),
     .hold(1'b0),
     .oe1(1'b1),
-    .oe2(ac2ramd),
+    .oe2(ac2ramd_),
     .out1(accout1), 
     .out2(busData)
 );
 
 assign busORacc=
   (oprOSR ? 12'o7777 : 12'o0000) |
-  (oprMQA ? mqout1   : 12'o0000)
+  (mq2orbus_ ? mqout1   : 12'o0000)
 
 ;
 
@@ -284,10 +349,14 @@ assign busORacc=
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ACC CLORIN █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
+wire claDCA_;
+wire claDCA1, claDCA2, claO3D, claO3I, claO3J, claO3K, claO3L;
+or (claDCA_, claDCA1, claDCA2, claO3D, claO3I, claO3J, claO3K, claO3L);
+
 wire [11:0] clorinOut;
 CLORIN theCLORIN(
   .IN(accout1),
-  .CLR({oprCLA, oprMQL, dcaCLA, 5'b00000}),
+  .CLR({oprCLA, claDCA_, 6'b00000}),
   .DOR(busORacc),
   .INV(oprCMA),
   .OUT(clorinOut)
@@ -312,137 +381,326 @@ INCREMENTER theINCREMENTER(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ACC ROTATER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
+wire rot2ac_;
+wire rot2acDCA1, rot2acDCA2, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L;
+or(rot2ac_, rot2acDCA1, rot2acDCA2, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L);
+
 wire rotaterLO;
 ROTATER theRotater(
   .OP({oprRIGHT,oprLEFT,oprX2}),
   .AI(incOut),
   .LI(rotaterLI),
-  .OE(rot2ac),
+  .OE(rot2ac_),
   .AO(accIn),
   .LO(rotaterLO)
 );
 
 
-reg done=0;
-reg ir2pc=0, ir2rama=0;
-reg pc_ld=0, pc_ck=0;
-reg ramd2ac_and=0,ramd2ac_add=0;
-reg ac2ramd=0;
-reg ac_ck=0;
-reg link_ck=0;
-reg mq_ck=0;
-reg mq_hold=0;
-reg rot2ac=0;
 
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT REGISTER █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+
+wire ind_ck_;
+wire ind_ckIND, ind_ckPPIND;
+or (ind_ck_, ind_ckIND, ind_ckPPIND);
+
+wire ind2inc_;
+wire ind2incPPIND, ind2regJMP2;
+or (ind2inc_, ind2incPPIND, ind2regJMP2);
+
+wire ind2rama_;
+wire ind2ramaAND2, ind2ramaTAD2, ind2ramaISZ2, ind2ramaDCA2;
+or (ind2rama_, ind2ramaAND2, ind2ramaTAD2, ind2ramaISZ2, ind2ramaDCA2);
+
+MULTILATCH theIndReg(
+    .CLK(CLK),
+    .in(busData),
+    .clear(sw_CLEAR),
+    .latch(ind_ck_),
+    .hold(1'b0),
+    .oe1(ind2inc_),
+    .oe2(ind2rama_),
+    .out1(busReg), 
+    .out2(busRamA)
+);
+
+
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ DATA REGISTER █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+wire data_ck_;
+wire data_ckISZ1, data_ckISZ2;
+or (data_ck_ ,data_ckISZ1, data_ckISZ2);
+
+wire ld2inc_;
+wire ld2incISZ1, ld2incISZ2;
+or (ld2inc_ ,ld2incISZ1, ld2incISZ2);
+
+wire [11:0] dummy1;   
+MULTILATCH theDataReg(
+    .CLK(CLK),
+    .in(busData),
+    .clear(sw_CLEAR),
+    .latch(data_ck_),
+    .hold(1'b0),
+    .oe1(ld2inc_),
+    .oe2(1'b0),
+    .out1(busReg),
+    .out2(dummy1)
+);
+
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ BUS INCREMENTER █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+
+wire inc2ramd_;
+wire inc2ramdPPIND, inc2ramdISZ1, inc2ramdISZ2;
+or (inc2ramd_, inc2ramdPPIND, inc2ramdISZ1, inc2ramdISZ2);
+
+wire incZero;
+INCREMENTER theBUSINCREMENTER(
+  .IN(busReg),
+  .INC(1'b1),
+  .OE(inc2ramd_),
+  .OUT(busData),
+  .C(incZero)
+);
 
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ BUS INTERCONNECTS █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-//wire [11:0] irzp= { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]};
-assign busPCin=ir2pc ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // First OC12 module
-assign busRamA=ir2rama ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // Second OC12 module
+wire ir2pc_;
+wire ir2pcJMP1;
+or(ir2pc_, ir2pcJMP1);
+
+wire reg2pc_;
+wire reg2pcJMP2;
+or (reg2pc_, reg2pcJMP2);
+
+wire ir2rama_;
+wire ir2ramaIND, ir2ramaPPIND, ir2ramaAND1, ir2ramaTAD1, ir2ramaISZ1, ir2ramaDCA1;
+or(ir2rama_, ir2ramaIND, ir2ramaPPIND, ir2ramaAND1, ir2ramaTAD1, ir2ramaISZ1, ir2ramaDCA1);
+
+assign busPCin=ir2pc_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // First OC12 module
+assign busPCin=reg2pcJMP2 ? busReg[11:0] : 12'bzzzzzzzz;
+assign busRamA=ir2rama_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // Second OC12 module
 assign busRamA=ckFetch ? busLatPC : 12'bzzzzzzzzzzzz;
-assign busRamD=ram_we ? busData : 12'bzzzzzzzzzzzz;
+assign busRamD=ram_we_ ? busData : 12'bzzzzzzzzzzzz;
 
 
-always @* begin
-  pc_ck=stbFetch;
-  ram_oe_2=ckFetch;
-end
+//always @* begin
+// 
+// ▁ ▂ ▄ ▅ ▆ ▇ █ FETCH CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
+// 
+assign pc_ckFETCH=    stbFetch;
+assign ram_oeFETCH=   ckFetch;
+
+// 
+// ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
+// 
+assign ir2ramaIND=   instIsIND & (ckIndirect);
+assign ram_oeIND=    instIsIND & (ckIndirect);
+assign ind_ckIND=    instIsIND & (stbIndirect);
+
+// 
+// ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT W. AUTOINC CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
+// 
+assign ir2ramaPPIND= instIsPPIND & (ckAutoinc1 | ckAutoinc2 | ckIndirect);
+assign ram_oePPIND=  instIsPPIND & (ckAutoinc1 | ckIndirect);
+assign ind2incPPIND= instIsPPIND & (ckAutoinc1 | ckAutoinc2);
+assign ind_ckPPIND=  instIsPPIND & (stbAutoinc1 | stbIndirect);
+assign inc2ramdPPIND=instIsPPIND & (ckAutoinc2);
+assign ram_wePPIND=  instIsPPIND & (stbAutoinc2);
+//end
 
 
+//
 // AND 0xxx
-always @* begin
-  if (instAND && instIsDIR) begin
-    ir2rama=ck1;
-    ramd2ac_and=ck1;
-    ram_oe_1=ck1;
-    ac_ck=stb1;
-    done=ck2;
-  end
-end
+//
+wire AND1,AND2;
+// always @* begin
+assign  AND1=(instAND && instIsDIR);
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  ir2ramaAND1=     AND1&(ck1                                                                        );
+assign  ramd2ac_andAND1= AND1&(ck1                                                                        );
+assign  ram_oeAND1=      AND1&(ck1                                                                        );
+assign  ac_ckAND1=       AND1&(      stb1                                                                 );
+assign  doneAND1=        AND1&(             ck2                                                           );
 
+assign  AND2=(instAND && (instIsIND || instIsPPIND));
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  ind2ramaAND2=    AND2&(ck1                                                                        );
+assign  ramd2ac_andAND2= AND2&(ck1                                                                        );
+assign  ram_oeAND2=      AND2&(ck1                                                                        );
+assign  ac_ckAND2=       AND2&(      stb1                                                                 );
+assign  doneAND2=        AND2&(             ck2                                                           );
+// end
+
+//
 // TAD 1xx
-always @* begin
-  if (instTAD && instIsDIR) begin
-    ir2rama=ck1;
-    ramd2ac_add=ck1;
-    ram_oe_1=ck1;
+//
+wire TAD1=(instTAD && instIsDIR);
+wire TAD2=(instTAD && (instIsIND || instIsPPIND));
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  ir2ramaTAD1=     TAD1&(ck1                                                                        );
+assign  ramd2ac_addTAD1= TAD1&(ck1                                                                        );
+assign  ram_oeTAD1=      TAD1&(ck1                                                                        );
+assign  ac_ckTAD1=       TAD1&(      stb1                                                                 );
+assign  link_ckTAD1=     TAD1&(      stb1                                                                 );
+assign  doneTAD1=        TAD1&(             ck2                                                           );
 
-    ac_ck=stb1;
-    link_ck=stb1;
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  ind2ramaTAD2=    TAD2&(ck1                                                                        );
+assign  ramd2ac_addTAD2= TAD2&(ck1                                                                        );
+assign  ram_oeTAD2=      TAD2&(ck1                                                                        );
+assign  ac_ckTAD2=       TAD2&(      stb1                                                                 );
+assign  link_ckTAD2=     TAD2&(      stb1                                                                 );
+assign  doneTAD2=        TAD2&(             ck2                                                           );
+// end
 
-    done=ck2;
-  end
-end
-
+//
 // ISZ 2xx
-always @* begin
-  if (instISZ ) begin
-    done=ck1;
-  end
-end
+//
+wire ISZ1=(instISZ && instIsDIR);
+wire ISZ2=(instISZ && (instIsIND || instIsPPIND));
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  ram_oeISZ1=      ISZ1&(ck1 |                     ck3                                               );
+assign  ir2ramaISZ1=     ISZ1&(ck1 |        ck2 |        ck3                                               );
+assign  data_ckISZ1=     ISZ1&(      stb1                                                                  );
+assign  ld2incISZ1=      ISZ1&(      stb1 | ck2 |        ck3 |        ck4                                  );
+assign  ram_weISZ1=      ISZ1&(             ck2                                                            );
+assign  inc2ramdISZ1=    ISZ1&(             ck2                                                            );
+assign  pc_ckISZ1=       ISZ1&(                                       ck4 & incZero                        );
+assign  doneISZ1=        ISZ1&(                                                    ck5                     );
 
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  ram_oeISZ2=      ISZ2&(ck1 |                     ck3                                               );
+assign  ind2ramaISZ2=    ISZ2&(ck1 |        ck2 |        ck3                                               );
+assign  data_ckISZ2=     ISZ2&(      stb1                                                                  );
+assign  ld2incISZ2=      ISZ2&(      stb1 | ck2 |        ck3 |        ck4                                  );
+assign  ram_weISZ2=      ISZ2&(             ck2                                                            );
+assign  inc2ramdISZ2=    ISZ2&(             ck2                                                            );
+assign  pc_ckISZ2=       ISZ2&(                                       ck4 & incZero                        );
+assign  doneISZ2=        ISZ2&(                                                    ck5                     );
+// end
+
+//
 // DCA 3xx
-reg dcaCLA=0;
-always @* begin
-  if (instDCA && instIsDIR) begin
-    ir2rama=(ck1|ck1);
-    ac2ramd=ck1;
-    ram_we=stb1;
+//
+wire DCA1=(instDCA && instIsDIR);
+wire DCA2=(instDCA && (instIsIND || instIsPPIND));
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  ir2ramaDCA1=    DCA1&(ck1                                                                        );
+assign  ac2ramdDCA1=    DCA1&(ck1                                                                        );
+assign  ram_weDCA1=     DCA1&(       stb1                                                                );
+assign  claDCA1=        DCA1&(              ck2                                                          );
+assign  rot2acDCA1=     DCA1&(              ck2                                                          );
+assign  ac_ckDCA1=      DCA1&(                    stb2                                                   );
+assign  doneDCA1=       DCA1&(                           ck3                                             );
 
-    dcaCLA=ck2;
-//    ir2rama=ck2;
-    ram_oe_1=ck2;
-    rot2ac=ck2;
-    ac_ck=stb2;
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  ind2ramaDCA2=   DCA2&(ck1                                                                        );
+assign  ac2ramdDCA2=    DCA2&(ck1                                                                        );
+assign  ram_weDCA2=     DCA2&(       stb1                                                                );
+assign  claDCA2=        DCA2&(              ck2                                                          );
+assign  rot2acDCA2=     DCA2&(              ck2                                                          );
+assign  ac_ckDCA2=      DCA2&(                    stb2                                                   );
+assign  doneDCA2=       DCA2&(                           ck3                                             );
 
-    done=ck3;
-  end
-end
+// //
+// // JMS 4xx
+// //
+// always @* begin
+//   if (instJMS ) begin
+//     //            1     1      2     2      3     3      4     4      5     5      6     6
+//     //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+//   end
 
-// JMS 4xx
-always @* begin
-  if (instJMS ) begin
-    done=ck1;
-  end
-end
+//   if (instJMS && (instIsIND || instIsPPIND)) begin
+//     //            1     1      2     2      3     3      4     4      5     5      6     6
+//     //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+//   end
+// end
 
+
+//
 // JMP 5xx DIRECT
-always @* begin
-  if (instJMP && instIsDIR) begin
-    ir2pc=ck1; 
-    pc_ld=ck1;
-    pc_ck=stb1;
-    done=ck2;
-  end
-end
+//
+wire JMP1=(instJMP && instIsDIR);
+wire JMP2=(instJMP && (instIsIND || instIsPPIND));
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  ir2pcJMP1=       JMP1&(ck1                                                                        ); 
+assign  pc_ldJMP1=       JMP1&(ck1                                                                        );
+assign  pc_ckJMP1=       JMP1&(      stb1                                                                 );
+assign  doneJMP1=    JMP1&(             ck2                                                           );
 
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign ind2regJMP2=       JMP2&(ck1);
+assign reg2pcJMP2=        JMP2&(ck1);
+assign  pc_ldJMP2=        JMP2&(ck1                                                                        );
+assign  pc_ckJMP2=        JMP2&(      stb1                                                                 );
+assign  doneJMP2=         JMP2&(             ck2                                                           );
+
+//
 // IOT 6xx
-always @* begin
-  if (instIOT ) begin
-    done=ck1;
-  end
-end
+//
+// always @* begin
+//   if (instIOT ) begin
+//     //            1     1      2     2      3     3      4     4      5     5      6     6
+//     //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+//   end
+// end
 
+//
 // OPR 7xx
-always @* begin
-  if (instOPR & opr1) begin
-    rot2ac=ck1;
-    ac_ck=stb1;
-    link_ck=stb1;
-    done=ck2;
-  end
-  if (instOPR & opr2) begin
-    rot2ac=(ck1|ck2);
-    pc_ck=(stb1&doSkip);
-//    rot2ac=ck2;
- //   mq_ck=ck2;
-    ac_ck=stb2;
-    done=ck3;
-  end
+//
+wire OP1=(instOPR & opr1);
+wire OP2=(instOPR & opr2);
+wire O3a=instOPR & opr3 & !oprCLA & !oprMQA & !oprSCA & !oprMQL; // 7401 NOP
+wire O3b=instOPR & opr3 &  oprCLA & !oprMQA & !oprSCA & !oprMQL; // 7601 CLA
+wire O3c=instOPR & opr3 & !oprCLA &  oprMQA & !oprSCA & !oprMQL; // 7501 MQA
+wire O3d=instOPR & opr3 &  oprCLA &  oprMQA & !oprSCA & !oprMQL; // 7701 ACL
+// wire O3e=instOPR & opr3 & !oprCLA & !oprMQA &  oprSCA & !oprMQL;
+// wire O3f=instOPR & opr3 &  oprCLA & !oprMQA &  oprSCA & !oprMQL;
+// wire O3g=instOPR & opr3 & !oprCLA &  oprMQA &  oprSCA & !oprMQL;
+// wire O3h=instOPR & opr3 &  oprCLA &  oprMQA &  oprSCA & !oprMQL;
+wire O3i=instOPR & opr3 & !oprCLA & !oprMQA & !oprSCA &  oprMQL; // 7421 MQL
+wire O3j=instOPR & opr3 &  oprCLA & !oprMQA & !oprSCA &  oprMQL; // 7621 CAM
+wire O3k=instOPR & opr3 & !oprCLA &  oprMQA & !oprSCA &  oprMQL; // 7521 SWP
+wire O3l=instOPR & opr3 &  oprCLA &  oprMQA & !oprSCA &  oprMQL; // 7721 CLA,SWP
+// wire O3m=instOPR & opr3 & !oprCLA & !oprMQA &  oprSCA &  oprMQL;
+// wire O3n=instOPR & opr3 &  oprCLA & !oprMQA &  oprSCA &  oprMQL;
+// wire O3o=instOPR & opr3 & !oprCLA &  oprMQA &  oprSCA &  oprMQL;
+// wire O3p=instOPR & opr3 &  oprCLA &  oprMQA &  oprSCA &  oprMQL;
+
+// always @* begin
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  rot2acOPR1=      OP1&(ck1                                                                        );
+assign  ac_ckOPR1=       OP1&(      stb1                                                                 );
+assign  link_ckOPR1=     OP1&(      stb1                                                                 );
+assign  doneOPR1=        OP1&(           ck2                                                             );
+
+  //            1     1      2     2      3     3      4     4      5     5      6     6
+  //           ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  rot2acOPR2=      OP2&(ck1 |        ck2                                                           );
+assign  pc_ckOPR2=       OP2&(      stb1 & doSkip                                                        );
+assign  ac_ckOPR2=       OP2&(                   stb2                                                    );
+assign  doneOPR2=        OP2&(                          ck3                                              );
+
 
 
 //  1--CLA
@@ -460,88 +718,81 @@ always @* begin
 // CLA, SWP   7721    load AC from MQ then clear MQ     (CLA,MQL,MQA,SWP)
 //
 
-// Tests from INSTR#1
-// 4746 MQ test1  7601 CLAE
-// 4753 MQ test2  7401 NOPE
-// 4761 MQ test3  7421 MQL
-// 4766 MQ test4  7421 MQL 7501 MQA
-// 4776 MQ test5  7421 MQL 7501 MQA
-// 5005 MQ test6  7421 MQL 7501 MQA
-// 5015 MQ test7  7621 CAM 7421 MQL 7501 MQA
-// 5027 MQ test8  7701 ACL 7421 MQL 7501 MQA
-// 5040 MQ test9  7701 ACL 7421 MQL 7501 MQA
-// 5052 MQ test10 7701 ACL 7421 MQL 7501 MQA
-// 5070 MQ test11 7701 ACL 7421 MQL 7501 MQA
-// 5106 MQ test12 7621 CAM 7521 SWP 7701 ACL
-// 5117 MQ test13 7621 CAM 7521 SWP 7701 ACL
-// 5131 MQ test14
-// 5147 MQ test15
-// 5165 MQ test16
-// 5175 MQ test17
-// 5207 MQ test18
+
+  // NOP        7401    no operation                      ()
+  //                   1     1      2     2      3     3      4     4      5     5      6     6
+  //                   ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  doneOPR3A=      O3a&(ck1                                                                        );
 
 
+  // CLA        7601    clear AC                          (CLA)
+  //                   1     1      2     2      3     3      4     4      5     5      6     6
+  //                   ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  rot2acOPR3B=    O3b&(ck1                                                                        );
+assign  ac_ckOPR3B=     O3b&(      stb1                                                                 );
+assign  doneOPR3B=      O3b&(             ck2                                                           );
 
-  if (instOPR & opr3) begin
-    if (oprCLA | (oprMQA & !oprMQL)) begin
-      rot2ac=ck1;
-      ac_ck=stb1;
-      done=ck2;
-    end
-    if (!oprCLA & (!oprMQA & oprMQL)) begin
-      rot2ac=ck1|ck2;
-      mq_ck=stb1;
-      ac_ck=stb2;
-      done=ck3;
-    end
-    if (oprCLA & (!oprMQA & oprMQL)) begin
-      rot2ac=ck1|ck2;
-      mq_ck=stb2;
-      ac_ck=stb1;
-      done=ck3;
-    end
-    if (!oprCLA & (oprMQA & oprMQL)) begin
-      rot2ac=ck1|ck2;
-      mq_hold=stb1;
-      ac_ck=stb2;
-      mq_ck=stb2;
-      done=ck3;
-    end
-    if (oprCLA & (oprMQA & oprMQL)) begin
-      rot2ac=ck1|ck2;
-      //mq_hold=stb1;
-      ac_ck=stb2;
-      mq_clr=stb2;
-      done=ck3;
-    end
-//    rot2ac=(ck1|ck2);
-//    mq_ck=stb1 & oprMQL;
-//    ac_ck=stb2;
-//    done=ck3;
-  end
 
-//   if (instOPR & opr3 & (~oprSWP)) begin
-//     rot2ac=(ck1|ck2);
-//     if (!oprCLA) begin
-//       mq_ck=stb1;
-//       ac_ck=stb2;
-//     end else begin
-//       mq_ck=stb2;
-//       ac_ck=stb1;
-//     end
-// //    rot2ac=ck2;
-//     done=ck3;
-//   end
+  // MQA        7501    inclusive OR the MQ with the AC   (MQA)
+  //                   1     1      2     2      3     3      4     4      5     5      6     6
+  //                   ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  rot2acOPR3C=    O3c&(ck1                                                                        );
+assign  mq2orbusOPR3C=  O3c&(ck1);
+assign  ac_ckOPR3C=     O3c&(      stb1                                                                 );
+assign  doneOPR3C=      O3c&(             ck2                                                           );
 
-//   if (instOPR & opr3 & (oprSWP)) begin
-//     rot2ac=(ck1|ck2);
-//     ac_ck=(stb1 & oprCLA);
-//     mq_ck=stb2;
-//     ac_ck=stb2;
-//     done=ck3;
-//   end
+  // ACL        7701    load MQ into AC                   (CLA,MQA)
+  //                   1     1      2     2      3     3      4     4      5     5      6     6
+  //                   ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  rot2acOPR3D=    O3d&(ck1                                                            );
+assign  mq2orbusOPR3D=  O3d&(ck1);
+assign  claO3D=         O3d&(ck1                                                                        );
+assign  ac_ckOPR3D=     O3d&(      stb1                                                                 );
+assign  doneOPR3D=      O3d&(                          ck2                                              );
 
-end
+
+  // MQL        7421    load MQ from AC then clear AC     (MQL)
+  //                   1     1      2     2      3     3      4     4      5     5      6     6
+  //                   ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  rot2acOPR3I=    O3i&(ck1 |        ck2                                                           );
+assign  mq_ckOPR3I=     O3i&(      stb1                                                                 );
+assign  claO3I=         O3i&(             ck2                                                           );
+assign  ac_ckOPR3I=     O3i&(                   stb2                                                    );
+assign  doneOPR3I=      O3i&(                          ck3                                              );
+
+
+  // CAM        7621    clear AC and MQ                   (CLA, MQL)
+  //                   1     1      2     2      3     3      4     4      5     5      6     6
+  //                   ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  rot2acOPR3J=    O3j&(ck1 |        ck1                                                           );
+assign  mq_ckOPR3J=     O3j&(      stb2                                                                 );
+assign  claO3J=         O3j&(             ck1                                                           );
+assign  ac_ckOPR3J=     O3j&(                   stb1                                                    );
+assign  doneOPR3J=      O3j&(                          ck3                                              );
+
+  // SWP        7521    swap AC and MQ                    (MQL,MQA,SWP)
+  //                   1     1      2     2      3     3      4     4      5     5      6     6
+  //                   ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  rot2acOPR3K=    O3k&(ck1 |        ck2 |        ck3                                              );
+assign  mq2orbusOPR3K=  O3k&(ck1|ck2|ck3);
+assign  mq_holdOPR3K=   O3k&(ck1 |        ck2 |        ck3                                              );
+assign  claO3K=         O3k&(             ck2                                                           );
+assign  ac_ckOPR3K=     O3k&(                   stb2                                                    );
+assign  mq_ckOPR3K=     O3k&(                          ck3                                              );
+assign  doneOPR3K=      O3k&(                                       ck4                                 );
+
+  // CLA, SWP   7721    load AC from MQ then clear MQ     (CLA,MQL,MQA,SWP)
+  //                   1     1      2     2      3     3      4     4      5     5      6     6
+  //                   ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+assign  rot2acOPR3L=    O3l&(ck1 |        ck2                                                           );
+assign  mq2orbusOPR3L=  O3l&(             ck2                                                           );
+assign  claO3L=         O3l&(ck1                                                                        );
+assign  ac_ckOPR3L=     O3l&(      stb1 |       stb2                                                    );
+assign  mq_holdOPR3L=   O3l&(             ck2                                                           );
+assign  mq_ckOPR3L=     O3l&(                   stb2                                                    );
+assign  doneOPR3L=      O3l&(                          ck3                                              );
+
+// end
 
 endmodule
 
