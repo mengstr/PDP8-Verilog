@@ -32,6 +32,7 @@ module CPU_tb();
     end
 
     always @(dut.theSEQUENCER.stepCnt) begin
+        if (dut.theSEQUENCER.stepCnt==5'd31) begin $display("Unhandled OP"); $finish; end
         if (dut.theSEQUENCER.stepCnt==5'b00001) begin:PRN
             $display("PC=%04o L=%d ACC=%04o MQ=%04o IR=%04o",
                 dut.thePC.PC,
@@ -41,7 +42,7 @@ module CPU_tb();
                 dut.busIR 
             );
             if (dut.busIR==12'o7402) begin $display("end by HLT"); $finish; end
-            if ((dut.busIR>>9)==6) begin $display("end by IOT"); $finish; end
+//            if ((dut.busIR>>9)==6) begin $display("end by IOT"); $finish; end
             if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bx)) begin $display("X in theACC.data"); $finish; end
             if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bz)) begin $display("Z in theACC.data"); $finish; end
         end
