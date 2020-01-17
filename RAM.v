@@ -21,14 +21,10 @@ reg [11:0] DO;
 
 initial $readmemh("RAM.initial", mem);
 
-// always @(negedge we) begin
-//   $display("-- Wrote %04o to address %04o --",dataI, addr);
-// end
-
 always @(posedge clk) begin
   if (we) begin
     mem[addr] <= dataI;
-    $display("-- Wrote %04o to address %04o --",dataI, addr);
+//    $display("-- Wrote %04o to address %04o --",dataI, addr);
   end
   if (oe) DO<=mem[addr];
 //  if (oe) dataO=mem[addr]; else dataO=12'bz;

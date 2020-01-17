@@ -1,7 +1,7 @@
 #!/bin/bash
 
 FILE=top
-FILES="CPU.v SEQUENCER.v PROGRAMCOUNTER.v RAM.v IRDECODER.v OPRDECODER.v MULTILATCH.v LINK.v ADDAND.v CLORIN.v INCREMENTER.v ROTATER.v SKIP.v"
+FILES="CPU.v SEQUENCER.v PROGRAMCOUNTER.v RAM.v IRDECODER.v OPRDECODER.v MULTILATCH.v LINK.v ADDAND.v CLORIN.v INCREMENTER.v ROTATER.v SKIP.v INTERRUPT.v"
 
 #DR="docker run --rm -it -w /root -v/Users/mats/Documents/Projects/PDP8-X/verilog/:/root"
 DR="docker run --rm --log-driver=none  -a stdout -a stderr -w /root -v/Users/mats/Documents/Projects/PDP8-X/verilog/:/root"

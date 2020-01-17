@@ -74,8 +74,8 @@ wire stbIndirect;
 wire stb1, stb2, stb3, stb4, stb5, stb6;
 
 wire done_;
-wire      doneAND1, doneAND2, doneTAD1, doneTAD2, doneISZ1, doneISZ2, doneDCA1, doneDCA2, doneJMS1, doneJMS2, doneJMP1, doneJMP2, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L;
-or(done_, doneAND1, doneAND2, doneTAD1, doneTAD2, doneISZ1, doneISZ2, doneDCA1, doneDCA2, doneJMS1, doneJMS2, doneJMP1, doneJMP2, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L);
+wire      doneAND1, doneAND2, doneTAD1, doneTAD2, doneISZ1, doneISZ2, doneDCA1, doneDCA2, doneJMS1, doneJMS2, doneJMP1, doneJMP2, doneIOT, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L;
+or(done_, doneAND1, doneAND2, doneTAD1, doneTAD2, doneISZ1, doneISZ2, doneDCA1, doneDCA2, doneJMS1, doneJMS2, doneJMP1, doneJMP2, doneIOT, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L);
 
 SEQUENCER theSEQUENCER(
     .SYSCLK(SYSCLK),
@@ -239,8 +239,8 @@ MULTILATCH theMQ(
 //
 
 wire link_ck_;
-wire link_ckTAD1, link_ckTAD2, link_ckOPR1;
-or(link_ck_, link_ckTAD1, link_ckTAD2, link_ckOPR1);
+wire         link_ckTAD1, link_ckTAD2, link_ckIOT, link_ckOPR1;
+or(link_ck_, link_ckTAD1, link_ckTAD2, link_ckIOT, link_ckOPR1);
 
 wire link;
 wire rotaterLI;
@@ -249,10 +249,10 @@ LINK theLINK(
   .SYSCLK(SYSCLK),
   .CLEAR(sw_CLEAR),
   .LINK_CK(link_ck_),
-  .CLL(oprCLL),
+  .CLL(oprCLL | linkclrIOT),
   .CML((oprCML ^ (incC & oprIAC)) | (andaddC & instTAD)),
   .SET(oprLEFT|oprRIGHT),
-   .FROM_ROTATER(rotaterLO),
+  .FROM_ROTATER(rotaterLO),
   .L(link),
   .TO_ROTATER(rotaterLI)
 );
@@ -315,8 +315,8 @@ ADDAND theADDAND(
 //
 
 wire ac_ck_;
-wire ac_ckAND1, ac_ckAND2, ac_ckTAD1, ac_ckTAD2, ac_ckDCA1, ac_ckDCA2, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L;
-or (ac_ck_, ac_ckAND1, ac_ckAND2, ac_ckTAD1, ac_ckTAD2, ac_ckDCA1, ac_ckDCA2, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L);
+wire        ac_ckAND1, ac_ckAND2, ac_ckTAD1, ac_ckTAD2, ac_ckDCA1, ac_ckDCA2, ac_ckIOT, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L;
+or (ac_ck_, ac_ckAND1, ac_ckAND2, ac_ckTAD1, ac_ckTAD2, ac_ckDCA1, ac_ckDCA2, ac_ckIOT, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L);
 
 wire ac2ramd_;
 wire ac2ramdDCA1, ac2ramdDCA2;
@@ -353,7 +353,7 @@ or (claDCA_, claDCA1, claDCA2, claO3D, claO3I, claO3J, claO3K, claO3L);
 wire [11:0] clorinOut;
 CLORIN theCLORIN(
   .IN(accout1),
-  .CLR({oprCLA, claDCA_, 6'b00000}),
+  .CLR({oprCLA, claDCA_, iotCLR, 5'b0000}),
   .DOR(busORacc),
   .INV(oprCMA),
   .OUT(clorinOut)
@@ -379,8 +379,8 @@ INCREMENTER theINCREMENTER(
 //
 
 wire rot2ac_;
-wire rot2acDCA1, rot2acDCA2, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L;
-or(rot2ac_, rot2acDCA1, rot2acDCA2, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L);
+wire        rot2acDCA1, rot2acDCA2, rot2acIOT, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L;
+or(rot2ac_, rot2acDCA1, rot2acDCA2, rot2acIOT, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L);
 
 wire rotaterLO;
 ROTATER theRotater(
@@ -673,8 +673,23 @@ assign doneJMP2=        JMP2&(             ck2                                  
 //
 // IOT 6xxx
 //
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
+wire iotCLR;
+wire linkclrIOT;
+INTERRUPT theInterrupt(
+  .CLK(CLK),
+  .clear(sw_CLEAR),
+  .EN(instIOT & (busIR[8:3]==6'o00)),
+  .IR(busIR[2:0]),
+  .ck1(ck1), .ck2(ck2), .ck3(ck3), .ck4(ck4), .ck5(ck5), .ck6(ck6),
+  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
+  .done(doneIOT),
+  .rot2ac(rot2acIOT),
+  .ac_ck(ac_ckIOT),
+  .clr(iotCLR),
+  .linkclr(linkclrIOT),
+  .link_ck(link_ckIOT)
+);
+
 
 
 //

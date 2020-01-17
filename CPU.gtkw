@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Thu Jan 16 14:46:30 2020
+[*] Fri Jan 17 13:45:37 2020
 [*]
 [dumpfile] "/Users/mats/Documents/Projects/PDP8-X/verilog/CPU.vcd"
-[dumpfile_mtime] "Thu Jan 16 14:44:12 2020"
-[dumpfile_size] 2839390
+[dumpfile_mtime] "Fri Jan 17 13:42:40 2020"
+[dumpfile_size] 2927860
 [savefile] "/Users/mats/Documents/Projects/PDP8-X/verilog/CPU.gtkw"
-[timestart] 5675300
+[timestart] 5803700
 [size] 1666 902
 [pos] -1 -1
-*-11.781009 5686900 9777300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-12.781009 5825300 9777300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] CPU_tb.
 [treeopen] CPU_tb.dut.
 [sst_width] 193
@@ -55,10 +55,13 @@ CPU_tb.dut.busIR[11:0]
 @200
 -
 @28
+[color] 2
 CPU_tb.dut.theLINK.L
 @30
 +{ACC} CPU_tb.dut.theACC.data[11:0]
 +{MQ} CPU_tb.dut.theMQ.data[11:0]
+@28
+CPU_tb.dut.theRAM.we
 @c00200
 -thePC
 @30
@@ -67,10 +70,23 @@ CPU_tb.dut.thePC.CLK
 CPU_tb.dut.thePC.LD
 CPU_tb.dut.thePC.PC[11:0]
 CPU_tb.dut.thePC.PCLAT[11:0]
-CPU_tb.dut.thePC.LATCH1
-CPU_tb.dut.thePC.LATCH2
 @1401200
 -thePC
+@800201
+-theINTERRUPT
+@29
+[color] 2
+CPU_tb.dut.theInterrupt.flgION
+CPU_tb.dut.theInterrupt.instSKON
+CPU_tb.dut.theInterrupt.instION
+CPU_tb.dut.theInterrupt.instIOF
+CPU_tb.dut.theInterrupt.instSRQ
+CPU_tb.dut.theInterrupt.instGTF
+CPU_tb.dut.theInterrupt.instRTF
+CPU_tb.dut.theInterrupt.instSGT
+CPU_tb.dut.theInterrupt.instCAF
+@1000201
+-theINTERRUPT
 @c00200
 -CK_
 @28
@@ -149,7 +165,7 @@ CPU_tb.dut.theOPRDECODER.oprTSTINV
 CPU_tb.dut.theOPRDECODER.oprX2
 @1401200
 -OPR
-@c00201
+@c00200
 -theACC
 @30
 CPU_tb.dut.theACC.data[11:0]
@@ -159,7 +175,7 @@ CPU_tb.dut.theACC.oe1
 CPU_tb.dut.theACC.oe2
 CPU_tb.dut.theACC.out1[11:0]
 CPU_tb.dut.theACC.out2[11:0]
-@1401201
+@1401200
 -theACC
 @c00200
 -theADDAND
@@ -252,7 +268,6 @@ CPU_tb.dut.busPC[11:0]
 CPU_tb.dut.busPCin[11:0]
 CPU_tb.dut.busRamA[11:0]
 CPU_tb.dut.busRamD[11:0]
-CPU_tb.dut.pBusPC[11:0]
 @1401200
 -busses
 @c00200
