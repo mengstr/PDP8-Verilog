@@ -5,8 +5,7 @@ module PROGRAMCOUNTER (
   input CLR,
   input LD,
   input CLK,
-  input LATCH1,
-  input LATCH2,
+  input LATCH,
   output [11:0] PC,
   output [11:0] PCLAT
 );
@@ -28,8 +27,8 @@ always @(posedge CLK or posedge CLR) begin
   end
 end
 
-  always @(LATCH1 or LATCH2 or thisPC) begin
-    if (LATCH1 || LATCH2) thisPCLAT = thisPC;
+  always @(LATCH or thisPC) begin
+    if (LATCH) thisPCLAT = thisPC;
   end
 
 endmodule

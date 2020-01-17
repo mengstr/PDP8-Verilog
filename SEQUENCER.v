@@ -9,7 +9,6 @@ module SEQUENCER (
     input STEPM,            // Rising edge executes one microstep
     input STEPI,            // Rising edge executes one instruction
     input [1:0] SEQTYPE,           // ({instIsPPIND,instIsIND}),
-    output PH1,PH2,
     output CK_FETCH,
     output CK_AUTOINC1, CK_AUTOINC2,
     output CK_INDIRECT,
@@ -54,8 +53,6 @@ module SEQUENCER (
         end
     end
  
-    assign PH1=(stepCnt%2==0);
-    assign PH2=!(stepCnt%2==1);
     assign STB_FETCH=(stepCnt==1);
     assign STB_AUTOINC1=(stepCnt==3);
     assign STB_AUTOINC2=(stepCnt==5);
