@@ -1,24 +1,27 @@
 #!/bin/bash
 
 FILE=top
-FILES="CPU.v SEQUENCER.v PROGRAMCOUNTER.v RAM.v IRDECODER.v OPRDECODER.v MULTILATCH.v LINK.v ADDAND.v CLORIN.v INCREMENTER.v ROTATER.v SKIP.v INTERRUPT.v"
+FILES="\
+    CPU.v SEQUENCER.v PROGRAMCOUNTER.v RAM.v \
+    IRDECODER.v OPRDECODER.v \
+    MULTILATCH.v LINK.v ADDAND.v CLORIN.v INCREMENTER.v ROTATER.v SKIP.v \
+    INTERRUPT.v TTY.v"
 
-#DR="docker run --rm -it -w /root -v/Users/mats/Documents/Projects/PDP8-X/verilog/:/root"
-DR="docker run --rm --log-driver=none  -a stdout -a stderr -w /root -v/Users/mats/Documents/Projects/PDP8-X/verilog/:/root"
+DR="docker run --rm --log-driver=none  -a stdout -a stderr -w/work -v${PWD}/:/work"
 
 PCF=dummy.pcf
 PACKAGE=vq100
 
+echo --LINTING
+$DR verilator/verilator -Wall -Wno-UNUSED -DNOTOP --top-module top --lint-only top.v $FILES
 
-    echo --LINTING
-    $DR antonkrug/verilator-slim /bin/sh -c "verilator -Wall -Wno-UNUSED -DNOTOP --top-module top --lint-only top.v $FILES"
-#    if [ $? != 0 ]; then exit 1; fi
-    # $DR cranphin/iverilog iverilog -i -DNOTOP $FILE.v 
-    # if [ $? != 0 ]; then exit 1; fi
-    # if [ -f tb/${FILE}_tb.v ]; then 
-    #     $DR cranphin/iverilog iverilog -i tb/${FILE}_tb.v;
-    #     if [ $? != 0 ]; then exit 1; fi
-    # fi
+# if [ $? != 0 ]; then exit 1; fi
+# $DR cranphin/iverilog iverilog -i -DNOTOP $FILE.v 
+# if [ $? != 0 ]; then exit 1; fi
+# if [ -f tb/${FILE}_tb.v ]; then 
+#     $DR cranphin/iverilog iverilog -i tb/${FILE}_tb.v;
+#     if [ $? != 0 ]; then exit 1; fi
+# fi
 
 if [ "$1" != "test" ]; then
 
@@ -70,10 +73,8 @@ fi # !=test
 
 if [ -f tb/CPU_tb.v ]; then 
     echo --TESTING
-    echo $DR cranphin/iverilog iverilog -D PRINT $2 -o CPU.vvp tb/CPU_tb.v $FILES 
     $DR cranphin/iverilog iverilog -D PRINT $2 -o CPU.vvp tb/CPU_tb.v $FILES 
     if [ $? != 0 ]; then exit 1; fi
-    echo $DR cranphin/iverilog vvp CPU.vvp | tee CPU.log
     $DR cranphin/iverilog vvp CPU.vvp | ./showop.sh | tee CPU.log
     if [ $? != 0 ]; then exit 1; fi
 fi
