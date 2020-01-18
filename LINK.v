@@ -8,11 +8,10 @@ input CLL,        // Clear link
 input CML,        // Complement link
 input SET,        // Update L to be FROM_ROTATER
 input FROM_ROTATER,
-output L,
+output reg L,
 output TO_ROTATER
 );
 
-reg L=0;
 reg lastCML=0;
 reg lastSET=0;
 
@@ -20,10 +19,7 @@ reg lastSET=0;
 // always @(posedge SYSCLK) lastSET<=SET;
 
 always @(posedge SYSCLK) begin
-  if (CLEAR) L<=0;
-  // if (CLEAR || CLL) L<=0;
-//  if (CML==1 && lastCML==0) L<=~L;
-//  if (SET==1 && lastSET==0) L<=FROM_ROTATER;
+//  if (CLEAR) L<=0;
 end
 
 always @(posedge LINK_CK) begin 
