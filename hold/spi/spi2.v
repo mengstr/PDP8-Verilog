@@ -6,10 +6,11 @@ module top (
   output        PIN9,   //shiftout_latch,
   output        PIN7,    //shiftout_data
   output        LED1,
-  output        LED2 
+  output        LED2,
+  output        PIN33
 );
 
-localparam SPEED = 10;
+localparam SPEED = 26;
 
     reg [SPEED-1:0] divider=0;
     reg stb=0;
@@ -18,7 +19,7 @@ localparam SPEED = 10;
         stb<=(divider == 0);
     end
 
-
+assign PIN33=divider[SPEED-1];
 assign LED1=PIN7;
 assign LED2=PIN9;
 

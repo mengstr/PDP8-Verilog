@@ -1,8 +1,9 @@
 DIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-RUN = docker run --rm -it -w /root -v$(DIR):/root cranphin/icestorm
+#RUN = docker run --rm -it -w /root -v$(DIR):/root cranphin/icestorm
+RUN = docker run --rm --log-driver=none -a stdout -a stderr -w /root -v$(DIR):/root cranphin/icestorm
 
-PROJ = spi2
-PIN_DEF = ice40hx1k-evb.pcf
+PROJ = fivebythree
+PIN_DEF = $(PROJ).pcf
 DEVICE = hx1k
 
 all: $(PROJ).rpt $(PROJ).bin
@@ -29,7 +30,7 @@ image:
 	$(RUN) dot -Tpng $(PROJ).dot -o $(PROJ).png
 
 prog: $(PROJ).bin
-	../upload/iceflash /dev/cu.usbmodem48065801 -e -w $< -t -g
+	../../upload/iceflash /dev/cu.usbmodem48065801 -e -w $< -t -g
 
 clean:
 	rm -f $(PROJ).blif $(PROJ).asc $(PROJ).bin $(PROJ).rpt $(PROJ).dot $(PROJ).png $(PROJ).json

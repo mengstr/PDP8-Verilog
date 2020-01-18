@@ -7,6 +7,39 @@ set_io --warn-no-port BUT2  42
 set_io --warn-no-port LED1  40
 set_io --warn-no-port LED2  51
 
+
+set_io --warn-no-port PIN5  1               # 3_1A
+#                     PIN6                  # EXTCLK
+set_io --warn-no-port PIN7  2               # 3_1B
+#                     PIN8                  # GND
+set_io --warn-no-port PIN9  3               # 3_2A
+#                     PIN10                 # LED1
+set_io --warn-no-port PIN11 4               # 3_2B
+#                     PIN12                 # LED2
+set_io --warn-no-port PIN13 7               # 3_3A
+set_io --warn-no-port PIN14 37              # 2_9/TxD
+set_io --warn-no-port PIN15 8               # 3_3B
+set_io --warn-no-port PIN16 36              # 2_8/RxD
+set_io --warn-no-port PIN17 9               # 3_5A
+set_io --warn-no-port PIN18 34              # 2_7
+set_io --warn-no-port PIN19 10              # 3_5B
+set_io --warn-no-port PIN20 33              # 2_6
+set_io --warn-no-port PIN21 12              # 3_6A
+set_io --warn-no-port PIN22 30              # 2_5
+set_io --warn-no-port PIN23 13              # 3_6B
+set_io --warn-no-port PIN24 29              # 2_4
+set_io --warn-no-port PIN25 16              # 3_7B
+set_io --warn-no-port PIN26 28              # 2_3
+set_io --warn-no-port PIN27 18              # 3_8A
+set_io --warn-no-port PIN28 27              # 2_2
+set_io --warn-no-port PIN29 19              # 3_8B
+set_io --warn-no-port PIN30 26              # 2_1
+set_io --warn-no-port PIN31 20              # 3_10A
+set_io --warn-no-port PIN32 25              # 3_12B
+set_io --warn-no-port PIN33 21              # 3_10B
+set_io --warn-no-port PIN34 24              # 3_12A
+
+
 #
 # Pins for SRAM on the olimex board
 #
@@ -49,43 +82,3 @@ set_io --warn-no-port ADR[14] 96
 set_io --warn-no-port ADR[15] 97
 set_io --warn-no-port ADR[16] 99
 set_io --warn-no-port ADR[17] 100
-
-#
-# Expansion header on the olimex board
-#
-#                     PIN1                  # +5V
-#                     PIN2                  # GND
-#                     PIN3                  # +3v3
-#                     PIN4                  # GND
-set_io --warn-no-port PIN5  1               # 3_1A
-#                     PIN6                  # EXTCLK
-set_io --warn-no-port PIN7  2               # 3_1B
-#                     PIN8                  # GND
-set_io --warn-no-port PIN9  3               # 3_2A
-#                     PIN10                 # LED1
-set_io --warn-no-port PIN11 4               # 3_2B
-#                     PIN12                 # LED2
-set_io --warn-no-port PIN13 7               # 3_3A
-set_io --warn-no-port PIN14 37              # 2_9/TxD
-set_io --warn-no-port PIN15 8               # 3_3B
-set_io --warn-no-port PIN16 36              # 2_8/RxD
-set_io --warn-no-port PIN17 9               # 3_5A
-set_io --warn-no-port PIN18 34              # 2_7
-set_io --warn-no-port PIN19 10              # 3_5B
-set_io --warn-no-port PIN20 33              # 2_6
-set_io --warn-no-port PIN21 12              # 3_6A
-set_io --warn-no-port PIN22 30              # 2_5
-set_io --warn-no-port PIN23 13              # 3_6B
-set_io --warn-no-port PIN24 29              # 2_4
-set_io --warn-no-port PIN25 16              # 3_7B
-set_io --warn-no-port PIN26 28              # 2_3
-set_io --warn-no-port PIN27 18              # 3_8A
-set_io --warn-no-port PIN28 27              # 2_2
-set_io --warn-no-port PIN29 19              # 3_8B
-set_io --warn-no-port PIN30 26              # 2_1
-set_io --warn-no-port PIN31 20              # 3_10A
-set_io --warn-no-port PIN32 25              # 3_12B
-set_io --warn-no-port PIN33 21              # 3_10B
-set_io --warn-no-port PIN34 24              # 3_12A
-
-

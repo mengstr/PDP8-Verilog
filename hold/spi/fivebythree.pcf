@@ -1,0 +1,28 @@
+#
+# OLMEX iCE40HX1K-EVB
+#
+set_io --warn-no-port CLK   15
+set_io --warn-no-port BUT1  41
+set_io --warn-no-port BUT2  42
+set_io --warn-no-port LED1  40
+set_io --warn-no-port LED2  51
+
+set_io --warn-no-port PIXEL[0]   1    # 3_1A
+set_io --warn-no-port PIXEL[1]   2    # 3_1B
+set_io --warn-no-port PIXEL[2]   3    # 3_2A
+set_io --warn-no-port PIXEL[3]   4    # 3_2B
+set_io --warn-no-port PIXEL[4]   7    # 3_3A
+set_io --warn-no-port PIXEL[5]   8    # 3_3B
+set_io --warn-no-port PIXEL[6]   9    # 3_5A
+set_io --warn-no-port PIXEL[7]  10    # 3_5B
+set_io --warn-no-port PIXEL[8]  12    # 3_6A
+set_io --warn-no-port PIXEL[9]  13    # 3_6B
+set_io --warn-no-port PIXEL[10] 16    # 3_7B
+set_io --warn-no-port PIXEL[11] 18    # 3_8A
+set_io --warn-no-port PIXEL[12] 19    # 3_8B
+set_io --warn-no-port PIXEL[13] 20    # 3_10A
+set_io --warn-no-port PIXEL[14] 21    # 3_10B
+
+set_io --warn-no-port DIGIT0    25    # 3_12B
+set_io --warn-no-port DIGIT1    24    # 3_12A
+
