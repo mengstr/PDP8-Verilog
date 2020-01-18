@@ -7,6 +7,7 @@ FILES="\
     MULTILATCH.v LINK.v ADDAND.v CLORIN.v INCREMENTER.v ROTATER.v SKIP.v \
     INTERRUPT.v TTY.v"
 
+echo $files
 DR="docker run --rm --log-driver=none  -a stdout -a stderr -w/work -v${PWD}/:/work"
 
 PCF=dummy.pcf
@@ -71,12 +72,10 @@ if [ "$1" != "test" ]; then
 
 fi # !=test
 
-if [ -f tb/CPU_tb.v ]; then 
-    echo --TESTING
-    $DR cranphin/iverilog iverilog -D PRINT $2 -o CPU.vvp tb/CPU_tb.v $FILES 
-    if [ $? != 0 ]; then exit 1; fi
-    $DR cranphin/iverilog vvp CPU.vvp | ./showop.sh | tee CPU.log
-    if [ $? != 0 ]; then exit 1; fi
-fi
+echo --TESTING
+$DR cranphin/iverilog iverilog -D PRINT $2 -o CPU.vvp tbCPU.v $FILES 
+if [ $? != 0 ]; then exit 1; fi
+$DR cranphin/iverilog vvp CPU.vvp | ./showop.sh | tee CPU.log
+if [ $? != 0 ]; then exit 1; fi
 
 echo --Done
