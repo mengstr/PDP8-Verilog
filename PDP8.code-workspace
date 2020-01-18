@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "/Users/mats/Documents/Projects/PDP8-X/verilog/"
+		}
+	],
+	"settings": {
+		"zenMode.centerLayout": false,
+		"zenMode.fullScreen": false,
+		"zenMode.hideStatusBar": false,
+		"verilog.linting.linter": "verilator",
+		"verilog.linting.verilator.arguments": "-Wall",
+		"todo-tree.general.statusBar": "total",
+		"todo-tree.highlights.enabled": false
+	}
+}
