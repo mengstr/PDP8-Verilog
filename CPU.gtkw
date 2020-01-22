@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Fri Jan 17 13:45:37 2020
+[*] Wed Jan 22 20:13:38 2020
 [*]
 [dumpfile] "/Users/mats/Documents/Projects/PDP8-X/verilog/CPU.vcd"
-[dumpfile_mtime] "Fri Jan 17 13:42:40 2020"
-[dumpfile_size] 2927860
+[dumpfile_mtime] "Wed Jan 22 20:12:12 2020"
+[dumpfile_size] 2697914
 [savefile] "/Users/mats/Documents/Projects/PDP8-X/verilog/CPU.gtkw"
-[timestart] 5803700
-[size] 1666 902
+[timestart] 3167590
+[size] 1615 902
 [pos] -1 -1
-*-12.781009 5825300 9777300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-11.781009 3169200 9777300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] CPU_tb.
 [treeopen] CPU_tb.dut.
 [sst_width] 193
 [signals_width] 311
 [sst_expanded] 1
-[sst_vpaned_height] 449
+[sst_vpaned_height] 555
 @c00200
 -RUNHALT
 @28
@@ -72,24 +72,30 @@ CPU_tb.dut.thePC.PC[11:0]
 CPU_tb.dut.thePC.PCLAT[11:0]
 @1401200
 -thePC
-@800201
+@800200
 -theINTERRUPT
-@29
-[color] 2
-CPU_tb.dut.theInterrupt.flgION
-CPU_tb.dut.theInterrupt.instSKON
-CPU_tb.dut.theInterrupt.instION
-CPU_tb.dut.theInterrupt.instIOF
-CPU_tb.dut.theInterrupt.instSRQ
-CPU_tb.dut.theInterrupt.instGTF
+@28
+CPU_tb.dut.theInterrupt.clr
+CPU_tb.dut.theInterrupt.done
+CPU_tb.dut.theInterrupt.irqRq
+CPU_tb.dut.theInterrupt.flgGIE
+CPU_tb.dut.theInterrupt.flgNoInt
+CPU_tb.dut.theInterrupt.pc_ck
+CPU_tb.dut.theInterrupt.ac_ck
+CPU_tb.dut.theInterrupt.rot2ac
+@30
+CPU_tb.dut.theInterrupt.ACGTF[11:0]
+@28
 CPU_tb.dut.theInterrupt.instRTF
-CPU_tb.dut.theInterrupt.instSGT
-CPU_tb.dut.theInterrupt.instCAF
-@1000201
+CPU_tb.dut.theInterrupt.linkcml5
+CPU_tb.dut.i
+CPU_tb.dut.theIRDECODER.JMS
+@1000200
 -theINTERRUPT
 @c00200
 -CK_
 @28
+CPU_tb.dut.ckF
 CPU_tb.dut.theSEQUENCER.CK_FETCH
 CPU_tb.dut.theSEQUENCER.STB_FETCH
 CPU_tb.dut.theSEQUENCER.CK_AUTOINC1
@@ -256,7 +262,7 @@ CPU_tb.dut.theIndReg.out1[11:0]
 CPU_tb.dut.theIndReg.out2[11:0]
 @1401200
 -theIndReg
-@c00200
+@800200
 -busses
 @30
 CPU_tb.dut.busData[11:0]
@@ -268,7 +274,11 @@ CPU_tb.dut.busPC[11:0]
 CPU_tb.dut.busPCin[11:0]
 CPU_tb.dut.busRamA[11:0]
 CPU_tb.dut.busRamD[11:0]
-@1401200
+@28
+CPU_tb.dut.pc2ramd_
+@29
+CPU_tb.dut.latpc2ramd_
+@1000200
 -busses
 @c00200
 -OP3

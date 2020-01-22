@@ -60,7 +60,7 @@ reg [1:0] CLKdivider=0;
 reg CLK;
 always @(posedge SYSCLK) begin
   CLKdivider<=CLKdivider+1;
-  CLK<=CLKdivider[1];
+  CLK<=CLKdivider[0];
 end
 
 //
@@ -144,8 +144,13 @@ RAM theRAM(
 
 assign busData=ckFetch?busRamD:12'bz;
 assign busData=ram_oe_?busRamD:12'bz;
+wire i=theInterrupt.flgGIE & (!theInterrupt.flgNoInt);
+reg ckF=0;
 always @(posedge CLK) begin
-  if (ckFetch) busIR<=busData;
+//  if (ckFetch) busIR<= busData;
+  if (instJMS & ck2 & i & irqRq) theInterrupt.flgGIE<=0;
+  if (ckFetch & !ckF) busIR<= (i & irqRq) ? 12'o4000 : busData;
+  ckF<=ckFetch;
 end
 
 
@@ -254,7 +259,7 @@ LINK theLINK(
   .CLEAR(sw_CLEAR),
   .LINK_CK(link_ck_),
   .CLL(oprCLL | linkclrIOT0),
-  .CML((oprCML ^ (incC & oprIAC)) | (andaddC & instTAD)),
+  .CML(((oprCML ^ (incC & oprIAC)) | (andaddC & instTAD)) | linkcmlIOT0),
   .SET(oprLEFT|oprRIGHT),
   .FROM_ROTATER(rotaterLO),
   .L(link),
@@ -342,9 +347,8 @@ MULTILATCH theACC(
 
 assign busORacc=
   (oprOSR ? 12'o7777 : 12'o0000) |
-  (mq2orbus_ ? mqout1   : 12'o0000)
-
-;
+  (mq2orbus_ ? mqout1   : 12'o0000) |
+  busACGTF;
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ACC CLORIN █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -493,6 +497,11 @@ wire pc2ramd_;
 wire          pc2ramdJMS1, pc2ramdJMS2;
 or (pc2ramd_, pc2ramdJMS1, pc2ramdJMS2);
 
+wire latpc2ramd_;
+wire             latpc2ramdJMS1;
+or (latpc2ramd_, latpc2ramdJMS1);
+
+
 // wire reg2rama_;
 // wire reg2ramaJMS2;
 // or (reg2rama_, reg2ramaJMS2);
@@ -505,6 +514,8 @@ assign busRamA=ckFetch ? busLatPC : 12'bzzzzzzzzzzzz;
 // assign busRamA=reg2rama_ ?  busReg[11:0] : 12'bzzzzzzzz;
 assign busRamD=ram_we_ ? busData : 12'bzzzzzzzzzzzz;
 assign busRamD=pc2ramd_ ? busPC : 12'bzzzzzzzzzzzz;
+assign busRamD=latpc2ramd_ ? busLatPC : 12'bzzzzzzzzzzzz;
+
 // 
 // ▁ ▂ ▄ ▅ ▆ ▇ █ FETCH CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
 // 
@@ -636,7 +647,11 @@ wire JMS2=(instJMS && (instIsIND || instIsPPIND));
 //                            1     1      2     2      3     3      4     4      5     5      6     6
 //                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 assign ir2ramaJMS1=     JMS1&(ck1                                                                        ); 
-assign pc2ramdJMS1=     JMS1&(ck1                                                                        );
+//assign pc2ramdJMS1=     JMS1&(ck1                                                                        );
+
+assign pc2ramdJMS1=     !i&JMS1&(ck1                                                                        );
+assign latpc2ramdJMS1=  i&JMS1&(ck1                                                                        );
+
 assign ram_weJMS1=      JMS1&(stb1                                                                       );
 assign ir2pcJMS1=       JMS1&(ck2                                                                        ); 
 assign pc_ldJMS1=       JMS1&(ck2                                                                        );
@@ -681,21 +696,27 @@ assign doneJMP2=        JMP2&(             ck2                                  
 // 600x CPU INTERRUPT HANDLING
 wire iotCLR0;
 wire linkclrIOT0;
+wire linkcmlIOT0;
+wire [11:0] busACGTF;
 INTERRUPT theInterrupt(
   .CLK(CLK),
   .clear(sw_CLEAR),
   .EN(instIOT & (busIR[8:3]==6'o00)),
   .IR(busIR[2:0]),
+  .AC(accout1),
+  .LINK(link),
   .ck1(ck1), .ck2(ck2), .ck3(ck3), .ck4(ck4), .ck5(ck5), .ck6(ck6),
-  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
+  .stbFetch(stbFetch), .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   .irqRq(irqRq),
   .done(doneIOT0),
   .rot2ac(rot2acIOT0),
   .ac_ck(ac_ckIOT0),
   .clr(iotCLR0),
   .linkclr(linkclrIOT0),
+  .linkcml(linkcmlIOT0),
   .link_ck(link_ckIOT0),
-  .pc_ck(pc_ckIOT0)
+  .pc_ck(pc_ckIOT0),
+  .ACGTF(busACGTF)
 );
 
 // 603x & 604x TTY HANDLING
@@ -706,7 +727,7 @@ TTY theTTY(
   .EN1(instIOT & (busIR[8:3]==6'o03)),
   .EN2(instIOT & (busIR[8:3]==6'o04)),
   .IR(busIR[2:0]),
-  .ACbit11(accout1[11:11]),
+  .ACbit11(accout1[0:0]), // PDP has the bit order reversed
   .ck1(ck1), .ck2(ck2), .ck3(ck3), .ck4(ck4), .ck5(ck5), .ck6(ck6),
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   .done(doneIOT34),

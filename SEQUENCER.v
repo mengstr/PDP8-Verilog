@@ -75,3 +75,11 @@ module SEQUENCER (
     assign CK_6=(stepCnt==18 || stepCnt==19);
 endmodule
 
+// 000x Fetch
+// 001x Auto1
+// 010x Auto2
+// 011x Ind
+// 100x CK/STB1
+// 101x CK/STB2
+// 110x CK/STB3
+// 111x CK/STB4

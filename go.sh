@@ -1,15 +1,8 @@
 #!/bin/bash
 
 FILE=top
-FILES="\
-    CPU.v SEQUENCER.v PROGRAMCOUNTER.v RAM.v \
-    IRDECODER.v OPRDECODER.v \
-    MULTILATCH.v LINK.v ADDAND.v CLORIN.v INCREMENTER.v ROTATER.v SKIP.v \
-    INTERRUPT.v TTY.v"
-
-echo $files
-DR="docker run --rm --log-driver=none  -a stdout -a stderr -w/work -v${PWD}/:/work"
-
+FILES=$(ls [A-Z]*.v)
+DR="docker run --rm --log-driver=none -a stdout -a stderr -w/work -v${PWD}/:/work"
 PCF=dummy.pcf
 PACKAGE=vq100
 
@@ -73,7 +66,7 @@ if [ "$1" != "test" ]; then
 fi # !=test
 
 echo --TESTING
-$DR cranphin/iverilog iverilog -D PRINT $2 -o CPU.vvp CPU.vt $FILES 
+$DR cranphin/iverilog iverilog -D TRACE -o CPU.vvp CPU.vt $FILES 
 if [ $? != 0 ]; then exit 1; fi
 $DR cranphin/iverilog vvp CPU.vvp | ./showop.sh | tee CPU.log
 if [ $? != 0 ]; then exit 1; fi

@@ -63,16 +63,18 @@ module TTY(
   output irq
 );
 
-reg flgKBDIE=0;
+reg flgTTYIE=0;
 reg flgKBD=0;
-reg flgTTY=0;
-or(irq, flgKBD, flgTTY);
+reg flgPRN=0;
+//or(irq, flgKBD, flgTTY);
+
+assign irq=(flgTTYIE) & (flgKBD | flgPRN);
 
 wire     done30, done35, done40, done41;
 or(done, done30, done35, done40, done41);
 
-wire pc_ck1;
-or (pc_ck, pc_ck1);
+wire       pc_ck41;
+or (pc_ck, pc_ck41);
 
 wire instKCF=(EN1 & (IR==3'o0)); //Keyboard Clear Flags
 wire instKSF=(EN1 & (IR==3'o1)); //Keyboard Skip if Flag
@@ -93,23 +95,21 @@ wire instTLS=(EN2 & (IR==3'o6)); //Teleprinter Load and start
 
 always @(posedge CLK) begin
     if (clear)   begin
-        flgKBDIE<=0;
+        flgTTYIE<=1;
         flgKBD<=0;
-        flgTTY<=0;
+        flgPRN<=0;
     end
-    if (instKIE) flgKBDIE<=ACbit11; ////Keyboard Interrupt Set/Reset
+    if (instKIE) flgTTYIE<=ACbit11; ////Keyboard Interrupt Set/Reset
     if (instKCF) flgKBD<=0; //Keyboard Clear Flags
-    if (instTFL) flgTTY<=1; //Teleprinter Flag set
+    if (instTFL) flgPRN<=1; //Teleprinter Flag set
 end
 
 assign done30 = instKCF & ck1;
 assign done35 = instKIE & ck1;
 assign done40 = instTFL & ck1;
 
-assign pc_ck1=   (instTSF & flgTTY & stb1);
+assign pc_ck41= instTSF & flgPRN & stb1;
 assign done41 = instTSF & ck2;
-
-
 
 endmodule
 
@@ -136,4 +136,37 @@ endmodule
 //
 //-----------------------------
 //
+
+//            TTYin TTYou INT NO
+//            IE IO IE IO BUS INT ION
+//----------------------------------------------------
+//IOT TEST 11
+// 4340 CAF   1  0  1  1  1   0   0
+// 4341 TAD   1  0  1  0  0   0   0
+// 4342 DCA   1  0  1  0  0   0   0
+// 4343 ION   1  0  1  0  0   0   0
+// 4344 GTF   1  0  1  0  0   1   1     L-0 AC=0000 
+// 4345 AND   1  0  1  0  0   0   1     L=0 AC=0200
+// 4346 SKON  1  0  1  0  0   0   1     L=0 AC=0200
+// 4350 BSW   1  0  1  0  0   0   0     L=0 AC=0200
+// 4351 RTR   1  0  1  0  0   0   0     L=0 AC=0002
+// 4352 SZL   1  0  1  0  0   0   0     L=1 AC=0000
+// 4354 SZA   1  0  1  0  0   0   0     L=1 AC=0000
+// 4355 JMP   1  0  1  0  0   0   0     L=1 AC=0000
+//
+//IOT TEST 12
+// 4360 7320  1  0  1  0  0   0   0     L=1 AC=0000
+// 4361 TAD   1  0  1  0  0   0   0     L=1 AC=0000
+// 4362 DCA   1  0  1  0  0   0   0     L=1 AC=4376
+// 4363 RTF   1  0  1  0  0   0   0     L=1 AC=0000
+// 4364 SKP   1  0  1  0  0   1   1     L=0 AC=0000
+// 4366 SNL   1  0  1  0  0   1   1     L=0 AC=0000
+// 4367 SNA   1  0  1  0  0   1   1     L=0 AC=0000
+// 4371 SKON  1  0  1  0  0   1   1     L=0 AC=0000
+// 4373 JMPi  1  0  1  0  0   1   0     L=0 AC=0000
+// 4400 CAF   1  0  1  0  0   0   0     L=0 AC=0000
+// 4401 TAD   1  0  1  0  0   0   0     L=0 AC=0000
+//
+
+
 
