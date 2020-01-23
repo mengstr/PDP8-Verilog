@@ -17,19 +17,11 @@ module RAM(
 );
 
 reg [11:0] mem [0:4095];
-reg [11:0] DO;
-
 initial $readmemh("RAM.initial", mem);
 
-always @(posedge clk) begin
-  if (we) begin
-    mem[addr] <= dataI;
-//    $display("-- Wrote %04o to address %04o --",dataI, addr);
-  end
-  if (oe) DO<=mem[addr];
-//  if (oe) dataO=mem[addr]; else dataO=12'bz;
+always @* begin //@(posedge clk) begin
+  if (we) mem[addr] = dataI;
 end
-
-assign dataO=oe ? DO : 12'bz;
+assign dataO=oe ? mem[addr] : 12'bz;
 
 endmodule
