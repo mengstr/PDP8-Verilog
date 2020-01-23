@@ -66,7 +66,7 @@ if [ "$1" != "test" ]; then
 fi # !=test
 
 echo --TESTING
-$DR cranphin/iverilog iverilog -D TRACE -o CPU.vvp CPU.vt $FILES 
+$DR cranphin/iverilog iverilog -g2012 -D TRACE -o CPU.vvp CPU.vt $FILES 
 if [ $? != 0 ]; then exit 1; fi
 $DR cranphin/iverilog vvp CPU.vvp | ./showop.sh | tee CPU.log
 if [ $? != 0 ]; then exit 1; fi
