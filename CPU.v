@@ -173,7 +173,7 @@ wire oprSCL, oprMUY, oprDVI, oprNMI, oprSHL, oprASL, oprLSR; // OPR 3
 wire oprCLA;
 
 OPRDECODER  theOPRDECODER(
-  .IR(busIR),
+  .IR(busIR[8:0]),
   .OPR(instOPR),
   .opr1(opr1), .opr2(opr2), .opr3(opr3),
   .oprIAC(oprIAC), .oprX2(oprX2), .oprLEFT(oprLEFT), .oprRIGHT(oprRIGHT), .oprCML(oprCML), .oprCMA(oprCMA), .oprCLL(oprCLL), // OPR 1
