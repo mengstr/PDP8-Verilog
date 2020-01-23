@@ -13,8 +13,7 @@ module OPRDECODER  (
   output oprHLT, oprOSR, oprTSTINV, oprSNLSZL, oprSZASNA, oprSMASPA,  // OPR 2
   output oprMQL, oprSWP, oprMQA, oprSCA,  // OPR 3 
   output oprSCL, oprMUY, oprDVI, oprNMI, oprSHL, oprASL, oprLSR, // OPR 3
-  output oprCLA, // OPR 1,2,3
-  output oprNOP // OPR x,3
+  output oprCLA // OPR 1,2,3
 );
   wire s0,s1,s2,s3,s4;
 
@@ -53,32 +52,7 @@ module OPRDECODER  (
   assign oprMUY = (IR[0] & s2 & IR[2] & s4 & IR[8] & OPR);
   assign oprSCL = (IR[0] & IR[1] & s3 & s4 & IR[8] & OPR);
 
-  // assign oprNOP0 = (s1 | (s2 & s3 & s4) | s0 | ~ OPR);
-  // assign oprNOP = (s1 & s2 & s3 & s4 & ~ IR[4] & ~ IR[5] & ~ IR[6] & ~ IR[7] & OPR);
-
-  // assign oprCLA1 = (IR[7] & s0 & OPR);
-  // assign oprCLA2 = (s1 & IR[7] & IR[8] & OPR);
-  // assign oprCLA_3 = (IR[0] & IR[7] & IR[8] & OPR);
-
-  // assign oprNOP = (s1 | (s2 & s3 & s4) | s0 | ~ OPR) |
-  //                 (s1 & s2 & s3 & s4 & ~ IR[4] & ~ IR[5] & ~ IR[6] & ~ IR[7] & OPR);
-
-  
-  wire nop1=(s1 | (s2 & s3 & s4) | s0 | ~ OPR);
-  wire nop2=(s1 & s2 & s3 & s4 & ~ IR[4] & ~ IR[5] & ~ IR[6] & ~ IR[7] & OPR);
-  or(oprNOP, nop1,nop2);
-
-  // assign oprCLA = (IR[7] & s0 & OPR) | 
-  //                 (s1 & IR[7] & IR[8] & OPR) | 
-  //                 (IR[0] & IR[7] & IR[8] & OPR);
-
-  // wire cla1=(IR[7] & s0 & OPR); 
-  // wire cla2=(s1 & IR[7] & IR[8] & OPR);
-  // wire cla3=(IR[0] & IR[7] & IR[8] & OPR);
-  // or(oprCLA, cla1,cla2,cla3);
-
   assign oprCLA = ((IR[0] & IR[7] & OPR) | (~ IR[1] & IR[7] & OPR) | (IR[7] & ~ IR[8] & OPR));
-//  assign oprCLA = OPR & (((IR[0] & IR[7]) | (~ IR[1] & IR[7]) | (IR[7] & ~ IR[8])));
 
 
 endmodule
