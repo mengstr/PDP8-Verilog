@@ -118,8 +118,8 @@ wire       pc_ld05;
 or(pc_ld_, pc_ld05);
 
 wire pc_ck_;
-wire       pc_ckFETCH, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ckOPR2;
-or(pc_ck_, pc_ckFETCH, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ckOPR2);
+wire       pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ckOPR2;
+or(pc_ck_, pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ckOPR2);
 
 
 PROGRAMCOUNTER thePC(
@@ -137,12 +137,12 @@ PROGRAMCOUNTER thePC(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ RAM MEMORY █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 wire ram_oe_;
-wire       ram_oeFETCH, ram_oeIND, ram_oePPIND, ram_oe05;
-or(ram_oe_,ram_oeFETCH, ram_oeIND, ram_oePPIND, ram_oe05);
+wire        ram_oeIFI, ram_oe05;
+or(ram_oe_, ram_oeIFI, ram_oe05);
 
 wire ram_we_;
-wire        ram_wePPIND, ram_we05;
-or(ram_we_, ram_wePPIND, ram_we05);
+wire        ram_weIFI, ram_we05;
+or(ram_we_, ram_weIFI, ram_we05);
 
 RAM theRAM(
   .clk(SYSCLK),
@@ -416,12 +416,12 @@ ROTATER theRotater(
 //
 
 wire ind_ck_;
-wire ind_ckIND, ind_ckPPIND;
-or (ind_ck_, ind_ckIND, ind_ckPPIND);
+wire        ind_ckIFI;
+or(ind_ck_, ind_ckIFI);
 
 wire ind2inc_;
-wire          ind2incPPIND, ind2reg05;
-or (ind2inc_, ind2incPPIND, ind2reg05);
+wire          ind2incIFI, ind2reg05;
+or (ind2inc_, ind2incIFI, ind2reg05);
 
 wire ind2rama_;
 wire          ind2rama05;
@@ -469,8 +469,8 @@ MULTILATCH theDataReg(
 //
 
 wire inc2ramd_;
-wire inc2ramdPPIND, inc2ramd05;
-or (inc2ramd_, inc2ramdPPIND, inc2ramd05);
+wire inc2ramdIFI, inc2ramd05;
+or (inc2ramd_, inc2ramdIFI, inc2ramd05);
 
 wire incZero;
 INCREMENTER theBUSINCREMENTER(
@@ -496,8 +496,8 @@ or (reg2pc_, reg2pc05);
 
 
 wire ir2rama_;
-wire         ir2ramaIND, ir2ramaPPIND, ir2rama05;
-or(ir2rama_, ir2ramaIND, ir2ramaPPIND, ir2rama05);
+wire         ir2ramaIFI, ir2rama05;
+or(ir2rama_, ir2ramaIFI, ir2rama05);
 
 wire pc2ramd_;
 wire          pc2ramd05;
@@ -517,28 +517,26 @@ assign busRamD=ram_we_ ? busData : 12'bzzzzzzzzzzzz;
 assign busRamD=pc2ramd_ ? busPC : 12'bzzzzzzzzzzzz;
 assign busRamD=pclat2ramd_ ? busLatPC : 12'bzzzzzzzzzzzz;
 
-// 
-// ▁ ▂ ▄ ▅ ▆ ▇ █ FETCH CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
-// 
-assign pc_ckFETCH=    stbFetch;
-assign ram_oeFETCH=   ckFetch;
+INSTFETCHIND theinstFI (
+   .stbFetch(stbFetch),
+   .ckFetch(ckFetch),
+   .instIsIND(instIsIND),
+   .instIsPPIND(instIsPPIND),
+   .ckIndirect(ckIndirect),
+   .stbIndirect(stbIndirect),
+   .ckAutoinc1(ckAutoinc1),
+   .stbAutoinc2(stbAutoinc2),
+   .ckAutoinc2(ckAutoinc2),
+   .stbAutoinc1(stbAutoinc1),
+  .inc2ramd(inc2ramdIFI),
+  .ind_ck(ind_ckIFI),
+  .ind2inc(ind2incIFI),
+  .ir2rama(ir2ramaIFI),
+  .pc_ck(pc_ckIFI),
+  .ram_oe(ram_oeIFI),
+  .ram_we(ram_weIFI)
+);
 
-// 
-// ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
-// 
-assign ir2ramaIND=   instIsIND & (ckIndirect);
-assign ram_oeIND=    instIsIND & (ckIndirect);
-assign ind_ckIND=    instIsIND & (stbIndirect);
-
-// 
-// ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT W. AUTOINC CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
-// 
-assign ir2ramaPPIND= instIsPPIND & (ckAutoinc1 | ckAutoinc2 | ckIndirect);
-assign ram_oePPIND=  instIsPPIND & (ckAutoinc1 | ckIndirect);
-assign ind2incPPIND= instIsPPIND & (ckAutoinc1 | ckAutoinc2);
-assign ind_ckPPIND=  instIsPPIND & (stbAutoinc1 | stbIndirect);
-assign inc2ramdPPIND=instIsPPIND & (ckAutoinc2);
-assign ram_wePPIND=  instIsPPIND & (stbAutoinc2);
 
 
 INST0_5 theinst0_5 (
