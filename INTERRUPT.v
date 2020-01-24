@@ -67,11 +67,14 @@ module INTERRUPT(
   output linkcml,
   output link_ck,
   output pc_ck,
-  output [11:0] ACGTF
+  output [11:0] ACGTF,
+  output IRQOVERRIDE
 );
 
 reg flgGIE=0;          // Global Inerupt Enable
 reg flgNoInt=0;        // If set the GIE is overridden as disabled 
+reg IRQOVERRIDEx=0;
+assign IRQOVERRIDE=IRQOVERRIDEx;
 
 wire        link_ck5, link_ck7;
 or(link_ck, link_ck5, link_ck7);
@@ -114,7 +117,8 @@ always @(posedge CLK) begin
     if (stb1 & instCAF)      begin flgNoInt<=0; flgGIE<=0; end
     if (stb1 & instRTF)      begin flgNoInt<=!AC[8]; flgGIE<=!AC[8]; end
     if (stbFetch & flgNoInt) begin flgNoInt<=0;            end
-    // if (stb1 & flgNoInt) begin flgNoInt<=0;            end
+    if (ck1 & flgGIE & (!flgNoInt) & irqRq) begin IRQOVERRIDEx<=1; end;
+    if (ck3 & IRQOVERRIDEx) begin flgGIE<=0; IRQOVERRIDEx<=0; end;
 end
 
 assign pc_ck0=  instSKON & stb1 & flgGIE;       // 6000 SKON
@@ -122,7 +126,6 @@ assign done0=   instSKON & ck2;
 
 assign done1 = instION & ck2;                   // 6001 ION
 assign done2 = instIOF & ck2;                   // 6002 IOF
-
 
 assign pc_ck3=  instSRQ & stb1 & irqRq;         // 6003 SRQ
 assign done3=   instSRQ & ck2;

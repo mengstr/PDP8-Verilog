@@ -1,3 +1,10 @@
+//
+// ROATAER.v - for the PDP-8 in Verilog project
+//
+// github.com/SmallRoomLabs/PDP8-Verilog
+// Mats Engstrom - mats.engstrom@gmail.com
+//
+
 `default_nettype none
 
 module ROTATER (
@@ -6,34 +13,43 @@ module ROTATER (
   input LI,
   input OE,
   output [11:0] AO,
-  output reg LO
+  output LO
 );
 
-reg [11:0] Areg;
+  reg [11:0] Areg;
+  reg Lreg;
 
-always @* begin
- if (OP[2] & !OP[1] & !OP[0]) begin // Shift right 1 step
-  Areg={LI,AI[11:1]};
-  LO=AI[0];
- end else if (!OP[2] & OP[1] & !OP[0]) begin // Shift left 1 step
-  Areg={AI[10:0],LI};
-  LO=AI[11];
- end else if (OP[2] & !OP[1] & OP[0]) begin // Shift right 2 steps
-  Areg={AI[0],LI,AI[11:2]};
-  LO=AI[1];
- end else if (!OP[2] & OP[1] & OP[0]) begin // Shift left 2 steps
-  Areg={AI[9:0],LI,AI[11]};
-  LO=AI[10];
- end else if (!OP[2] & !OP[1] & OP[0]) begin // Swap
-  Areg={AI[5:0],AI[11:6]};
-  LO=LI;
- end else begin
-  Areg=AI;
-  LO=LI;
- end  
-end
+  always @* begin
+  case({OP[2],OP[1],OP[0]})
+    3'b001: begin // Swap
+              Areg={AI[5:0],AI[11:6]};
+              Lreg=LI;
+            end
+    3'b010: begin // Shift left 1 step
+              Areg={AI[10:0],LI};
+              Lreg=AI[11];
+              end
+    3'b011: begin // Shift left 2 steps
+              Areg={AI[9:0],LI,AI[11]};
+              Lreg=AI[10];
+              end
+    3'b100: begin // Shift right 1 step
+              Areg={LI,AI[11:1]};
+              Lreg=AI[0];
+              end
+    3'b101: begin // Shift right 2 steps
+              Areg={AI[0],LI,AI[11:2]};
+              Lreg=AI[1];
+              end
+    default: begin
+                Areg=AI;
+                Lreg=LI;
+              end
+    endcase
+  end
 
-assign AO=OE ? Areg : 12'bzzzzzzzzzzzz;
+  assign AO=OE ? Areg : 12'bzzzzzzzzzzzz;
+  assign LO=Lreg;
 
 endmodule
 

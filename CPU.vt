@@ -1,39 +1,39 @@
-`timescale 1ns/1ps
+`timescale 100ns/10ns
 
 module CPU_tb();
     reg SYSCLK=0;
-    reg clear=0,run=0, halt=0;
-    reg mstep=0, istep=0;
+    reg reset=0,run=0, halt=0;
     wire [11:0] dutBusPC, dutBusData;
     wire instAND, instTAD, instISZ, instDCA, instJMS, instJMP, instIOT, instOPR;
 
     CPU dut(
         .SYSCLK(SYSCLK),
-        .sw_CLEAR(clear),
-        .sw_RUN(run), .sw_HALT(halt),
-        .sw_STEPM(mstep), .sw_STEPI(istep),
+        .sw_RESET(reset),
+        .sw_RUN(run), 
+        .sw_HALT(halt),
         .pBusPC(dutBusPC),
         .pBusData(dutBusData),
         .pInstAND(instAND), .pInstTAD(instTAD), .pInstISZ(instISZ), .pInstDCA(instDCA), .pInstJMS(instJMS), .pInstJMP(instJMP), .pInstIOT(instIOT), .pInstOPR(instOPR)
     );
     
-    initial begin
-        $dumpfile("CPU.vcd");
-        $dumpvars;
-        #20000 $finish;
-    end
     
+    always begin
+        #1 SYSCLK<=~SYSCLK;
+    end
+
     // Clear/reset the entire system
     initial begin 
-        #0.5 clear=1; #5 clear=0; 
+        reset=1; #5 reset=0; 
     end  
     
     initial begin 
-        #10 run=1; #0.5 run=0; 
+        #10 run=1; #5 run=0; 
     end
 
-    always begin
-        #0.1 SYSCLK<=~SYSCLK;
+    initial begin
+        $dumpfile("CPU.vcd");
+        $dumpvars(0,CPU_tb);
+        #32000 $finish;
     end
 
     always @(dut.theSEQUENCER.stepCnt) begin
@@ -59,7 +59,4 @@ module CPU_tb();
     end
     
 
-
-
 endmodule
-

@@ -1,3 +1,10 @@
+//
+// SKIP.v - for the PDP-8 in Verilog project
+//
+// github.com/SmallRoomLabs/PDP8-Verilog
+// Mats Engstrom - mats.engstrom@gmail.com
+//
+
 `default_nettype none
 
 module SKIP (
@@ -10,20 +17,7 @@ module SKIP (
   output OUT
 );
 
-
   assign OUT = ((((1'b1 ^ (AC!=0 | AC[11])) & SZASNA) | (AC[11] & SMASPA) | (LINK & SNLSZL)) ^ TSTINV);
-
-  // always @* begin
-  //   if (
-  //     (TSTINV==0 && (AC==0 && SZASNA) || (AC[11]==1 && SMASPA) || (LINK && SNLSZL) )
-  //     ||
-  //     (TSTINV==1 && (AC!=0 && SZASNA) || (AC[11]!=1 && SMASPA) || (!LINK && SNLSZL) )
-  //   ) begin
-  //       OUT=1;
-  //     end else begin
-  //       OUT=0;
-  //     end
-  // end
 
 endmodule
 

@@ -1,37 +1,23 @@
+//
+// CLORIN.v - for the PDP-8 in Verilog project
+//
+// github.com/SmallRoomLabs/PDP8-Verilog
+// Mats Engstrom - mats.engstrom@gmail.com
+//
+
 `default_nettype none
 
 module CLORIN (
   input [11:0] IN,
-  input [7:0] CLR,
+  input CLR,
   input [11:0] DOR,
   input INV,
   output [11:0] OUT
 );
 
-  assign OUT=(CLR==8'b00000000) ?               //413
+  assign OUT=(CLR==1'b0) ?
     INV ? (IN|DOR)^12'b111111111111 : (IN|DOR) :
     INV ? (   DOR)^12'b111111111111 : (   DOR) ;
-
-  // wire [11:0] tmp=(CLR==8'b00000000) ? (IN|DOR):(DOR); //417
-  // assign OUT=INV?tmp:tmp^12'b111111111111;
-
-  // assign OUT= //420
-  //   !INV ?
-  //      (CLR!=8'b00000000) ? (DOR):(IN|DOR) :
-  //     ((CLR!=8'b00000000) ? (DOR):(IN|DOR))^12'b111111111111 ;
-
-  // assign OUT= //417
-  //   INV ?
-  //      (CLR==8'b00000000) ? (IN|DOR):(DOR) :
-  //     ((CLR==8'b00000000) ? (IN|DOR):(DOR))^12'b111111111111 ;
-
-  // always @* begin                              //420
-  //   if (CLR==0) begin
-  //     OUT=(IN | DOR) ^ {12{INV}};
-  //   end else begin
-  //     OUT=DOR ^ {12{INV}};
-  //   end
-  // end
 
 endmodule
 

@@ -1,15 +1,21 @@
-`default_nettype none
+//
+// OPRDECODER.v - for the PDP-8 in Verilog project
+//
+// github.com/SmallRoomLabs/PDP8-Verilog
+// Mats Engstrom - mats.engstrom@gmail.com
+//
 
+`default_nettype none
 
 module OPRDECODER  (
   input [8:0] IR,
   input OPR,
   output opr1,opr2,opr3,
-  output oprIAC, oprX2, oprLEFT, oprRIGHT, oprCML, oprCMA, oprCLL, // OPR 1
+  output oprIAC, oprX2, oprLEFT, oprRIGHT, oprCML, oprCMA, oprCLL,    // OPR 1
   output oprHLT, oprOSR, oprTSTINV, oprSNLSZL, oprSZASNA, oprSMASPA,  // OPR 2
-  output oprMQL, oprSWP, oprMQA, oprSCA,  // OPR 3 
-  output oprSCL, oprMUY, oprDVI, oprNMI, oprSHL, oprASL, oprLSR, // OPR 3
-  output oprCLA // OPR 1,2,3
+  output oprMQL, oprSWP, oprMQA, oprSCA,                              // OPR 3 
+  output oprSCL, oprMUY, oprDVI, oprNMI, oprSHL, oprASL, oprLSR,      // OPR 3
+  output oprCLA                                                       // OPR 1,2,3
 );
 
   assign opr1 = OPR & ~IR[8];

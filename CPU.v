@@ -14,16 +14,33 @@
 // [PC]       [DATA], [RAMADDR]                         PC
 // [LATPC]    OC12A, OC12B                              PC
 // [PCIN]     PC, [REG],                                [DATA], OC12A ,'NEWPC'
+//
+//
+// CPU
+// ADDAND           comb  [A] [B]             -> [zOUT]
+// CLORIN           comb  [IN] CLR [OR] INV   -> [OUT]
+// ROTATER          comb  [IN] L              -> [zOUT] L
+// OPRDECODER       comb  [IR]                -> opr*
+// SKIP             comb  [AC] flags*         -> OUT
+// IRDECODER        comb  [PCL] [IR]          -> instType*
+// IOTBASEDECODER   comb  [IR]                -> iotRange*
+// INCREMENTER      comb  [IN]                -> [zOUT] C
+// PROGRAMCOUNTER   seq   [IN]                -> [PC] [PCLAT]
+// SEQUENCER
+// MULTILATCH
+// LINK
+// INTERRUPT
+// RAM
+// TTY
+//
 
 `default_nettype none
 
 module CPU(
   input SYSCLK,
-  input sw_CLEAR,    // Clear/reset CPU
+  input sw_RESET,    // Clear/reset CPU
   input sw_RUN,      // Start CPU
   input sw_HALT,     // Halt CPU at next instruction
-  input sw_STEPM,    // Step one micro step
-  input sw_STEPI,    // Step one instruction
   output [11:0] pBusPC,
   output [11:0] pBusData,
   output pInstAND, pInstTAD, pInstISZ, pInstDCA, pInstJMS, pInstJMP, pInstIOT, pInstOPR
@@ -43,6 +60,7 @@ module CPU(
   // The buses
 wire [11:0] busReg;
 reg [11:0] busIR;
+reg [11:0] busIRx;
 wire [11:0] busData;
 wire [11:0] busRamD;
 wire [11:0] busRamA;
@@ -54,9 +72,6 @@ wire [11:0] busORacc;
   wire irqRq;           // Some device is asserting irq
   wire      irqRqIOT34;
   or(irqRq, irqRqIOT34);
-
-reg CLK=0;
-always @(posedge SYSCLK) CLK<=!CLK;
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ SEQUENCER █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -73,13 +88,15 @@ wire stbIndirect;
 wire stb1, stb2, stb3, stb4, stb5, stb6;
 
 wire done_;
-wire      doneAND1, doneAND2, doneTAD1, doneTAD2, doneISZ1, doneISZ2, doneDCA1, doneDCA2, doneJMS1, doneJMS2, doneIRQ, doneJMP1, doneJMP2, doneIOT0, doneIOT34, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L;
-or(done_, doneAND1, doneAND2, doneTAD1, doneTAD2, doneISZ1, doneISZ2, doneDCA1, doneDCA2, doneJMS1, doneJMS2, doneIRQ, doneJMP1, doneJMP2, doneIOT0, doneIOT34, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L);
+wire      done05, doneIOT0, doneIOT34, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L;
+or(done_, done05, doneIOT0, doneIOT34, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L);
 
 SEQUENCER theSEQUENCER(
-    .SYSCLK(SYSCLK),
-    .CLK(CLK),
-    .CLEAR(sw_CLEAR || done_), .RUN(sw_RUN), .HALT(sw_HALT), .STEPM(sw_STEPM), .STEPI(sw_STEPI),
+    .CLK(SYSCLK),
+    .RESET(sw_RESET),
+    .RUN(sw_RUN),
+    .HALT(sw_HALT),
+    .DONE(done_), 
     .SEQTYPE({instIsPPIND,instIsIND}),
     .CK_FETCH(ckFetch),
     .CK_AUTOINC1(ckAutoinc1), .CK_AUTOINC2(ckAutoinc2), 
@@ -97,19 +114,19 @@ SEQUENCER theSEQUENCER(
 //
 
 wire pc_ld_;
-wire       pc_ldJMS1, pc_ldJMS2, pc_ldIRQ, pc_ldJMP1, pc_ldJMP2;
-or(pc_ld_, pc_ldJMS1, pc_ldJMS2, pc_ldIRQ, pc_ldJMP1, pc_ldJMP2);
+wire       pc_ld05;
+or(pc_ld_, pc_ld05);
 
 wire pc_ck_;
-wire       pc_ckFETCH, pc_ckISZ1, pc_ckISZ2, pc_ckJMS1, pc_ckJMS2, pc_ckIRQ, pc_ckJMP1, pc_ckJMP2, pc_ckIOT0, pc_ckIOT34, pc_ckOPR2;
-or(pc_ck_, pc_ckFETCH, pc_ckISZ1, pc_ckISZ2, pc_ckJMS1, pc_ckJMS2, pc_ckIRQ, pc_ckJMP1, pc_ckJMP2, pc_ckIOT0, pc_ckIOT34, pc_ckOPR2);
+wire       pc_ckFETCH, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ckOPR2;
+or(pc_ck_, pc_ckFETCH, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ckOPR2);
 
 
 PROGRAMCOUNTER thePC(
+  .RESET(sw_RESET),
   .IN(busPCin),
-  .CLR(sw_CLEAR),
   .LD(pc_ld_),
-  .CLK(pc_ck_),
+  .CK(pc_ck_),
   .LATCH(ckFetch & (!stbFetch)),
   .PC(busPC),
   .PCLAT(busLatPC)
@@ -120,12 +137,12 @@ PROGRAMCOUNTER thePC(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ RAM MEMORY █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 wire ram_oe_;
-wire       ram_oeFETCH, ram_oeIND, ram_oePPIND, ram_oeAND1, ram_oeAND2, ram_oeTAD1, ram_oeTAD2, ram_oeISZ1, ram_oeISZ2;
-or(ram_oe_,ram_oeFETCH, ram_oeIND, ram_oePPIND, ram_oeAND1, ram_oeAND2, ram_oeTAD1, ram_oeTAD2, ram_oeISZ1, ram_oeISZ2);
+wire       ram_oeFETCH, ram_oeIND, ram_oePPIND, ram_oe05;
+or(ram_oe_,ram_oeFETCH, ram_oeIND, ram_oePPIND, ram_oe05);
 
 wire ram_we_;
-wire        ram_wePPIND, ram_weISZ1, ram_weISZ2, ram_weDCA1, ram_weDCA2, ram_weJMS1, ram_weJMS2, ram_weIRQ;
-or(ram_we_, ram_wePPIND, ram_weISZ1, ram_weISZ2, ram_weDCA1, ram_weDCA2, ram_weJMS1, ram_weJMS2, ram_weIRQ);
+wire        ram_wePPIND, ram_we05;
+or(ram_we_, ram_wePPIND, ram_we05);
 
 RAM theRAM(
   .clk(SYSCLK),
@@ -139,8 +156,9 @@ RAM theRAM(
 
 assign busData = ckFetch ? busRamD : 12'bzzzzzzzzzzzz;
 assign busData = ram_oe_ ? busRamD : 12'bzzzzzzzzzzzz;
-always @(posedge CLK) begin
-  if (ckFetch) busIR<= irqOverride ? 12'o4000 : busData; //FIXME
+always @(negedge SYSCLK) begin
+  if (ckFetch) busIR= irqOverride ? 12'o4000 : busData; //FIXME
+  if (stbFetch) busIRx= irqOverride ? 12'o4000 : busData; //FIXME
 end
 
 
@@ -219,9 +237,9 @@ or (mq2orbus_, mq2orbusOPR3C, mq2orbusOPR3D, mq2orbusOPR3K, mq2orbusOPR3L);
 wire [11:0] mqout1;
 wire [11:0] mqout2;
 MULTILATCH theMQ(
-    .CLK(CLK),
+    .RESET(sw_RESET),
+    .CLK(SYSCLK),
     .in(accout1),
-    .clear(sw_CLEAR),
     .latch(mq_ck_), 
     .hold(mq_hold_),
     .oe1(mq2orbus_), 
@@ -236,15 +254,15 @@ MULTILATCH theMQ(
 //
 
 wire link_ck_;
-wire         link_ckTAD1, link_ckTAD2, link_ckIOT0, link_ckOPR1;
-or(link_ck_, link_ckTAD1, link_ckTAD2, link_ckIOT0, link_ckOPR1);
+wire         link_ck05, link_ckIOT0, link_ckOPR1;
+or(link_ck_, link_ck05, link_ckIOT0, link_ckOPR1);
 
 wire link;
 wire rotaterLI;
 
 LINK theLINK(
   .SYSCLK(SYSCLK),
-  .CLEAR(sw_CLEAR),
+  .CLEAR(sw_RESET),
   .LINK_CK(link_ck_),
   .CLL(oprCLL | linkclrIOT0),
   .CML(((oprCML ^ (incC & oprIAC)) | (andaddC & instTAD)) | linkcmlIOT0),
@@ -260,11 +278,11 @@ LINK theLINK(
 //
 
 wire ramd2ac_add_, ramd2ac_and_;
-wire ramd2ac_andAND1, ramd2ac_andAND2;
-wire ramd2ac_addTAD1, ramd2ac_addTAD2;
+wire ramd2ac_and05;
+wire ramd2ac_add05;
 
-or(ramd2ac_and_, ramd2ac_andAND1, ramd2ac_andAND2);
-or(ramd2ac_add_, ramd2ac_addTAD1, ramd2ac_addTAD2);
+or(ramd2ac_and_, ramd2ac_and05);
+or(ramd2ac_add_, ramd2ac_add05);
 
 wire andaddC;
 ADDAND theADDAND(
@@ -312,19 +330,19 @@ ADDAND theADDAND(
 //
 
 wire ac_ck_;
-wire        ac_ckAND1, ac_ckAND2, ac_ckTAD1, ac_ckTAD2, ac_ckDCA1, ac_ckDCA2, ac_ckIOT0, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L;
-or (ac_ck_, ac_ckAND1, ac_ckAND2, ac_ckTAD1, ac_ckTAD2, ac_ckDCA1, ac_ckDCA2, ac_ckIOT0, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L);
+wire        ac_ck05, ac_ckIOT0, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L;
+or (ac_ck_, ac_ck05, ac_ckIOT0, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L);
 
 wire ac2ramd_;
-wire ac2ramdDCA1, ac2ramdDCA2;
-or (ac2ramd_, ac2ramdDCA1, ac2ramdDCA2);
+wire ac2ramd05;
+or (ac2ramd_, ac2ramd05);
 
 wire [11:0] accIn;
 wire [11:0] accout1;
 MULTILATCH theACC(
-    .CLK(CLK),
+    .RESET(sw_RESET),
+    .CLK(SYSCLK),
     .in(accIn),
-    .clear(sw_CLEAR),
     .latch(ac_ck_),
     .hold(1'b0),
     .oe1(1'b1),
@@ -343,13 +361,16 @@ assign busORacc=
 //
 
 wire claDCA_;
-wire claDCA1, claDCA2, claO3D, claO3I, claO3J, claO3K, claO3L;
-or (claDCA_, claDCA1, claDCA2, claO3D, claO3I, claO3J, claO3K, claO3L);
+wire         cla05, claO3D, claO3I, claO3J, claO3K, claO3L;
+or (claDCA_, cla05, claO3D, claO3I, claO3J, claO3K, claO3L);
+
+wire clorinCLR;
+or (clorinCLR, claDCA_, oprCLA, iotCLR0);
 
 wire [11:0] clorinOut;
 CLORIN theCLORIN(
   .IN(accout1),
-  .CLR({oprCLA, claDCA_, iotCLR0, 5'b0}),
+  .CLR(clorinCLR),
   .DOR(busORacc),
   .INV(oprCMA),
   .OUT(clorinOut)
@@ -375,8 +396,8 @@ INCREMENTER theINCREMENTER(
 //
 
 wire rot2ac_;
-wire        rot2acDCA1, rot2acDCA2, rot2acIOT0, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L;
-or(rot2ac_, rot2acDCA1, rot2acDCA2, rot2acIOT0, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L);
+wire        rot2ac05, rot2acIOT0, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L;
+or(rot2ac_, rot2ac05, rot2acIOT0, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L);
 
 wire rotaterLO;
 ROTATER theRotater(
@@ -399,17 +420,17 @@ wire ind_ckIND, ind_ckPPIND;
 or (ind_ck_, ind_ckIND, ind_ckPPIND);
 
 wire ind2inc_;
-wire          ind2incPPIND, ind2regJMS2, ind2regJMP2;
-or (ind2inc_, ind2incPPIND, ind2regJMS2, ind2regJMP2);
+wire          ind2incPPIND, ind2reg05;
+or (ind2inc_, ind2incPPIND, ind2reg05);
 
 wire ind2rama_;
-wire          ind2ramaAND2, ind2ramaTAD2, ind2ramaISZ2, ind2ramaDCA2, ind2ramaJMS2;
-or(ind2rama_, ind2ramaAND2, ind2ramaTAD2, ind2ramaISZ2, ind2ramaDCA2, ind2ramaJMS2);
+wire          ind2rama05;
+or(ind2rama_, ind2rama05);
 
 MULTILATCH theIndReg(
-    .CLK(CLK),
+    .RESET(sw_RESET),
+    .CLK(SYSCLK),
     .in(busData),
-    .clear(sw_CLEAR),
     .latch(ind_ck_),
     .hold(1'b0),
     .oe1(ind2inc_),
@@ -423,18 +444,18 @@ MULTILATCH theIndReg(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ DATA REGISTER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 wire data_ck_;
-wire data_ckISZ1, data_ckISZ2;
-or (data_ck_ ,data_ckISZ1, data_ckISZ2);
+wire data_ck05;
+or (data_ck_ ,data_ck05);
 
 wire ld2inc_;
-wire ld2incISZ1, ld2incISZ2;
-or (ld2inc_ ,ld2incISZ1, ld2incISZ2);
+wire ld2inc05;
+or (ld2inc_ ,ld2inc05);
 
 wire [11:0] dummy1;   
 MULTILATCH theDataReg(
-    .CLK(CLK),
+    .RESET(sw_RESET),
+    .CLK(SYSCLK),
     .in(busData),
-    .clear(sw_CLEAR),
     .latch(data_ck_),
     .hold(1'b0),
     .oe1(ld2inc_),
@@ -448,8 +469,8 @@ MULTILATCH theDataReg(
 //
 
 wire inc2ramd_;
-wire inc2ramdPPIND, inc2ramdISZ1, inc2ramdISZ2;
-or (inc2ramd_, inc2ramdPPIND, inc2ramdISZ1, inc2ramdISZ2);
+wire inc2ramdPPIND, inc2ramd05;
+or (inc2ramd_, inc2ramdPPIND, inc2ramd05);
 
 wire incZero;
 INCREMENTER theBUSINCREMENTER(
@@ -466,28 +487,25 @@ INCREMENTER theBUSINCREMENTER(
 //
 
 wire ir2pc_;
-wire       ir2pcJMS1, ir2pcIRQ, ir2pcJMP1;
-or(ir2pc_, ir2pcJMS1, ir2pcIRQ, ir2pcJMP1);
+wire       ir2pc05;
+or(ir2pc_, ir2pc05);
 
 wire reg2pc_;
-wire reg2pcJMS2, reg2pcJMP2;
-or (reg2pc_, reg2pcJMS2, reg2pcJMP2);
+wire reg2pc05;
+or (reg2pc_, reg2pc05);
 
-// wire ind2pc_;
-// wire ind2pcJMS2;
-// or (ind2pc_, ind2pcJMS2);
 
 wire ir2rama_;
-wire         ir2ramaIND, ir2ramaPPIND, ir2ramaAND1, ir2ramaTAD1, ir2ramaISZ1, ir2ramaDCA1, ir2ramaJMS1, ir2ramaIRQ;
-or(ir2rama_, ir2ramaIND, ir2ramaPPIND, ir2ramaAND1, ir2ramaTAD1, ir2ramaISZ1, ir2ramaDCA1, ir2ramaJMS1, ir2ramaIRQ);
+wire         ir2ramaIND, ir2ramaPPIND, ir2rama05;
+or(ir2rama_, ir2ramaIND, ir2ramaPPIND, ir2rama05);
 
 wire pc2ramd_;
-wire          pc2ramdJMS1, pc2ramdJMS2;
-or (pc2ramd_, pc2ramdJMS1, pc2ramdJMS2);
+wire          pc2ramd05;
+or (pc2ramd_, pc2ramd05);
 
 wire pclat2ramd_;
-wire            pclat2ramdIRQ;
-or(pclat2ramd_, pclat2ramdIRQ);
+wire            pclat2ramd05;
+or(pclat2ramd_, pclat2ramd05);
 
 assign busPCin=ir2pc_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // First OC12 module
 assign busPCin=reg2pc_ ? busReg[11:0] : 12'bzzzzzzzz;
@@ -523,162 +541,38 @@ assign inc2ramdPPIND=instIsPPIND & (ckAutoinc2);
 assign ram_wePPIND=  instIsPPIND & (stbAutoinc2);
 
 
-//
-// AND 0xxx
-//
-wire AND1=(instAND && instIsDIR);
-wire AND2=(instAND && (instIsIND || instIsPPIND));
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ir2ramaAND1=     AND1&(ck1                                                                        );
-assign ramd2ac_andAND1= AND1&(ck1                                                                        );
-assign ram_oeAND1=      AND1&(ck1                                                                        );
-assign ac_ckAND1=       AND1&(      stb1                                                                 );
-assign doneAND1=        AND1&(             ck2                                                           );
-
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ind2ramaAND2=    AND2&(ck1                                                                        );
-assign ramd2ac_andAND2= AND2&(ck1                                                                        );
-assign ram_oeAND2=      AND2&(ck1                                                                        );
-assign ac_ckAND2=       AND2&(      stb1                                                                 );
-assign doneAND2=        AND2&(             ck2                                                           );
-// end
-
-//
-// TAD 1xxx
-//
-wire TAD1=(instTAD && instIsDIR);
-wire TAD2=(instTAD && (instIsIND || instIsPPIND));
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ir2ramaTAD1=     TAD1&(ck1                                                                        );
-assign ramd2ac_addTAD1= TAD1&(ck1                                                                        );
-assign ram_oeTAD1=      TAD1&(ck1                                                                        );
-assign ac_ckTAD1=       TAD1&(      stb1                                                                 );
-assign link_ckTAD1=     TAD1&(      stb1                                                                 );
-assign doneTAD1=        TAD1&(             ck2                                                           );
-
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ind2ramaTAD2=    TAD2&(ck1                                                                        );
-assign ramd2ac_addTAD2= TAD2&(ck1                                                                        );
-assign ram_oeTAD2=      TAD2&(ck1                                                                        );
-assign ac_ckTAD2=       TAD2&(      stb1                                                                 );
-assign link_ckTAD2=     TAD2&(      stb1                                                                 );
-assign doneTAD2=        TAD2&(             ck2                                                           );
-// end
-
-//
-// ISZ 2xxx
-//
-wire ISZ1=(instISZ && instIsDIR);
-wire ISZ2=(instISZ && (instIsIND || instIsPPIND));
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ram_oeISZ1=      ISZ1&(ck1 |                     ck3                                               );
-assign ir2ramaISZ1=     ISZ1&(ck1 |        ck2 |        ck3                                               );
-assign data_ckISZ1=     ISZ1&(      stb1                                                                  );
-assign ld2incISZ1=      ISZ1&(      stb1 | ck2 |        ck3 |        ck4                                  );
-assign ram_weISZ1=      ISZ1&(             ck2                                                            );
-assign inc2ramdISZ1=    ISZ1&(             ck2                                                            );
-assign pc_ckISZ1=       ISZ1&(                                       ck4 & incZero                        );
-assign doneISZ1=        ISZ1&(                                                    ck5                     );
-
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ram_oeISZ2=      ISZ2&(ck1 |                     ck3                                               );
-assign ind2ramaISZ2=    ISZ2&(ck1 |        ck2 |        ck3                                               );
-assign data_ckISZ2=     ISZ2&(      stb1                                                                  );
-assign ld2incISZ2=      ISZ2&(      stb1 | ck2 |        ck3 |        ck4                                  );
-assign ram_weISZ2=      ISZ2&(             ck2                                                            );
-assign inc2ramdISZ2=    ISZ2&(             ck2                                                            );
-assign pc_ckISZ2=       ISZ2&(                                       ck4 & incZero                        );
-assign doneISZ2=        ISZ2&(                                                    ck5                     );
-// end
-
-//
-// DCA 3xxx
-//
-wire DCA1=(instDCA && instIsDIR);
-wire DCA2=(instDCA && (instIsIND || instIsPPIND));
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ir2ramaDCA1=     DCA1&(ck1                                                                        );
-assign ac2ramdDCA1=     DCA1&(ck1                                                                        );
-assign ram_weDCA1=      DCA1&(       stb1                                                                );
-assign claDCA1=         DCA1&(              ck2                                                          );
-assign rot2acDCA1=      DCA1&(              ck2                                                          );
-assign ac_ckDCA1=       DCA1&(                    stb2                                                   );
-assign doneDCA1=        DCA1&(                           ck3                                             );
-
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ind2ramaDCA2=    DCA2&(ck1                                                                        );
-assign ac2ramdDCA2=     DCA2&(ck1                                                                        );
-assign ram_weDCA2=      DCA2&(       stb1                                                                );
-assign claDCA2=         DCA2&(              ck2                                                          );
-assign rot2acDCA2=      DCA2&(              ck2                                                          );
-assign ac_ckDCA2=       DCA2&(                    stb2                                                   );
-assign doneDCA2=        DCA2&(                           ck3                                             );
-
-//
-// JMS 4xxx
-//
-wire JMS1=(instJMS && instIsDIR);
-wire JMS2=(instJMS && (instIsIND || instIsPPIND));
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ir2ramaJMS1=     JMS1&(ck1                                                                        ); 
-assign pc2ramdJMS1=     JMS1&(ck1                                                                        );
-assign ram_weJMS1=      JMS1&(stb1                                                                       );
-assign ir2pcJMS1=       JMS1&(ck2                                                                        ); 
-assign pc_ldJMS1=       JMS1&(ck2                                                                        );
-assign pc_ckJMS1=       JMS1&(      stb2 |       stb3                                                    );
-assign doneJMS1=        JMS1&(             ck4                                                           );
-
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ind2ramaJMS2=    JMS2&(ck1|ck2                                                                        );
-assign pc2ramdJMS2=     JMS2&(ck1                                                                        );
-assign ram_weJMS2=      JMS2&(stb1                                                                       );
-assign ind2regJMS2=     JMS2&(ck1|ck2                                                                        );
-assign reg2pcJMS2=      JMS2&(ck1|ck2                                                                        );
-assign pc_ldJMS2=       JMS2&(ck2                                                                        );
-assign pc_ckJMS2=       JMS2&(      stb2 |       stb3                                                    );
-assign doneJMS2=        JMS2&(             ck4                                                           );
+INST0_5 theinst0_5 (
+ .instIsDIR(instIsDIR), .instIsIND(instIsIND), .instIsPPIND(instIsPPIND),
+ .instAND(instAND), .instDCA(instDCA), .instISZ(instISZ), .instJMP(instJMP), .instJMS(instJMS), .instTAD(instTAD),
+.incZero(incZero),
+.irqOverride(irqOverride),
+.ck1(ck1), .ck2(ck2), .ck3(ck3), .ck4(ck4), .ck5(ck5),
+.stb1(stb1), .stb2(stb2), .stb3(stb3),
+.pclat2ramd(pclat2ramd05),
+.ac2ramd(ac2ramd05),
+.cla(cla05),
+.inc2ramd(inc2ramd05),
+.data_ck(data_ck05),
+.ind2reg(ind2reg05),
+.ld2inc(ld2inc05),
+.link_ck(link_ck05),
+.pc2ramd(pc2ramd05),
+.ramd2ac_add(ramd2ac_add05),
+.ramd2ac_and(ramd2ac_and05),
+.reg2pc(reg2pc05),
+.rot2ac(rot2ac05),
+.ir2pc(ir2pc05),
+.ind2rama(ind2rama05),
+.pc_ld(pc_ld05),
+.ac_ck(ac_ck05),
+.ir2rama(ir2rama05),
+.ram_oe(ram_oe05),
+.pc_ck(pc_ck05),
+.ram_we(ram_we05),
+.done(done05)
+);
 
 
-//                                  1     1      2     2      3     3      4     4      5     5      6     6
-//                                  ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ir2ramaIRQ=     irqOverride&(ck1                                                                        ); 
-assign pclat2ramdIRQ=  irqOverride&(ck1                                                                        );
-assign ram_weIRQ=      irqOverride&(stb1                                                                       );
-assign ir2pcIRQ=       irqOverride&(ck2                                                                        ); 
-assign pc_ldIRQ=       irqOverride&(ck2                                                                        );
-assign pc_ckIRQ=       irqOverride&(      stb2 |       stb3                                                    );
-assign doneIRQ=        irqOverride&(             ck4                                                           );
-
-
-//
-// JMP 5xxx DIRECT
-//
-wire JMP1=(instJMP && instIsDIR);
-wire JMP2=(instJMP && (instIsIND || instIsPPIND));
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ir2pcJMP1=       JMP1&(ck1                                                                        ); 
-assign pc_ldJMP1=       JMP1&(ck1                                                                        );
-assign pc_ckJMP1=       JMP1&(      stb1                                                                 );
-assign doneJMP1=        JMP1&(             ck2                                                           );
-
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ind2regJMP2=     JMP2&(ck1                                                                        );
-assign reg2pcJMP2=      JMP2&(ck1                                                                        );
-assign pc_ldJMP2=       JMP2&(ck1                                                                        );
-assign pc_ckJMP2=       JMP2&(      stb1                                                                 );
-assign doneJMP2=        JMP2&(             ck2                                                           );
 
 //
 // IOT 6xxx
@@ -691,8 +585,8 @@ wire linkcmlIOT0;
 wire [11:0] busACGTF;
 wire irqOverride;
 INTERRUPT theInterrupt(
-  .CLK(CLK),
-  .clear(sw_CLEAR),
+  .CLK(SYSCLK),
+  .clear(sw_RESET),
   .EN(instIOT & (busIR[8:3]==6'o00)),
   .IR(busIR[2:0]),
   .AC(accout1),
@@ -715,8 +609,8 @@ INTERRUPT theInterrupt(
 // 603x & 604x TTY HANDLING
 wire iotCLR34;
 TTY theTTY(
-  .CLK(CLK),
-  .clear(sw_CLEAR | iotCLR0),
+  .CLK(SYSCLK),
+  .clear(sw_RESET | iotCLR0),
   .EN1(instIOT & (busIR[8:3]==6'o03)),
   .EN2(instIOT & (busIR[8:3]==6'o04)),
   .IR(busIR[2:0]),

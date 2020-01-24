@@ -1,3 +1,10 @@
+//
+// SEQUENCER.v - for the PDP-8 in Verilog project
+//
+// github.com/SmallRoomLabs/PDP8-Verilog
+// Mats Engstrom - mats.engstrom@gmail.com
+//
+
 `default_nettype none
 
 //
@@ -5,9 +12,11 @@
 //
 
 module MULTILATCH (
+    input RESET,
     input CLK, 
     input [11:0] in,
-    input clear,hold,latch,
+    input hold,
+    input latch,
     input oe1,oe2,
     output [11:0] out1, out2
 );
@@ -19,12 +28,12 @@ module MULTILATCH (
     assign out2=oe2 ? data : 12'bz;
 
     always @* begin
-        if (clear) holdreg=0;
+        if (RESET) holdreg=0;
         if (!hold) holdreg=in;
     end
 
-    always @(posedge latch or posedge clear) begin
-        if (clear) begin
+    always @(posedge latch or posedge RESET) begin
+        if (RESET) begin
             data<=0;
         end else begin 
             data<=holdreg;
