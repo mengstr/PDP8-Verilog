@@ -1,3 +1,10 @@
+//
+// TTY.v - for the PDP-8 in Verilog project
+//
+// github.com/SmallRoomLabs/PDP8-Verilog
+// Mats Engstrom - mats.engstrom@gmail.com
+//
+
 `default_nettype none
 
 //
@@ -56,7 +63,7 @@ module TTY(
   input EN2,                             // High when this module is to be activated  604x
   input [2:0] IR,
   input ACbit11,
-  input ck1,ck2,ck3,ck4,ck5,ck6,
+  input ck1, ck2, ck3, ck4, ck5, ck6,
   input stb1,stb2,stb3,stb4,stb5,stb6,
   output done,
   output pc_ck,

@@ -8,6 +8,7 @@ INKSCAPE=/Applications/Inkscape.app/Contents/MacOS/Inkscape
 function jsonToPng {
     netlistsvg $1.json -o $1.svg --skin $SKIN
     $INKSCAPE $1.svg --without-gui --export-dpi=150 --export-background=WHITE --export-background-opacity=1.0 --export-type=png --export-file $1.png 2> /dev/null
+    rm $1.svg $1.json
 }
 
 echo Graph as plain
@@ -33,3 +34,4 @@ jsonToPng $FILE.naig
 echo Graph into simple logic - NOT, AND, XOR, etc
 $DR cranphin/icestorm yosys -q -p "prep -top $2 -flatten; cd $2; simplemap; write_json $FILE.simplemap.json" $FILE.v
 jsonToPng $FILE.simplemap
+

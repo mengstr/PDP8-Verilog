@@ -1,3 +1,10 @@
+//
+// INTERRUPT.v - for the PDP-8 in Verilog project
+//
+// github.com/SmallRoomLabs/PDP8-Verilog
+// Mats Engstrom - mats.engstrom@gmail.com
+//
+
 `default_nettype none
 
 //
@@ -110,15 +117,15 @@ wire instSGT= (EN & (IR==3'o6));
 wire instCAF= (EN & (IR==3'o7));
 
 always @(posedge CLK) begin
-    if (clear)               begin flgNoInt<=0; flgGIE<=0; end
-    if (stb1 & instSKON)     begin              flgGIE<=0; end
-    if (stb1 & instION)      begin flgNoInt<=1; flgGIE<=1; end
-    if (stb1 & instIOF)      begin flgNoInt<=0; flgGIE<=0; end
-    if (stb1 & instCAF)      begin flgNoInt<=0; flgGIE<=0; end
-    if (stb1 & instRTF)      begin flgNoInt<=!AC[8]; flgGIE<=!AC[8]; end
-    if (stbFetch & flgNoInt) begin flgNoInt<=0;            end
-    if (ck1 & flgGIE & (!flgNoInt) & irqRq) begin IRQOVERRIDEx<=1; end;
-    if (ck3 & IRQOVERRIDEx) begin flgGIE<=0; IRQOVERRIDEx<=0; end;
+  if (clear)               begin flgNoInt<=0; flgGIE<=0; end
+  if (stb1 & instSKON)     begin              flgGIE<=0; end
+  if (stb1 & instION)      begin flgNoInt<=1; flgGIE<=1; end
+  if (stb1 & instIOF)      begin flgNoInt<=0; flgGIE<=0; end
+  if (stb1 & instCAF)      begin flgNoInt<=0; flgGIE<=0; end
+  if (stb1 & instRTF)      begin flgNoInt<=!AC[8]; flgGIE<=!AC[8]; end
+  if (stbFetch & flgNoInt) begin flgNoInt<=0;            end
+  if (ck1 & flgGIE & (!flgNoInt) & irqRq) begin IRQOVERRIDEx<=1; end;
+  if (ck3 & IRQOVERRIDEx) begin flgGIE<=0; IRQOVERRIDEx<=0; end;
 end
 
 assign pc_ck0=  instSKON & stb1 & flgGIE;       // 6000 SKON

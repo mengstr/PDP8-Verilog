@@ -8,16 +8,10 @@
 `default_nettype none
 
 module INSTFETCHIND (
-  input stbFetch,
-  input ckFetch,
   input instIsIND,
   input instIsPPIND,
-  input ckIndirect,
-  input stbIndirect,
-  input ckAutoinc1,
-  input stbAutoinc2,
-  input ckAutoinc2,
-  input stbAutoinc1,
+  input ckFetch, ckAuto1, ckAuto2, ckInd,
+  input stbFetch, stbAuto1, stbAuto2, stbInd, 
   output inc2ramd,
   output ind_ck,
   output ind2inc,
@@ -57,18 +51,18 @@ assign ram_oeFETCH=   ckFetch;
 // 
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
 // 
-assign ir2ramaIND=   instIsIND & (ckIndirect);
-assign ram_oeIND=    instIsIND & (ckIndirect);
-assign ind_ckIND=    instIsIND & (stbIndirect);
+assign ir2ramaIND=   instIsIND & (ckInd);
+assign ram_oeIND=    instIsIND & (ckInd);
+assign ind_ckIND=    instIsIND & (stbInd);
 
 // 
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT W. AUTOINC CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
 // 
-assign ir2ramaPPIND= instIsPPIND & (ckAutoinc1 | ckAutoinc2 | ckIndirect);
-assign ram_oePPIND=  instIsPPIND & (ckAutoinc1 | ckIndirect);
-assign ind2incPPIND= instIsPPIND & (ckAutoinc1 | ckAutoinc2);
-assign ind_ckPPIND=  instIsPPIND & (stbAutoinc1 | stbIndirect);
-assign inc2ramdPPIND=instIsPPIND & (ckAutoinc2);
-assign ram_wePPIND=  instIsPPIND & (stbAutoinc2);
+assign ir2ramaPPIND= instIsPPIND & (ckAuto1 | ckAuto2 | ckInd);
+assign ram_oePPIND=  instIsPPIND & (ckAuto1 | ckInd);
+assign ind2incPPIND= instIsPPIND & (ckAuto1 | ckAuto2);
+assign ind_ckPPIND=  instIsPPIND & (stbAuto1 | stbInd);
+assign inc2ramdPPIND=instIsPPIND & (ckAuto2);
+assign ram_wePPIND=  instIsPPIND & (stbAuto2);
 
 endmodule

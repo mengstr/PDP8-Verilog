@@ -8,12 +8,8 @@
 `default_nettype none
 
 module INST7 (
-  input stb1, 
-  input stb2,
-  input ck1, 
-  input ck2,
-  input ck3,
-  input ck4,
+  input ck1, ck2, ck3, ck4, ck5, ck6,
+  input stb1,stb2,stb3,stb4,stb5,stb6,
   input doSkip,
   input instOPR,
   input opr1,
