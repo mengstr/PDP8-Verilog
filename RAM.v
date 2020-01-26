@@ -8,20 +8,31 @@
 //
 
 module RAM(
-  input clk,
-  input oe,
-  input we,
+  input clk,oe,we,
   input [11:0] addr, 
   input [11:0] dataI, 
   output [11:0] dataO
 );
 
-reg [11:0] mem [0:4095];
-initial $readmemh("RAM.initial", mem);
+  initial $readmemh("RAM.initial", mem);
+  reg [11:0] mem [0:4095];
+  reg [11:0] DO;
+ 
+  always @(negedge clk) begin
+    if (we) mem[addr] <= dataI;
+    if (oe) DO<=mem[addr];
+  end
 
-always @* begin //@(posedge clk) begin
-  if (we) mem[addr] = dataI;
-end
-assign dataO=oe ? mem[addr] : 12'bz;
-
+  assign dataO=oe ? DO : 12'bz;
 endmodule
+
+
+  // reg [11:0] mem [0:4095]; //silently dies at step 1
+  // initial $readmemh("RAM.initial", mem);
+  // always @(posedge clk) begin
+  //   if (we) mem[addr] = dataI;
+  // end
+  // assign dataO = oe ? mem[addr] : 12'b0;
+
+
+

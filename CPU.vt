@@ -54,7 +54,7 @@ module CPU_tb();
             if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bx)) begin $display("X in theACC.data"); $finish; end
             if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bz)) begin $display("Z in theACC.data"); $finish; end
         end
-        if ((dut.theSEQUENCER.running==1'b1) && ($countbits(dut.busRamD,'x)>0)) begin $display("X in dut.busRamD"); $finish; end
+        if ((dut.theSEQUENCER.running==1'b1) && ($countbits(dut.busData,'x)>0)) begin $display("X in dut.busRamD"); $finish; end
 
     end
     

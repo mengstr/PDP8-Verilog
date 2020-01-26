@@ -46,8 +46,8 @@ module CPU(
   output pInstAND, pInstTAD, pInstISZ, pInstDCA, pInstJMS, pInstJMP, pInstIOT, pInstOPR
 );
   
-  assign pBusPC=busRamA;
-  assign pBusData=busRamD;
+  assign pBusPC=busAddress;
+  assign pBusData=busData;
   assign pInstAND=instAND;
   assign pInstTAD=instTAD;
   assign pInstISZ=instISZ;
@@ -60,10 +60,8 @@ module CPU(
   // The buses
 wire [11:0] busReg;
 reg [11:0] busIR;
-reg [11:0] busIRx;
 wire [11:0] busData;
-wire [11:0] busRamD;
-wire [11:0] busRamA;
+wire [11:0] busAddress;
 wire [11:0] busPC;
 wire [11:0] busLatPC;
 wire [11:0] busPCin;
@@ -88,8 +86,8 @@ wire stbIndirect;
 wire stb1, stb2, stb3, stb4, stb5, stb6;
 
 wire done_;
-wire      done05, doneIOT0, doneIOT34, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L;
-or(done_, done05, doneIOT0, doneIOT34, doneOPR1, doneOPR2, doneOPR3A, doneOPR3B, doneOPR3C, doneOPR3D, doneOPR3I, doneOPR3J, doneOPR3K, doneOPR3L);
+wire      done05, doneIOT0, doneIOT34, done7;
+or(done_, done05, doneIOT0, doneIOT34, done7);
 
 SEQUENCER theSEQUENCER(
     .CLK(SYSCLK),
@@ -118,8 +116,8 @@ wire       pc_ld05;
 or(pc_ld_, pc_ld05);
 
 wire pc_ck_;
-wire       pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ckOPR2;
-or(pc_ck_, pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ckOPR2);
+wire       pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7;
+or(pc_ck_, pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7);
 
 
 PROGRAMCOUNTER thePC(
@@ -148,19 +146,10 @@ RAM theRAM(
   .clk(SYSCLK),
   .oe(ram_oe_),
   .we(ram_we_),
-  .addr(busRamA), 
-  .dataI(busRamD), 
-  .dataO(busRamD)
+  .addr(busAddress), 
+  .dataI(busData),
+  .dataO(busData) 
 );
-
-
-assign busData = ckFetch ? busRamD : 12'bzzzzzzzzzzzz;
-assign busData = ram_oe_ ? busRamD : 12'bzzzzzzzzzzzz;
-always @(negedge SYSCLK) begin
-  if (ckFetch) busIR= irqOverride ? 12'o4000 : busData; //FIXME
-  if (stbFetch) busIRx= irqOverride ? 12'o4000 : busData; //FIXME
-end
-
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION DECODER █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -223,16 +212,16 @@ SKIP theSKIP(
 //
 
 wire mq_ck_;
-wire  mq_ckOPR3I, mq_ckOPR3J, mq_ckOPR3K, mq_ckOPR3L;
-or (mq_ck_, mq_ckOPR3I, mq_ckOPR3J, mq_ckOPR3K, mq_ckOPR3L);
+wire        mq_ck7;
+or (mq_ck_, mq_ck7);
 
 wire mq_hold_;
-wire mq_holdOPR3K, mq_holdOPR3L;
-or (mq_hold_, mq_holdOPR3K, mq_holdOPR3L);
+wire          mq_hold7;
+or (mq_hold_, mq_hold7);
 
 wire mq2orbus_;
-wire mq2orbusOPR3C, mq2orbusOPR3D, mq2orbusOPR3K, mq2orbusOPR3L;
-or (mq2orbus_, mq2orbusOPR3C, mq2orbusOPR3D, mq2orbusOPR3K, mq2orbusOPR3L);
+wire mq2orbus7;
+or (mq2orbus_, mq2orbus7);
 
 wire [11:0] mqout1;
 wire [11:0] mqout2;
@@ -254,8 +243,8 @@ MULTILATCH theMQ(
 //
 
 wire link_ck_;
-wire         link_ck05, link_ckIOT0, link_ckOPR1;
-or(link_ck_, link_ck05, link_ckIOT0, link_ckOPR1);
+wire         link_ck05, link_ckIOT0, link_ck7;
+or(link_ck_, link_ck05, link_ckIOT0, link_ck7);
 
 wire link;
 wire rotaterLI;
@@ -330,8 +319,8 @@ ADDAND theADDAND(
 //
 
 wire ac_ck_;
-wire        ac_ck05, ac_ckIOT0, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L;
-or (ac_ck_, ac_ck05, ac_ckIOT0, ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L);
+wire        ac_ck05, ac_ckIOT0, ac_ck7;
+or (ac_ck_, ac_ck05, ac_ckIOT0, ac_ck7);
 
 wire ac2ramd_;
 wire ac2ramd05;
@@ -361,8 +350,8 @@ assign busORacc=
 //
 
 wire claDCA_;
-wire         cla05, claO3D, claO3I, claO3J, claO3K, claO3L;
-or (claDCA_, cla05, claO3D, claO3I, claO3J, claO3K, claO3L);
+wire         cla05, cla7;
+or (claDCA_, cla05, cla7);
 
 wire clorinCLR;
 or (clorinCLR, claDCA_, oprCLA, iotCLR0);
@@ -396,8 +385,8 @@ INCREMENTER theINCREMENTER(
 //
 
 wire rot2ac_;
-wire        rot2ac05, rot2acIOT0, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L;
-or(rot2ac_, rot2ac05, rot2acIOT0, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L);
+wire        rot2ac05, rot2acIOT0, rot2ac7;
+or(rot2ac_, rot2ac05, rot2acIOT0, rot2ac7);
 
 wire rotaterLO;
 ROTATER theRotater(
@@ -436,7 +425,7 @@ MULTILATCH theIndReg(
     .oe1(ind2inc_),
     .oe2(ind2rama_),
     .out1(busReg), 
-    .out2(busRamA)
+    .out2(busAddress)
 );
 
 
@@ -509,13 +498,15 @@ or(pclat2ramd_, pclat2ramd05);
 
 assign busPCin=ir2pc_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // First OC12 module
 assign busPCin=reg2pc_ ? busReg[11:0] : 12'bzzzzzzzz;
-//assign busPCin=ind2pc_ ? busReg[11:0] : 12'bzzzzzzzz;
-assign busRamA=ir2rama_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // Second OC12 module
-assign busRamA=ckFetch ? busLatPC : 12'bzzzzzzzzzzzz;
-// assign busRamA=reg2rama_ ?  busReg[11:0] : 12'bzzzzzzzz;
-assign busRamD=ram_we_ ? busData : 12'bzzzzzzzzzzzz;
-assign busRamD=pc2ramd_ ? busPC : 12'bzzzzzzzzzzzz;
-assign busRamD=pclat2ramd_ ? busLatPC : 12'bzzzzzzzzzzzz;
+assign busAddress=ir2rama_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // Second OC12 module
+assign busAddress=ckFetch ? busLatPC : 12'bzzzzzzzzzzzz;
+assign busIR   = ckFetch ? busData : busIR; 
+assign busData=pc2ramd_ ? busPC : 12'bzzzzzzzzzzzz;
+assign busData=pclat2ramd_ ? busLatPC : 12'bzzzzzzzzzzzz;
+
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - FETCH & INDEXING █ ▇ ▆ ▅ ▄ ▂ ▁
+//
 
 INSTFETCHIND theinstFI (
    .stbFetch(stbFetch),
@@ -538,6 +529,38 @@ INSTFETCHIND theinstFI (
 );
 
 
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 7xxx OPR █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+
+INST7 theinst7 (
+  .ck1(ck1), .ck2(ck2), .ck3(ck3), .ck4(ck4),
+  .stb1(stb1), .stb2(stb2),
+  .doSkip(doSkip),
+  .instOPR(instOPR),
+  .opr1(opr1),
+  .opr2(opr2),
+  .opr3(opr3),
+  .oprCLA(oprCLA),
+  .oprMQA(oprMQA),
+  .oprMQL(oprMQL),
+  .oprSCA(oprSCA),
+
+  .ac_ck(ac_ck7),
+  .cla(cla7),
+  .done(done7),
+  .link_ck(link_ck7),
+  .mq_ck(mq_ck7),
+  .mq_hold(mq_hold7),
+  .mq2orbus(mq2orbus7),
+  .pc_ck(pc_ck7),
+  .rot2ac(rot2ac7)
+);
+
+
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 0,1,2,3,4,5xxx  █ ▇ ▆ ▅ ▄ ▂ ▁
+//
 
 INST0_5 theinst0_5 (
  .instIsDIR(instIsDIR), .instIsIND(instIsIND), .instIsPPIND(instIsPPIND),
@@ -573,10 +596,9 @@ INST0_5 theinst0_5 (
 
 
 //
-// IOT 6xxx
+// ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 600x IOT CPU/INT █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-// 600x CPU INTERRUPT HANDLING
 wire iotCLR0;
 wire linkclrIOT0;
 wire linkcmlIOT0;
@@ -604,7 +626,10 @@ INTERRUPT theInterrupt(
   .IRQOVERRIDE(irqOverride)
 );
 
-// 603x & 604x TTY HANDLING
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 604x/604x IOT TTY █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+
 wire iotCLR34;
 TTY theTTY(
   .CLK(SYSCLK),
@@ -619,132 +644,6 @@ TTY theTTY(
   .pc_ck(pc_ckIOT34),
   .irq(irqRqIOT34)
 );
-
-
-//
-// OPR 7xx
-//
-wire OP1=(instOPR & opr1);
-wire OP2=(instOPR & opr2);
-wire O3a=instOPR & opr3 & !oprCLA & !oprMQA & !oprSCA & !oprMQL; // 7401 NOP
-wire O3b=instOPR & opr3 &  oprCLA & !oprMQA & !oprSCA & !oprMQL; // 7601 CLA
-wire O3c=instOPR & opr3 & !oprCLA &  oprMQA & !oprSCA & !oprMQL; // 7501 MQA
-wire O3d=instOPR & opr3 &  oprCLA &  oprMQA & !oprSCA & !oprMQL; // 7701 ACL
-// wire O3e=instOPR & opr3 & !oprCLA & !oprMQA &  oprSCA & !oprMQL;
-// wire O3f=instOPR & opr3 &  oprCLA & !oprMQA &  oprSCA & !oprMQL;
-// wire O3g=instOPR & opr3 & !oprCLA &  oprMQA &  oprSCA & !oprMQL;
-// wire O3h=instOPR & opr3 &  oprCLA &  oprMQA &  oprSCA & !oprMQL;
-wire O3i=instOPR & opr3 & !oprCLA & !oprMQA & !oprSCA &  oprMQL; // 7421 MQL
-wire O3j=instOPR & opr3 &  oprCLA & !oprMQA & !oprSCA &  oprMQL; // 7621 CAM
-wire O3k=instOPR & opr3 & !oprCLA &  oprMQA & !oprSCA &  oprMQL; // 7521 SWP
-wire O3l=instOPR & opr3 &  oprCLA &  oprMQA & !oprSCA &  oprMQL; // 7721 CLA,SWP
-// wire O3m=instOPR & opr3 & !oprCLA & !oprMQA &  oprSCA &  oprMQL;
-// wire O3n=instOPR & opr3 &  oprCLA & !oprMQA &  oprSCA &  oprMQL;
-// wire O3o=instOPR & opr3 & !oprCLA &  oprMQA &  oprSCA &  oprMQL;
-// wire O3p=instOPR & opr3 &  oprCLA &  oprMQA &  oprSCA &  oprMQL;
-
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign rot2acOPR1=      OP1&(ck1                                                                        );
-assign ac_ckOPR1=       OP1&(      stb1                                                                 );
-assign link_ckOPR1=     OP1&(      stb1                                                                 );
-assign doneOPR1=        OP1&(           ck2                                                             );
-
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign rot2acOPR2=      OP2&(ck1 |        ck2                                                           );
-assign pc_ckOPR2=       OP2&(      stb1 & doSkip                                                        );
-assign ac_ckOPR2=       OP2&(                   stb2                                                    );
-assign doneOPR2=        OP2&(                          ck3                                              );
-
-//  1--CLA
-//  2--MQA, MQL
-//  3--ALL OTHERS
-
-//
-// NOP        7401    no operation                      ()
-// CLA        7601    clear AC                          (CLA)
-// MQL        7421    load MQ from AC then clear AC     (MQL)
-// MQA        7501    inclusive OR the MQ with the AC   (MQA)
-// CAM        7621    clear AC and MQ                   (CLA, MQL)
-// SWP        7521    swap AC and MQ                    (MQL,MQA,SWP)
-// ACL        7701    load MQ into AC                   (CLA,MQA)
-// CLA, SWP   7721    load AC from MQ then clear MQ     (CLA,MQL,MQA,SWP)
-//
-
-
-// NOP        7401    no operation                      ()
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign doneOPR3A=        O3a&(ck1                                                                        );
-
-
-// CLA        7601    clear AC                          (CLA)
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign rot2acOPR3B=      O3b&(ck1                                                                        );
-assign ac_ckOPR3B=       O3b&(      stb1                                                                 );
-assign doneOPR3B=        O3b&(             ck2                                                           );
-
-
-// MQA        7501    inclusive OR the MQ with the AC   (MQA)
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign rot2acOPR3C=      O3c&(ck1                                                                        );
-assign mq2orbusOPR3C=    O3c&(ck1);
-assign ac_ckOPR3C=       O3c&(      stb1                                                                 );
-assign doneOPR3C=        O3c&(             ck2                                                           );
-
-// ACL        7701    load MQ into AC                   (CLA,MQA)
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign rot2acOPR3D=      O3d&(ck1                                                            );
-assign mq2orbusOPR3D=    O3d&(ck1);
-assign claO3D=           O3d&(ck1                                                                        );
-assign ac_ckOPR3D=       O3d&(      stb1                                                                 );
-assign doneOPR3D=        O3d&(                          ck2                                              );
-
-
-// MQL        7421    load MQ from AC then clear AC     (MQL)
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign rot2acOPR3I=      O3i&(ck1 |        ck2                                                           );
-assign mq_ckOPR3I=       O3i&(      stb1                                                                 );
-assign claO3I=           O3i&(             ck2                                                           );
-assign ac_ckOPR3I=       O3i&(                   stb2                                                    );
-assign doneOPR3I=        O3i&(                          ck3                                              );
-
-
-// CAM        7621    clear AC and MQ                   (CLA, MQL)
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign rot2acOPR3J=      O3j&(ck1 |        ck1                                                           );
-assign mq_ckOPR3J=       O3j&(      stb2                                                                 );
-assign claO3J=           O3j&(             ck1                                                           );
-assign ac_ckOPR3J=       O3j&(                   stb1                                                    );
-assign doneOPR3J=        O3j&(                          ck3                                              );
-
-// SWP        7521    swap AC and MQ                    (MQL,MQA,SWP)
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign rot2acOPR3K=      O3k&(ck1 |        ck2 |        ck3                                              );
-assign mq2orbusOPR3K=    O3k&(ck1|ck2|ck3);
-assign mq_holdOPR3K=     O3k&(ck1 |        ck2 |        ck3                                              );
-assign claO3K=           O3k&(             ck2                                                           );
-assign ac_ckOPR3K=       O3k&(                   stb2                                                    );
-assign mq_ckOPR3K=       O3k&(                          ck3                                              );
-assign doneOPR3K=        O3k&(                                       ck4                                 );
-
-// CLA, SWP   7721    load AC from MQ then clear MQ     (CLA,MQL,MQA,SWP)
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign rot2acOPR3L=      O3l&(ck1 |        ck2                                                           );
-assign mq2orbusOPR3L=    O3l&(             ck2                                                           );
-assign claO3L=           O3l&(ck1                                                                        );
-assign ac_ckOPR3L=       O3l&(      stb1 |       stb2                                                    );
-assign mq_holdOPR3L=     O3l&(             ck2                                                           );
-assign mq_ckOPR3L=       O3l&(                   stb2                                                    );
-assign doneOPR3L=        O3l&(                          ck3                                              );
 
 endmodule
 
