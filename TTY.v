@@ -115,7 +115,7 @@ always @(posedge CLK) begin
       if (instTFC) flgPRN<=0; //Teleprinter Flag clear
       if (instTLS) begin      //Teleprinter Load and start
         flgPRN<=0;
-        $display("/// Printed %d ///", AC & 12'd127);
+        if (ck1) $display("%c", AC & 12'd127);
         txtick<=63;
       end
       if (txtick==1) flgPRN<=1;

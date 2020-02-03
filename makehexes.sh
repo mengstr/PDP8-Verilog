@@ -28,3 +28,7 @@ echo -e "\nConverting D0IB-JMPJMS.pt"
 
 echo -e "\nConverting D0JB-JMPJMS-RANDOM"
 ./tape2hexram.sh < ../bin/D0JB-JMPJMS-RANDOM.pt > RAM.RandomJMPJMP.hex
+
+echo -e "\nConverting focal-8"
+./tape2hexram.sh < ../bin/focal-8.bin           > RAM.Focal-8.hex
+
