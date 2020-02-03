@@ -6,6 +6,16 @@ DR="docker run --rm --log-driver=none -a stdout -a stderr -w/work -v${PWD}/:/wor
 PCF=dummy.pcf
 PACKAGE=vq100
 
+SKIN=netlistsvg.skin
+INKSCAPE=/Applications/Inkscape.app/Contents/MacOS/Inkscape
+function jsonToPng {
+    netlistsvg $1.json -o $1.svg --skin $SKIN
+    $INKSCAPE $1.svg --without-gui --export-dpi=150 --export-background=WHITE --export-background-opacity=1.0 --export-type=png --export-file $1.png 2> /dev/null
+    rm $1.svg $1.json
+}
+
+
+
 echo --LINTING
 $DR verilator/verilator -Wall -Wno-UNUSED -DNOTOP --top-module top --lint-only top.v $FILES
 
@@ -23,6 +33,13 @@ if [ "$1" != "test" ]; then
     echo cranphin/icestorm yosys -p "synth_ice40 -top top -json $FILE.json" $FILE.v $FILES
     $DR cranphin/icestorm yosys -p "synth_ice40 -top top -json $FILE.json" $FILE.v $FILES > $FILE.yosys.tmp
     if [ $? != 0 ]; then cat $FILE.yosys.tmp; exit 1; fi
+
+function jsonToPng {
+    netlistsvg $1.json -o $1.svg --skin $SKIN
+    $INKSCAPE $1.svg --without-gui --export-dpi=150 --export-background=WHITE --export-background-opacity=1.0 --export-type=png --export-file $1.png 2> /dev/null
+    rm $1.svg $1.json
+}
+
 
     echo --PLACEING
     echo cranphin/icestorm nextpnr-ice40 --ignore-loops --hx1k --package $PACKAGE --pcf $PCF --json $FILE.json --asc $FILE.asc

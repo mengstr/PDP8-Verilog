@@ -96,8 +96,8 @@ or(ir2rama, ir2ramaAND1, ir2ramaDCA1, ir2ramaIRQ , ir2ramaISZ1, ir2ramaJMS1, ir2
 wire       ram_oeAND1 ,ram_oeAND2 ,ram_oeISZ1 ,ram_oeISZ2 ,ram_oeTAD1 ,ram_oeTAD2;
 or(ram_oe, ram_oeAND1 ,ram_oeAND2 ,ram_oeISZ1 ,ram_oeISZ2 ,ram_oeTAD1 ,ram_oeTAD2);
 
-wire       pc_ckIRQ ,pc_ckISZ1 ,pc_ckISZ2 ,pc_ckJMP1 ,pc_ckJMP2 ,pc_ckJMS1 ,pc_ckJMS2;
-or(pc_ck,  pc_ckIRQ ,pc_ckISZ1 ,pc_ckISZ2 ,pc_ckJMP1 ,pc_ckJMP2 ,pc_ckJMS1 ,pc_ckJMS2);
+wire       pc_ckIRQ ,pc_ckISZ1 ,pc_ckISZ2, pc_ckJMS1 ,pc_ckJMS2;
+or(pc_ck,  pc_ckIRQ ,pc_ckISZ1 ,pc_ckISZ2, pc_ckJMS1 ,pc_ckJMS2);
 
 wire       ram_weDCA1 ,ram_weDCA2 ,ram_weIRQ  ,ram_weISZ1 ,ram_weISZ2 ,ram_weJMS1 ,ram_weJMS2;
 or(ram_we, ram_weDCA1 ,ram_weDCA2 ,ram_weIRQ  ,ram_weISZ1 ,ram_weISZ2 ,ram_weJMS1 ,ram_weJMS2);
@@ -126,7 +126,6 @@ assign ramd2ac_andAND2= AND2&(ck1                                               
 assign ram_oeAND2=      AND2&(ck1                                                                        );
 assign ac_ckAND2=       AND2&(      stb1                                                                 );
 assign doneAND2=        AND2&(             ck2                                                           );
-// end
 
 //
 // TAD 1xxx
@@ -150,7 +149,6 @@ assign ram_oeTAD2=      TAD2&(ck1                                               
 assign ac_ckTAD2=       TAD2&(      stb1                                                                 );
 assign link_ckTAD2=     TAD2&(      stb1                                                                 );
 assign doneTAD2=        TAD2&(             ck2                                                           );
-// end
 
 //
 // ISZ 2xxx
@@ -165,7 +163,7 @@ assign data_ckISZ1=     ISZ1&(      stb1                                        
 assign ld2incISZ1=      ISZ1&(      stb1 | ck2 |        ck3 |        ck4                                  );
 assign ram_weISZ1=      ISZ1&(             ck2                                                            );
 assign inc2ramdISZ1=    ISZ1&(             ck2                                                            );
-assign pc_ckISZ1=       ISZ1&(                                       ck4 & incZero                        );
+assign pc_ckISZ1=       ISZ1&(                                       stb4 & incZero                        );
 assign doneISZ1=        ISZ1&(                                                    ck5                     );
 
 //                            1     1      2     2      3     3      4     4      5     5      6     6
@@ -176,9 +174,8 @@ assign data_ckISZ2=     ISZ2&(      stb1                                        
 assign ld2incISZ2=      ISZ2&(      stb1 | ck2 |        ck3 |        ck4                                  );
 assign ram_weISZ2=      ISZ2&(             ck2                                                            );
 assign inc2ramdISZ2=    ISZ2&(             ck2                                                            );
-assign pc_ckISZ2=       ISZ2&(                                       ck4 & incZero                        );
+assign pc_ckISZ2=       ISZ2&(                                       stb4 & incZero                        );
 assign doneISZ2=        ISZ2&(                                                    ck5                     );
-// end
 
 //
 // DCA 3xxx
@@ -215,32 +212,32 @@ wire JMS2=(instJMS && (instIsIND || instIsPPIND));
 assign ir2ramaJMS1=     JMS1&(ck1                                                                        ); 
 assign pc2ramdJMS1=     JMS1&(ck1                                                                        );
 assign ram_weJMS1=      JMS1&(stb1                                                                       );
-assign ir2pcJMS1=       JMS1&(ck2                                                                        ); 
-assign pc_ldJMS1=       JMS1&(ck2                                                                        );
-assign pc_ckJMS1=       JMS1&(      stb2 |       stb3                                                    );
-assign doneJMS1=        JMS1&(             ck4                                                           );
+assign ir2pcJMS1=       JMS1&(             ck2                                                                        ); 
+assign pc_ldJMS1=       JMS1&(             ck2                                                                        );
+assign pc_ckJMS1=       JMS1&(                                stb3                                                    );
+assign doneJMS1=        JMS1&(                                       ck4                                              );
 
 //                            1     1      2     2      3     3      4     4      5     5      6     6
 //                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ind2ramaJMS2=    JMS2&(ck1|ck2                                                                        );
+assign ind2ramaJMS2=    JMS2&(ck1|         ck2                                                                    );
 assign pc2ramdJMS2=     JMS2&(ck1                                                                        );
-assign ram_weJMS2=      JMS2&(stb1                                                                       );
-assign ind2regJMS2=     JMS2&(ck1|ck2                                                                        );
-assign reg2pcJMS2=      JMS2&(ck1|ck2                                                                        );
-assign pc_ldJMS2=       JMS2&(ck2                                                                        );
-assign pc_ckJMS2=       JMS2&(      stb2 |       stb3                                                    );
-assign doneJMS2=        JMS2&(             ck4                                                           );
+assign ram_weJMS2=      JMS2&(      stb1                                                                       );
+assign ind2regJMS2=     JMS2&(ck1|         ck2                                                                    );
+assign reg2pcJMS2=      JMS2&(ck1|         ck2                                                                    );
+assign pc_ldJMS2=       JMS2&(             ck2                                                                        );
+assign pc_ckJMS2=       JMS2&(                                stb3                                                    );
+assign doneJMS2=        JMS2&(                                       ck4                                              );
 
 
 //                                  1     1      2     2      3     3      4     4      5     5      6     6
 //                                  ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-assign ir2ramaIRQ=     irqOverride&(ck1                                                                        ); 
-assign pclat2ramdIRQ=  irqOverride&(ck1                                                                        );
-assign ram_weIRQ=      irqOverride&(stb1                                                                       );
-assign ir2pcIRQ=       irqOverride&(ck2                                                                        ); 
-assign pc_ldIRQ=       irqOverride&(ck2                                                                        );
-assign pc_ckIRQ=       irqOverride&(      stb2 |       stb3                                                    );
-assign doneIRQ=        irqOverride&(             ck4                                                           );
+assign ir2ramaIRQ=0;//     irqOverride&(ck1                                                                        ); 
+assign pclat2ramdIRQ=0;//  irqOverride&(ck1                                                                        );
+assign ram_weIRQ=0;//      irqOverride&(stb1                                                                       );
+assign ir2pcIRQ=0;//       irqOverride&(ck2                                                                        ); 
+assign pc_ldIRQ=0;//       irqOverride&(ck2                                                                        );
+assign pc_ckIRQ=0;//       irqOverride&(      stb2 |       stb3                                                    );
+assign doneIRQ=0;//        irqOverride&(             ck4                                                           );
 
 
 //
@@ -251,16 +248,14 @@ wire JMP2=(instJMP && (instIsIND || instIsPPIND));
 //                            1     1      2     2      3     3      4     4      5     5      6     6
 //                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 assign ir2pcJMP1=       JMP1&(ck1                                                                        ); 
-assign pc_ldJMP1=       JMP1&(ck1                                                                        );
-assign pc_ckJMP1=       JMP1&(      stb1                                                                 );
+assign pc_ldJMP1=       JMP1&(      stb1                                                                        );
 assign doneJMP1=        JMP1&(             ck2                                                           );
 
 //                            1     1      2     2      3     3      4     4      5     5      6     6
 //                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 assign ind2regJMP2=     JMP2&(ck1                                                                        );
 assign reg2pcJMP2=      JMP2&(ck1                                                                        );
-assign pc_ldJMP2=       JMP2&(ck1                                                                        );
-assign pc_ckJMP2=       JMP2&(      stb1                                                                 );
+assign pc_ldJMP2=       JMP2&(      stb1                                                                 );
 assign doneJMP2=        JMP2&(             ck2                                                           );
 
 endmodule

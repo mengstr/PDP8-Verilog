@@ -20,6 +20,7 @@ reg [11:0] DO;
 
 always @(negedge clk) begin
   if (we) mem[addr] <= dataI;
+//  if (we & addr==12'o0034) $display("Writing %o to address %o",dataI, addr);
   if (oe) DO<=mem[addr];
 end
 

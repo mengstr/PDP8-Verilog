@@ -38,14 +38,15 @@
 
 module CPU(
   input SYSCLK,
-  input sw_RESET,    // Clear/reset CPU
+  input sw_RESET,    // Reset CPU (power on reset)
+  input sw_CLEAR,    // Clear CPU (button)
   input sw_RUN,      // Start CPU
   input sw_HALT,     // Halt CPU at next instruction
   output [11:0] pBusPC,
   output [11:0] pBusData,
   output pInstAND, pInstTAD, pInstISZ, pInstDCA, pInstJMS, pInstJMP, pInstIOT, pInstOPR
 );
-  
+
 assign pBusPC=busAddress;
 assign pBusData=busData;
 assign pInstAND=instAND;
@@ -84,9 +85,9 @@ wire stb1, stb2, stb3, stb4, stb5, stb6;
 wire done_;
 wire      done05, doneIOT0, doneIOT34, done7;
 or(done_, done05, doneIOT0, doneIOT34, done7);
-
+ 
 SEQUENCER theSEQUENCER(
-  .CLK(SYSCLK),
+  .SYSCLK(SYSCLK),
   .RESET(sw_RESET),
   .RUN(sw_RUN),
   .HALT(sw_HALT),
@@ -111,16 +112,17 @@ wire pc_ck_;
 wire       pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7;
 or(pc_ck_, pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7);
 
-
 PROGRAMCOUNTER thePC(
+  .SYSCLK(SYSCLK),
   .RESET(sw_RESET),
   .IN(busPCin),
   .LD(pc_ld_),
-  .CK(pc_ck_),
-  .LATCH(ckFetch & (!stbFetch)),
+  .CK(pc_ck_ & ~(inIrq & ckFetch)),
+  .LATCH(1'b0),
+  .FETCH(ckFetch & ~inIrq),
   .PC(busPC),
   .PCLAT(busLatPC)
-);
+); 
 
 
 //
@@ -143,6 +145,29 @@ RAM theRAM(
   .dataO(busData) 
 );
 
+// wire i=theInterrupt.flgGIE & (!theInterrupt.flgNoInt);
+// reg ckF=0;
+// always @(posedge CLK) begin
+// //  if (ckFetch) busIR<= busData;
+//   if (instJMS & ck2 & i & irqRq) theInterrupt.flgGIE<=0;
+//   if (ckFetch & !ckF) busIR<= (i & irqRq) ? 12'o4000 : busData;
+//   ckF<=ckFetch;
+// end
+
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ IR █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+IR theIR(
+  .SYSCLK(SYSCLK),
+  .RESET(sw_RESET),
+  .ckFetch(ckFetch),
+  .busData(irqOverride ? 12'o4000 : busData),
+  .busIR(busIR)
+);
+
+wire inIrq=(busIR==12'o4000) | irqOverride;
+
+
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION DECODER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
@@ -152,6 +177,7 @@ wire instIsPPIND, instIsIND, instIsDIR, instIsMP;
 wire instAND, instTAD, instISZ, instDCA, instJMS, instJMP, instIOT, instOPR;
 
 IRDECODER theIRDECODER(
+  .RESET(sw_RESET),
   .PCLATCHED(busLatPC),
   .IR(busIR),
   .PPIND(instIsPPIND), .IND(instIsIND), .DIR(instIsDIR), .MP(instIsMP),
@@ -216,18 +242,19 @@ wire mq2orbus7;
 or (mq2orbus_, mq2orbus7);
 
 wire [11:0] mqout1;
-wire [11:0] mqout2;
+/* verilator lint_off PINMISSING */
 MULTILATCH theMQ(
   .RESET(sw_RESET),
-  .CLK(SYSCLK),
+  .SYSCLK(SYSCLK),
   .in(accout1),
   .latch(mq_ck_), 
   .hold(mq_hold_),
   .oe1(mq2orbus_), 
   .oe2(1'b1),
-  .out1(mqout1), 
-  .out2(mqout2)
+  .out1(mqout1) 
+//  .out2(mqout2)
 );
+/* verilator lint_on PINMISSING */
 
 
 //
@@ -322,7 +349,7 @@ wire [11:0] accIn;
 wire [11:0] accout1;
 MULTILATCH theACC(
   .RESET(sw_RESET),
-  .CLK(SYSCLK),
+  .SYSCLK(SYSCLK),
   .in(accIn),
   .latch(ac_ck_),
   .hold(1'b0),
@@ -410,7 +437,7 @@ or(ind2rama_, ind2rama05);
 
 MULTILATCH theIndReg(
   .RESET(sw_RESET),
-  .CLK(SYSCLK),
+  .SYSCLK(SYSCLK),
   .in(busData),
   .latch(ind_ck_),
   .hold(1'b0),
@@ -432,18 +459,19 @@ wire ld2inc_;
 wire ld2inc05;
 or (ld2inc_ ,ld2inc05);
 
-wire [11:0] dummy1;   
+/* verilator lint_off PINMISSING */
 MULTILATCH theDataReg(
   .RESET(sw_RESET),
-  .CLK(SYSCLK),
+  .SYSCLK(SYSCLK),
   .in(busData),
   .latch(data_ck_),
   .hold(1'b0),
   .oe1(ld2inc_),
   .oe2(1'b0),
-  .out1(busReg),
-  .out2(dummy1)
+  .out1(busReg)
+//  .out2(dummy1)
 );
+/* verilator lint_on PINMISSING */
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ BUS INCREMENTER █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -475,7 +503,6 @@ wire reg2pc_;
 wire reg2pc05;
 or (reg2pc_, reg2pc05);
 
-
 wire ir2rama_;
 wire         ir2ramaIFI, ir2rama05;
 or(ir2rama_, ir2ramaIFI, ir2rama05);
@@ -488,13 +515,15 @@ wire pclat2ramd_;
 wire            pclat2ramd05;
 or(pclat2ramd_, pclat2ramd05);
 
-assign busPCin=ir2pc_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // First OC12 module
-assign busPCin=reg2pc_ ? busReg[11:0] : 12'bzzzzzzzz;
-assign busAddress=ir2rama_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // Second OC12 module
-assign busAddress=ckFetch ? busLatPC : 12'bzzzzzzzzzzzz;
-assign busIR   = ckFetch ? busData : busIR; 
-assign busData=pc2ramd_ ? busPC : 12'bzzzzzzzzzzzz;
-assign busData=pclat2ramd_ ? busLatPC : 12'bzzzzzzzzzzzz;
+assign busPCin    = ir2pc_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // First OC12 module
+assign busPCin    = reg2pc_ ? busReg[11:0] : 12'bzzzzzzzz;
+
+// assign busAddress=ckFetch ? busLatPC : 12'bzzzzzzzzzzzz;
+assign busAddress = ir2rama_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // Second OC12 module
+assign busAddress = ckFetch ? busPC : 12'bzzzzzzzzzzzz;
+
+assign busData    = pc2ramd_ ? busPC : 12'bzzzzzzzzzzzz;
+assign busData    = pclat2ramd_ ? busLatPC : 12'bzzzzzzzzzzzz;
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - FETCH & INDEXING █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -505,6 +534,7 @@ INSTFETCHIND theinstFI (
    .instIsPPIND(instIsPPIND),
    .ckFetch(ckFetch), .ckAuto1(ckAuto1), .ckAuto2(ckAuto2), .ckInd(ckInd),
    .stbFetch(stbFetch), .stbAuto2(stbAuto2), .stbAuto1(stbAuto1), .stbInd(stbInd),
+  .irqOverride(irqOverride),
   .inc2ramd(inc2ramdIFI),
   .ind_ck(ind_ckIFI),
   .ind2inc(ind2incIFI),
@@ -547,7 +577,6 @@ INST7 theinst7 (
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 0,1,2,3,4,5xxx  █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-
 INST0_5 theinst0_5 (
  .instIsDIR(instIsDIR), .instIsIND(instIsIND), .instIsPPIND(instIsPPIND),
  .instAND(instAND), .instDCA(instDCA), .instISZ(instISZ), .instJMP(instJMP), .instJMS(instJMS), .instTAD(instTAD),
@@ -590,17 +619,19 @@ wire linkclrIOT0;
 wire linkcmlIOT0;
 wire [11:0] busACGTF;
 wire irqOverride;
+wire GIE;
 INTERRUPT theInterrupt(
-  .CLK(SYSCLK),
-  .clear(sw_RESET),
+  .SYSCLK(SYSCLK),
+  .RESET(sw_RESET),
+  .CLEAR(sw_CLEAR),
   .EN(instIOT & (busIR[8:3]==6'o00)),
   .IR(busIR[2:0]),
   .AC(accout1),
   .LINK(link),
-  .stbFetch(stbFetch), 
-  .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
-  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
+  .ckFetch(ckFetch), .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
+  .stbFetch(stbFetch), .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   .irqRq(irqRq),
+  .anyDone(done_),
   .done(doneIOT0),
   .rot2ac(rot2acIOT0),
   .ac_ck(ac_ckIOT0),
@@ -610,14 +641,14 @@ INTERRUPT theInterrupt(
   .link_ck(link_ckIOT0),
   .pc_ck(pc_ckIOT0),
   .ACGTF(busACGTF),
-  .IRQOVERRIDE(irqOverride)
+  .GIE(GIE),
+  .irqOverride(irqOverride)
 );
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 604x/604x IOT TTY █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-wire iotCLR34;
 TTY theTTY(
   .CLK(SYSCLK),
   .clear(sw_RESET | iotCLR0),

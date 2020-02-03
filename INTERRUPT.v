@@ -57,15 +57,17 @@
 //
 
 module INTERRUPT(
-  input CLK,
-  input clear,
+  input SYSCLK,
+  input RESET,
+  input CLEAR,
   input EN,                             // High when this module is to be activated
   input [2:0] IR,
   input [11:0] AC,
   input LINK,
-  input ck1,ck2,ck3,ck4,ck5,ck6,
+  input ckFetch, ck1,ck2,ck3,ck4,ck5,ck6,
   input stbFetch,stb1,stb2,stb3,stb4,stb5,stb6,
   input irqRq,
+  input anyDone,
   output done,
   output rot2ac,
   output ac_ck,
@@ -75,13 +77,14 @@ module INTERRUPT(
   output link_ck,
   output pc_ck,
   output [11:0] ACGTF,
-  output IRQOVERRIDE
+  output GIE,
+  output irqOverride
 );
 
-reg flgGIE=0;          // Global Inerupt Enable
-reg flgNoInt=0;        // If set the GIE is overridden as disabled 
-reg IRQOVERRIDEx=0;
-assign IRQOVERRIDE=IRQOVERRIDEx;
+
+reg IE;
+reg IEdly1, IEdly2;
+
 
 wire        link_ck5, link_ck7;
 or(link_ck, link_ck5, link_ck7);
@@ -116,26 +119,31 @@ wire instRTF= (EN & (IR==3'o5));
 wire instSGT= (EN & (IR==3'o6));
 wire instCAF= (EN & (IR==3'o7));
 
-always @(posedge CLK) begin
-  if (clear)               begin flgNoInt<=0; flgGIE<=0; end
-  if (stb1 & instSKON)     begin              flgGIE<=0; end
-  if (stb1 & instION)      begin flgNoInt<=1; flgGIE<=1; end
-  if (stb1 & instIOF)      begin flgNoInt<=0; flgGIE<=0; end
-  if (stb1 & instCAF)      begin flgNoInt<=0; flgGIE<=0; end
-  if (stb1 & instRTF)      begin flgNoInt<=!AC[8]; flgGIE<=!AC[8]; end
-  if (stbFetch & flgNoInt) begin flgNoInt<=0;            end
-  if (ck1 & flgGIE & (!flgNoInt) & irqRq) begin IRQOVERRIDEx<=1; end;
-  if (ck3 & IRQOVERRIDEx) begin flgGIE<=0; IRQOVERRIDEx<=0; end;
+wire AC8=~AC[8];
+always @(posedge SYSCLK) begin
+  if (CLEAR | RESET)       begin IE<=0; IEdly1<=0; IEdly2<=0; end
+  if (stb1 & instCAF)      begin IE<=0; IEdly1<=0; IEdly2<=0; end
+  if (stb1 & instIOF)      begin IE<=0; IEdly1<=0; IEdly2<=0; end
+  if (stb1 & instSKON)     begin IE<=0; IEdly1<=0; IEdly2<=0; end
+  if (stb1 & instRTF)      begin IE<=AC8; IEdly1<=AC8; IEdly2<=AC8; end
+
+  if (stb1 & instION)      begin IE<=1; IEdly1<=1; IEdly2<=1; end
+  if (anyDone & IEdly1)           begin IEdly1<=0; end
+  if (anyDone & IEdly2 & ~IEdly1) begin IEdly2<=0; end
+  if (anyDone & GIE & irqRq)      begin IE<=0; end
 end
 
-assign pc_ck0=  instSKON & stb1 & flgGIE;       // 6000 SKON
-assign done0=   instSKON & ck2;
+assign GIE=IE & ~IEdly1 & ~IEdly2;
+assign irqOverride=GIE & irqRq;
 
-assign done1 = instION & ck2;                   // 6001 ION
-assign done2 = instIOF & ck2;                   // 6002 IOF
+assign pc_ck0=    instSKON & stb1 & IE;           // 6000 SKON
+assign done0=     instSKON & ck2;
 
-assign pc_ck3=  instSRQ & stb1 & irqRq;         // 6003 SRQ
-assign done3=   instSRQ & ck2;
+assign done1 =    instION & ck2;                  // 6001 ION
+assign done2 =    instIOF & ck2;                  // 6002 IOF
+
+assign pc_ck3=    instSRQ & stb1 & irqRq;         // 6003 SRQ
+assign done3=     instSRQ & ck2;
 
 reg IF=0;       // TODO Instruction Field
 reg [2:0] DF=0; // TODO Data Field
@@ -143,36 +151,28 @@ reg GT=0;       // TODO Greater Than
 reg II=0;       // TODO Interrupt Inhibit bit 
 reg U=0;        // TODO User mode flag
 
-assign rot2ac4= instGTF & ck1;                  // 6004 GTF
-assign ACGTF =  instGTF & ck1 ? {LINK, GT, irqRq, II, flgGIE & (!flgNoInt), U, 1'b0, IF, 1'b0, DF} : 12'b0;
-assign clr4=     instGTF & ck1;
-assign ac_ck4=  instGTF & stb1;
-assign done4=   instGTF & ck2;
+assign rot2ac4=   instGTF & ck1;                  // 6004 GTF
+assign ACGTF =    instGTF & ck1 ? {LINK, GT, irqRq, II, IE , U, 1'b0, IF, 1'b0, DF} : 12'b0;
+assign clr4=      instGTF & ck1;
+assign ac_ck4=    instGTF & stb1;
+assign done4=     instGTF & ck2;
 
-assign linkclr5= instRTF & ck1;                 // 6005 RTF
-assign linkcml5= instRTF & ck1 & AC[11];
-assign link_ck5= instRTF & stb1;
-assign done5 = instRTF & ck2;
+assign linkclr5=  instRTF & ck1;                  // 6005 RTF
+assign linkcml5=  instRTF & ck1 & AC[11]; // GIE is updated in the always @(posedge
+assign link_ck5=  instRTF & stb1;
+assign done5 =    instRTF & ck2;
 
-assign rot2ac7= instCAF & ck1;                  // 6007 CAF
-assign clr7=     instCAF & ck1;
-assign linkclr7= instCAF & ck1;
-assign ac_ck7=  instCAF & stb1;
-assign link_ck7= instCAF & stb1;
-assign done7=   instCAF & ck2;
+assign rot2ac7=   instCAF & ck1;                  // 6007 CAF
+assign clr7=      instCAF & ck1;
+assign linkclr7=  instCAF & ck1;
+assign ac_ck7=    instCAF & stb1;
+assign link_ck7=  instCAF & stb1;
+assign done7=     instCAF & ck2;
 
 //                            1     1      2     2      3     3      4     4      5     5      6     6
 //                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 
 endmodule
-
-//
-// FLAG_ION: reset IOT_IOF or IRQ_JMS or IOT_CAF or IOT_SKON or RESET 
-//           set   IOT_ION or RTF_ION
-//
-// SkipInterruptRequest IOT_SRQ and IRQ_BUS
-//
-
 
 
 // FROM SIMH

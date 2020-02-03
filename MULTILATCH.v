@@ -13,7 +13,7 @@
 
 module MULTILATCH (
   input RESET,
-  input CLK, 
+  input SYSCLK, 
   input [11:0] in,
   input hold,
   input latch,

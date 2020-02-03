@@ -8,33 +8,43 @@
 `default_nettype none
 
 module PROGRAMCOUNTER (
+  input SYSCLK,
   input RESET,
   input [11:0] IN,
   input CK,
   input LD,
   input LATCH,
+  input FETCH,
   output [11:0] PC,
   output [11:0] PCLAT
 );
 
 reg [11:0] thisPC=0;
 reg [11:0] thisPCLAT=0;
+reg prevLD=0;
+reg prevFetch=0;
 
 assign PC=thisPC;
 assign PCLAT=thisPCLAT;
 
-always @(posedge CK or posedge RESET) begin 
+always @(posedge SYSCLK) begin 
   if (RESET) begin
     thisPC<=12'o0200;
-  end else if (LD) begin
+    prevLD<=0;
+    prevFetch<=0;
+  end else if (LD && !prevLD) begin
     thisPC<=IN;
-  end else begin
+  end else if (FETCH & !prevFetch) begin
+    thisPCLAT<=thisPC;
     thisPC<=thisPC+1;
+  end else if (CK & !prevFetch) begin
+    thisPC<=thisPC+1;
+    if (LATCH) thisPCLAT<=thisPC;
   end
+
+  prevLD<=LD;
+  prevFetch<=FETCH;
 end
 
-always @(LATCH or thisPC) begin
-  if (LATCH) thisPCLAT = thisPC;
-end
 
 endmodule

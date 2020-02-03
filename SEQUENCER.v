@@ -8,7 +8,7 @@
 `default_nettype none
 
 module SEQUENCER (
-  input CLK,              //
+  input SYSCLK,              //
   input RESET,
   input DONE,             // Reset step counter before the natural end at step 31
   input RUN,              // Rising edge starts continous run
@@ -23,52 +23,52 @@ module SEQUENCER (
 reg running;              // CPU is running continously
 reg [4:0] stepCnt; 
 
-always @(posedge CLK) begin 
+always @(posedge SYSCLK) begin 
     if (RESET) begin
-        running=0;
-        stepCnt=0;
+        running<=0;
+        stepCnt<=31;
     end 
     else 
     if (DONE) begin
-        stepCnt=0;
+        stepCnt<=0;
     end
     else
     begin
-        if (RUN==1 & running==0) running=1;
+        if (RUN==1 & running==0) running<=1;
 //            if (HALT & running) running=0;
         if (running) begin
             if (stepCnt==1) begin
                 case (SEQTYPE)
-                    2'b00: stepCnt=stepCnt+7;
-                    2'b01: stepCnt=stepCnt+5;
-                    2'b10: stepCnt=stepCnt+1; 
-                    2'b11: stepCnt=stepCnt+1;
+                    2'b00: stepCnt<=stepCnt+7;
+                    2'b01: stepCnt<=stepCnt+5;
+                    2'b10: stepCnt<=stepCnt+1; 
+                    2'b11: stepCnt<=stepCnt+1;
                 endcase
-            end else stepCnt=stepCnt+1;
+            end else stepCnt<=stepCnt+1;
         end
     end
 end
 
-assign CK_FETCH  = (stepCnt==0 || stepCnt==1);
-assign CK_AUTO1  = (stepCnt==2 || stepCnt==3);
-assign CK_AUTO2  = (stepCnt==4 || stepCnt==5);
-assign CK_IND    = (stepCnt==6 || stepCnt==7);
-assign CK_1      = (stepCnt==8 || stepCnt==9);
-assign CK_2      = (stepCnt==10 || stepCnt==11);
-assign CK_3      = (stepCnt==12 || stepCnt==13);
-assign CK_4      = (stepCnt==14 || stepCnt==15);
-assign CK_5      = (stepCnt==16 || stepCnt==17);
-assign CK_6      = (stepCnt==18 || stepCnt==19);
+assign CK_FETCH  = !RESET & (stepCnt==0 || stepCnt==1);
+assign CK_AUTO1  = !RESET & (stepCnt==2 || stepCnt==3);
+assign CK_AUTO2  = !RESET & (stepCnt==4 || stepCnt==5);
+assign CK_IND    = !RESET & (stepCnt==6 || stepCnt==7);
+assign CK_1      = !RESET & (stepCnt==8 || stepCnt==9);
+assign CK_2      = !RESET & (stepCnt==10 || stepCnt==11);
+assign CK_3      = !RESET & (stepCnt==12 || stepCnt==13);
+assign CK_4      = !RESET & (stepCnt==14 || stepCnt==15);
+assign CK_5      = !RESET & (stepCnt==16 || stepCnt==17);
+assign CK_6      = !RESET & (stepCnt==18 || stepCnt==19);
 
-assign STB_FETCH  = (stepCnt==1);
-assign STB_AUTO1 = (stepCnt==3);
-assign STB_AUTO2 = (stepCnt==5);
-assign STB_IND   = (stepCnt==7);
-assign STB_1     = (stepCnt==9);
-assign STB_2     = (stepCnt==11);
-assign STB_3     = (stepCnt==13);
-assign STB_4     = (stepCnt==15);
-assign STB_5     = (stepCnt==17);
-assign STB_6     = (stepCnt==19);
+assign STB_FETCH = !RESET & (stepCnt==1);
+assign STB_AUTO1 = !RESET & (stepCnt==3);
+assign STB_AUTO2 = !RESET & (stepCnt==5);
+assign STB_IND   = !RESET & (stepCnt==7);
+assign STB_1     = !RESET & (stepCnt==9);
+assign STB_2     = !RESET & (stepCnt==11);
+assign STB_3     = !RESET & (stepCnt==13);
+assign STB_4     = !RESET & (stepCnt==15);
+assign STB_5     = !RESET & (stepCnt==17);
+assign STB_6     = !RESET & (stepCnt==19);
 
 endmodule

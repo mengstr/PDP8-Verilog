@@ -2,13 +2,14 @@
 
 module CPU_tb();
     reg SYSCLK=0;
-    reg reset=0,run=0, halt=0;
+    reg reset=0, clear=0, run=0, halt=0;
     wire [11:0] dutBusPC, dutBusData;
     wire instAND, instTAD, instISZ, instDCA, instJMS, instJMP, instIOT, instOPR;
 
     CPU dut(
         .SYSCLK(SYSCLK),
         .sw_RESET(reset),
+        .sw_CLEAR(clear),
         .sw_RUN(run), 
         .sw_HALT(halt),
         .pBusPC(dutBusPC),
@@ -16,7 +17,8 @@ module CPU_tb();
         .pInstAND(instAND), .pInstTAD(instTAD), .pInstISZ(instISZ), .pInstDCA(instDCA), .pInstJMS(instJMS), .pInstJMP(instJMP), .pInstIOT(instIOT), .pInstOPR(instOPR)
     );
     
-    
+  reg [20:0] cnt=0;
+
     always begin
         #1 SYSCLK<=~SYSCLK;
     end
@@ -36,13 +38,15 @@ module CPU_tb();
         #32000 $finish;
     end
 
-    always @(dut.theSEQUENCER.stepCnt) begin
-        if (dut.theSEQUENCER.stepCnt==5'd31) begin $display("Unhandled OP"); $finish; end
-        if (dut.theSEQUENCER.stepCnt==5'b00001) begin:PRN    
+//    always @(dut.theSEQUENCER.stepCnt) begin
+    always @(dut.SYSCLK) begin
+        if (dut.theSEQUENCER.stepCnt==5'd30) begin $display("Unhandled OP"); $finish; end
+        if (dut.theSEQUENCER.stepCnt==5'd1 && dut.SYSCLK==0) begin:PRN    
+        cnt<=cnt+1;
  `ifdef TRACE
-            $display("PC=%04o IRQ,NO,GIE=%d,%d,%d L=%d ACC=%04o MQ=%04o IR=%04o",
-                dut.thePC.PC,
-                dut.theInterrupt.irqRq, dut.theInterrupt.flgNoInt, dut.theInterrupt.flgGIE,
+            $display("[%04o] IRQ,DLY,IE=%d,%d,%d L/AC:%d/%04o MQ:%04o IR:%04o",
+                dut.thePC.PCLAT,
+                dut.theInterrupt.irqRq, dut.theInterrupt.IEdly1|dut.theInterrupt.IEdly2, dut.theInterrupt.IE,
                 dut.link,
                 dut.theACC.data,
                 dut.theMQ.data,
@@ -50,11 +54,11 @@ module CPU_tb();
             );
 
     `endif
-            if (dut.busIR==12'o7402) begin $display("end by HLT"); $finish; end
             if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bx)) begin $display("X in theACC.data"); $finish; end
             if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bz)) begin $display("Z in theACC.data"); $finish; end
         end
-        if ((dut.theSEQUENCER.running==1'b1) && ($countbits(dut.busData,'x)>0)) begin $display("X in dut.busRamD"); $finish; end
+            if (dut.theSEQUENCER.stepCnt==5'd8 & dut.busIR==12'o7402) begin $display("end by HLT after %d instructions",cnt); $finish; end
+//        if ((dut.theSEQUENCER.running==1'b1) && ($countbits(dut.busData,'x)>0)) begin $display("X in dut.busRamD"); $finish; end
 
     end
     

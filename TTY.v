@@ -77,8 +77,8 @@ reg flgPRN=0;
 
 assign irq=(flgTTYIE) & (flgKBD | flgPRN);
 
-wire     done30, done35, done40, done41;
-or(done, done30, done35, done40, done41);
+wire     done30, done35, done40, done41, done42;
+or(done, done30, done35, done40, done41, done42);
 
 wire       pc_ck41;
 or (pc_ck, pc_ck41);
@@ -93,7 +93,7 @@ wire instKRB=(EN1 & (IR==3'o6)); //Keyboard Read and begin next read
 // TODO Handle 6037
 wire instTFL=(EN2 & (IR==3'o0)); //Teleprinter Flag set
 wire instTSF=(EN2 & (IR==3'o1)); //Teleprinter Skip if Flag
-// TODO Handle 6042
+wire instTFC=(EN2 & (IR==3'o2)); //Teleprinter Flag clear
 // TODO Handle 6043
 wire instTPC=(EN2 & (IR==3'o4)); //Teleprinter Print Character
 wire instTSK=(EN2 & (IR==3'o5)); //Teleprinter Skip
@@ -109,14 +109,15 @@ always @(posedge CLK) begin
     if (instKIE) flgTTYIE<=ACbit11; ////Keyboard Interrupt Set/Reset
     if (instKCF) flgKBD<=0; //Keyboard Clear Flags
     if (instTFL) flgPRN<=1; //Teleprinter Flag set
+    if (instTFC) flgPRN<=0; //Teleprinter Flag clear
 end
 
 assign done30 = instKCF & ck1;
 assign done35 = instKIE & ck1;
 assign done40 = instTFL & ck1;
-
 assign pc_ck41= instTSF & flgPRN & stb1;
 assign done41 = instTSF & ck2;
+assign done42 = instTFC & ck1;
 
 endmodule
 
