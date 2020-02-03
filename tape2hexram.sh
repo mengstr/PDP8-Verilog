@@ -69,15 +69,15 @@ while read line; do
     # Field records - update the field variable (unused in this code)
     if [ "$op" == "3" ]; then
         field=${line:1:1}
-#	>&2 echo "Field record "$field
+	>&2 echo "Field record "$field
         continue
     fi
 
     # Origin records - update the address variable at the second(final) record
     if [ $mode == 1 ]; then
         origin=$origin${line:1:2}
-#	>&2 echo "Origin record 0"$origin
         address=$((8#$origin))
+	>&2 echo "Origin record " $origin 
         mode=0
         continue
     fi
@@ -99,8 +99,17 @@ while read line; do
             lastData=${ram[$address]}
             if [ "${ram[$address]}" == "$FILLWORD" ]; then
                 ram[$address]=$data
-	    fi
+#                >&2 echo "ram["$(printf "%04o" $address)"]=" $data
+            else
+                 >&2 echo "Overwriting address" $(printf "%04o" $address) "old data" ${ram[$address]} "with new data" $data
+                ram[$address]=$data
+    	    fi
             (( address++ ))
+        else
+            if [ "$field" != "$lastField" ]; then
+                >&2 echo "Wrong field for addr:" $(printf "%04o" $address) "with data" $data
+            fi
+            lastField=$field
         fi
         continue
     fi

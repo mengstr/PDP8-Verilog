@@ -18,5 +18,6 @@
 *.vvp
 *.vcd
 *.log
+*.hex
 
 upload

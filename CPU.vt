@@ -35,7 +35,7 @@ module CPU_tb();
     initial begin
         $dumpfile("CPU.vcd");
         $dumpvars(0,CPU_tb);
-        #32000 $finish;
+        #100000 begin $display("DONE after %d instructions",cnt); $finish; end
     end
 
 //    always @(dut.theSEQUENCER.stepCnt) begin
@@ -43,6 +43,7 @@ module CPU_tb();
         if (dut.theSEQUENCER.stepCnt==5'd30) begin $display("Unhandled OP"); $finish; end
         if (dut.theSEQUENCER.stepCnt==5'd1 && dut.SYSCLK==0) begin:PRN    
         cnt<=cnt+1;
+      if ((cnt%1000)==0) $display("%d",cnt);
  `ifdef TRACE
             $display("[%04o] IRQ,DLY,IE=%d,%d,%d L/AC:%d/%04o MQ:%04o IR:%04o",
                 dut.thePC.PCLAT,

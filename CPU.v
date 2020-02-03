@@ -360,7 +360,7 @@ MULTILATCH theACC(
 );
 
 assign busORacc=
-  (oprOSR ? 12'o7777 : 12'o0000) |
+  (oprOSR ? 12'o`OSR : 12'o0000) |
   (mq2orbus_ ? mqout1   : 12'o0000) |
   busACGTF;
 
@@ -655,7 +655,7 @@ TTY theTTY(
   .EN1(instIOT & (busIR[8:3]==6'o03)),
   .EN2(instIOT & (busIR[8:3]==6'o04)),
   .IR(busIR[2:0]),
-  .ACbit11(accout1[0:0]), // PDP has the bit order reversed
+  .AC(accout1), //.ACbit11(accout1[0:0]), // PDP has the bit order reversed
   .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   .done(doneIOT34),

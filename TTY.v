@@ -62,7 +62,7 @@ module TTY(
   input EN1,                             // High when this module is to be activated  603x
   input EN2,                             // High when this module is to be activated  604x
   input [2:0] IR,
-  input ACbit11,
+  input [11:0] AC,
   input ck1, ck2, ck3, ck4, ck5, ck6,
   input stb1,stb2,stb3,stb4,stb5,stb6,
   output done,
@@ -70,18 +70,18 @@ module TTY(
   output irq
 );
 
+reg [5:0] txtick;
+
 reg flgTTYIE=0;
 reg flgKBD=0;
 reg flgPRN=0;
-//or(irq, flgKBD, flgTTY);
-
 assign irq=(flgTTYIE) & (flgKBD | flgPRN);
 
-wire     done30, done35, done40, done41, done42;
-or(done, done30, done35, done40, done41, done42);
+wire     done30, done31, done35, done40, done41, done42, done46;
+or(done, done30, done31, done35, done40, done41, done42, done46);
 
-wire       pc_ck41;
-or (pc_ck, pc_ck41);
+wire       pc_ck31, pc_ck41;
+or (pc_ck, pc_ck31, pc_ck41);
 
 wire instKCF=(EN1 & (IR==3'o0)); //Keyboard Clear Flags
 wire instKSF=(EN1 & (IR==3'o1)); //Keyboard Skip if Flag
@@ -100,24 +100,38 @@ wire instTSK=(EN2 & (IR==3'o5)); //Teleprinter Skip
 wire instTLS=(EN2 & (IR==3'o6)); //Teleprinter Load and start
 // TODO Handle 6047
 
+wire ACbit11=AC[0:0]; // PDP has the bit order reversed
+
 always @(posedge CLK) begin
     if (clear)   begin
         flgTTYIE<=1;
         flgKBD<=0;
         flgPRN<=0;
+        txtick<=0;
+    end else begin
+      if (instKIE) flgTTYIE<=ACbit11; ////Keyboard Interrupt Set/Reset
+      if (instKCF) flgKBD<=0; //Keyboard Clear Flags
+      if (instTFL) flgPRN<=1; //Teleprinter Flag set
+      if (instTFC) flgPRN<=0; //Teleprinter Flag clear
+      if (instTLS) begin      //Teleprinter Load and start
+        flgPRN<=0;
+        $display("/// Printed %d ///", AC & 12'd127);
+        txtick<=63;
+      end
+      if (txtick==1) flgPRN<=1;
+      if (txtick!=0) txtick<=txtick-1;
     end
-    if (instKIE) flgTTYIE<=ACbit11; ////Keyboard Interrupt Set/Reset
-    if (instKCF) flgKBD<=0; //Keyboard Clear Flags
-    if (instTFL) flgPRN<=1; //Teleprinter Flag set
-    if (instTFC) flgPRN<=0; //Teleprinter Flag clear
 end
 
 assign done30 = instKCF & ck1;
+assign pc_ck31= instKSF & flgKBD & stb1;
+assign done31 = instKSF & ck2;
 assign done35 = instKIE & ck1;
 assign done40 = instTFL & ck1;
 assign pc_ck41= instTSF & flgPRN & stb1;
 assign done41 = instTSF & ck2;
 assign done42 = instTFC & ck1;
+assign done46 = instTLS & ck1;
 
 endmodule
 

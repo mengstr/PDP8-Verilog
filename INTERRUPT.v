@@ -84,6 +84,7 @@ module INTERRUPT(
 
 reg IE;
 reg IEdly1, IEdly2;
+reg irqActive;
 
 
 wire        link_ck5, link_ck7;
@@ -120,8 +121,11 @@ wire instSGT= (EN & (IR==3'o6));
 wire instCAF= (EN & (IR==3'o7));
 
 wire AC8=~AC[8];
+wire preIrq;
+
 always @(posedge SYSCLK) begin
-  if (CLEAR | RESET)       begin IE<=0; IEdly1<=0; IEdly2<=0; end
+  if (CLEAR | RESET)       begin IE<=0; IEdly1<=0; IEdly2<=0; irqActive<=0; end
+  if (ckFetch & ~stbFetch & preIrq)    begin irqActive<=1; end
   if (stb1 & instCAF)      begin IE<=0; IEdly1<=0; IEdly2<=0; end
   if (stb1 & instIOF)      begin IE<=0; IEdly1<=0; IEdly2<=0; end
   if (stb1 & instSKON)     begin IE<=0; IEdly1<=0; IEdly2<=0; end
@@ -130,11 +134,14 @@ always @(posedge SYSCLK) begin
   if (stb1 & instION)      begin IE<=1; IEdly1<=1; IEdly2<=1; end
   if (anyDone & IEdly1)           begin IEdly1<=0; end
   if (anyDone & IEdly2 & ~IEdly1) begin IEdly2<=0; end
-  if (anyDone & GIE & irqRq)      begin IE<=0; end
+  // if (anyDone & GIE & irqRq)      begin IE<=0; end
+  if (anyDone & GIE & irqActive)      begin IE<=0; irqActive<=0; end
 end
 
+// FIXME - irqOverride must be activated at rising edge of ckFetch
 assign GIE=IE & ~IEdly1 & ~IEdly2;
-assign irqOverride=GIE & irqRq;
+assign preIrq=GIE & irqRq;
+assign irqOverride=preIrq & (irqActive | ckFetch);
 
 assign pc_ck0=    instSKON & stb1 & IE;           // 6000 SKON
 assign done0=     instSKON & ck2;
