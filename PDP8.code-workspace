@@ -9,7 +9,7 @@
 		"zenMode.fullScreen": false,
 		"zenMode.hideStatusBar": false,
 		"verilog.linting.linter": "verilator",
-		"verilog.linting.verilator.arguments": "-Wall",
+		"verilog.linting.verilator.arguments": "-Wall -DOSR=7777",
 		"todo-tree.general.statusBar": "total",
 		"todo-tree.highlights.enabled": false
 	}

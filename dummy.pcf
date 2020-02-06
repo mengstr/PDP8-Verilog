@@ -1,7 +1,7 @@
 #
 # Basic pins on the olimex board
 #
-set_io --warn-no-port SYSCLK   15
+set_io --warn-no-port EXTCLK   15
 set_io --warn-no-port P0 41    #BUT1  41
 set_io --warn-no-port P1 42    #BUT2  42
 set_io --warn-no-port P2 40    #LED1  40
