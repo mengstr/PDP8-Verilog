@@ -8,6 +8,7 @@
 
 module LINK (
 input SYSCLK,
+input RESET,
 input CLEAR,
 input LINK_CK,
 input CLL,        // Clear link

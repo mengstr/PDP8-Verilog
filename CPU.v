@@ -270,7 +270,8 @@ wire rotaterLI;
 
 LINK theLINK(
   .SYSCLK(SYSCLK),
-  .CLEAR(sw_RESET),
+  .RESET(sw_RESET),
+  .CLEAR(sw_RESET), //FIXME
   .LINK_CK(link_ck_),
   .CLL(oprCLL | linkclrIOT0),
   .CML(((oprCML ^ (incC & oprIAC)) | (andaddC & instTAD)) | linkcmlIOT0),
@@ -664,22 +665,23 @@ TTY theTTY(
 );
 
 
-assign doneIgnore=ck6 
-  & ((busIR==12'o6142) 
-  |  (busIR==12'o6077)
-  |  (busIR==12'o6152)
-  |  (busIR==12'o6762) // DTCA TC08-P: Clear Status Register A
+//601x 607x 610x 614x 615x 616x 617x 624x 633x 634x 676x 677x
+assign doneIgnore=ck6 & 
+  & ((busIR==12'o6011) // RSF  PR8-E: Skip on Reader Flag
   |  (busIR==12'o6012) // RRB  PR8-E: Read Reader Buffer
-  |  (busIR==12'o6346)
-  |  (busIR==12'o6772) // DTRB TC08-P: Read Status Register B
+  |  (busIR==12'o6077)
+  |  (busIR==12'o6101) // SMP  MP8-E: Skip on No Memory Parity Error
+  |  (busIR==12'o6141)
+  |  (busIR==12'o6142) 
+  |  (busIR==12'o6152)
   |  (busIR==12'o6167)
   |  (busIR==12'o6171)
-  |  (busIR==12'o6141)
-  |  (busIR==12'o6344)
-  |  (busIR==12'o6331)
-  |  (busIR==12'o6011) // RSF  PR8-E: Skip on Reader Flag
   |  (busIR==12'o6244) // RMF  KM8-E: Restore Memory Field
-  |  (busIR==12'o6101) // SMP  MP8-E: Skip on No Memory Parity Error
+  |  (busIR==12'o6331)
+  |  (busIR==12'o6344)
+  |  (busIR==12'o6346)
+  |  (busIR==12'o6762) // DTCA TC08-P: Clear Status Register A
+  |  (busIR==12'o6772) // DTRB TC08-P: Read Status Register B
   );
 
 endmodule

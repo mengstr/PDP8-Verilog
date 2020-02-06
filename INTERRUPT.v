@@ -138,7 +138,6 @@ always @(posedge SYSCLK) begin
   if (anyDone & GIE & irqActive)      begin IE<=0; irqActive<=0; end
 end
 
-// FIXME - irqOverride must be activated at rising edge of ckFetch
 assign GIE=IE & ~IEdly1 & ~IEdly2;
 assign preIrq=GIE & irqRq;
 assign irqOverride=preIrq & (irqActive | ckFetch);
