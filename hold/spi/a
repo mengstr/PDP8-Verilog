@@ -1,0 +1,1354 @@
+docker run --rm -it -w /root -v/Users/mats/Documents/Projects/PDP8-X/verilog/spi/:/root cranphin/icestorm yosys -p 'synth_ice40 -top top -json spi2.json' spi2.v
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2019  Clifford Wolf <clifford@clifford.at>           |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.9+932 (git sha1 db226870, clang 6.0.0-1ubuntu2 -fPIC -Os)
+
+
+-- Parsing `spi2.v' using frontend `verilog' --
+
+1. Executing Verilog-2005 frontend: spi2.v
+Parsing Verilog input from `spi2.v' to AST representation.
+Generating RTLIL representation for module `\top'.
+Generating RTLIL representation for module `\shift595'.
+Successfully finished Verilog frontend.
+
+-- Running command `synth_ice40 -top top -json spi2.json' --
+
+2. Executing SYNTH_ICE40 pass.
+
+2.1. Executing Verilog-2005 frontend: /usr/local/bin/../share/yosys/ice40/cells_sim.v
+Parsing Verilog input from `/usr/local/bin/../share/yosys/ice40/cells_sim.v' to AST representation.
+Generating RTLIL representation for module `\SB_IO'.
+Generating RTLIL representation for module `\SB_GB_IO'.
+Generating RTLIL representation for module `\SB_GB'.
+Generating RTLIL representation for module `\SB_LUT4'.
+Generating RTLIL representation for module `\SB_CARRY'.
+Generating RTLIL representation for module `\SB_DFF'.
+Generating RTLIL representation for module `\SB_DFFE'.
+Generating RTLIL representation for module `\SB_DFFSR'.
+Generating RTLIL representation for module `\SB_DFFR'.
+Generating RTLIL representation for module `\SB_DFFSS'.
+Generating RTLIL representation for module `\SB_DFFS'.
+Generating RTLIL representation for module `\SB_DFFESR'.
+Generating RTLIL representation for module `\SB_DFFER'.
+Generating RTLIL representation for module `\SB_DFFESS'.
+Generating RTLIL representation for module `\SB_DFFES'.
+Generating RTLIL representation for module `\SB_DFFN'.
+Generating RTLIL representation for module `\SB_DFFNE'.
+Generating RTLIL representation for module `\SB_DFFNSR'.
+Generating RTLIL representation for module `\SB_DFFNR'.
+Generating RTLIL representation for module `\SB_DFFNSS'.
+Generating RTLIL representation for module `\SB_DFFNS'.
+Generating RTLIL representation for module `\SB_DFFNESR'.
+Generating RTLIL representation for module `\SB_DFFNER'.
+Generating RTLIL representation for module `\SB_DFFNESS'.
+Generating RTLIL representation for module `\SB_DFFNES'.
+Generating RTLIL representation for module `\SB_RAM40_4K'.
+Generating RTLIL representation for module `\SB_RAM40_4KNR'.
+Generating RTLIL representation for module `\SB_RAM40_4KNW'.
+Generating RTLIL representation for module `\SB_RAM40_4KNRNW'.
+Generating RTLIL representation for module `\ICESTORM_LC'.
+Generating RTLIL representation for module `\SB_PLL40_CORE'.
+Generating RTLIL representation for module `\SB_PLL40_PAD'.
+Generating RTLIL representation for module `\SB_PLL40_2_PAD'.
+Generating RTLIL representation for module `\SB_PLL40_2F_CORE'.
+Generating RTLIL representation for module `\SB_PLL40_2F_PAD'.
+Generating RTLIL representation for module `\SB_WARMBOOT'.
+Generating RTLIL representation for module `\SB_SPRAM256KA'.
+Generating RTLIL representation for module `\SB_HFOSC'.
+Generating RTLIL representation for module `\SB_LFOSC'.
+Generating RTLIL representation for module `\SB_RGBA_DRV'.
+Generating RTLIL representation for module `\SB_LED_DRV_CUR'.
+Generating RTLIL representation for module `\SB_RGB_DRV'.
+Generating RTLIL representation for module `\SB_I2C'.
+Generating RTLIL representation for module `\SB_SPI'.
+Generating RTLIL representation for module `\SB_LEDDA_IP'.
+Generating RTLIL representation for module `\SB_FILTER_50NS'.
+Generating RTLIL representation for module `\SB_IO_I3C'.
+Generating RTLIL representation for module `\SB_IO_OD'.
+Generating RTLIL representation for module `\SB_MAC16'.
+Generating RTLIL representation for module `\ICESTORM_RAM'.
+Successfully finished Verilog frontend.
+
+2.2. Executing HIERARCHY pass (managing design hierarchy).
+
+2.2.1. Analyzing design hierarchy..
+Top module:  \top
+Used module:     \shift595
+
+2.2.2. Analyzing design hierarchy..
+Top module:  \top
+Used module:     \shift595
+Removed 0 unused modules.
+
+2.3. Executing PROC pass (convert processes to netlists).
+
+2.3.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 4 empty switches in `\shift595.$proc$spi2.v:58$10'.
+Cleaned up 4 empty switches.
+
+2.3.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 7 switch rules as full_case in process $proc$spi2.v:58$10 in module shift595.
+Removed a total of 0 dead cases.
+
+2.3.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 21 assignments to connections.
+
+2.3.4. Executing PROC_INIT pass (extract init attributes).
+Found init rule in `\shift595.$proc$spi2.v:55$71'.
+  Set init value: \shiftreg = 16'0000000000000000
+Found init rule in `\shift595.$proc$spi2.v:54$70'.
+  Set init value: \bitcnt = 4'0000
+Found init rule in `\shift595.$proc$spi2.v:53$69'.
+  Set init value: \digit = 2'00
+Found init rule in `\shift595.$proc$spi2.v:51$68'.
+  Set init value: \DO = 1'0
+Found init rule in `\shift595.$proc$spi2.v:49$67'.
+  Set init value: \LATCH = 1'0
+Found init rule in `\shift595.$proc$spi2.v:48$66'.
+  Set init value: \SCK = 1'0
+Found init rule in `\top.$proc$spi2.v:15$5'.
+  Set init value: \stb = 1'0
+Found init rule in `\top.$proc$spi2.v:14$4'.
+  Set init value: \divider = 10'0000000000
+
+2.3.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.3.6. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\shift595.$proc$spi2.v:55$71'.
+Creating decoders for process `\shift595.$proc$spi2.v:54$70'.
+Creating decoders for process `\shift595.$proc$spi2.v:53$69'.
+Creating decoders for process `\shift595.$proc$spi2.v:51$68'.
+Creating decoders for process `\shift595.$proc$spi2.v:49$67'.
+Creating decoders for process `\shift595.$proc$spi2.v:48$66'.
+Creating decoders for process `\shift595.$proc$spi2.v:58$10'.
+     1/46: $5$func$\Lookup7Seg$spi2.v:70$9$\Lookup7Seg[6:0]$62
+     2/46: $4$func$\Lookup7Seg$spi2.v:70$9$\Lookup7Seg[6:0]$60
+     3/46: $4$func$\Lookup7Seg$spi2.v:70$9$\in[3:0]$61
+     4/46: $5$func$\Lookup7Seg$spi2.v:69$8$\Lookup7Seg[6:0]$58
+     5/46: $4$func$\Lookup7Seg$spi2.v:69$8$\Lookup7Seg[6:0]$56
+     6/46: $4$func$\Lookup7Seg$spi2.v:69$8$\in[3:0]$57
+     7/46: $5$func$\Lookup7Seg$spi2.v:68$7$\Lookup7Seg[6:0]$54
+     8/46: $4$func$\Lookup7Seg$spi2.v:68$7$\Lookup7Seg[6:0]$52
+     9/46: $4$func$\Lookup7Seg$spi2.v:68$7$\in[3:0]$53
+    10/46: $5$func$\Lookup7Seg$spi2.v:67$6$\Lookup7Seg[6:0]$50
+    11/46: $4$func$\Lookup7Seg$spi2.v:67$6$\Lookup7Seg[6:0]$48
+    12/46: $4$func$\Lookup7Seg$spi2.v:67$6$\in[3:0]$49
+    13/46: $3$func$\Lookup7Seg$spi2.v:70$9$\in[3:0]$45
+    14/46: $3$func$\Lookup7Seg$spi2.v:70$9$\Lookup7Seg[6:0]$44
+    15/46: $3$func$\Lookup7Seg$spi2.v:69$8$\in[3:0]$43
+    16/46: $3$func$\Lookup7Seg$spi2.v:69$8$\Lookup7Seg[6:0]$42
+    17/46: $3$func$\Lookup7Seg$spi2.v:68$7$\in[3:0]$41
+    18/46: $3$func$\Lookup7Seg$spi2.v:68$7$\Lookup7Seg[6:0]$40
+    19/46: $3$func$\Lookup7Seg$spi2.v:67$6$\in[3:0]$39
+    20/46: $3$func$\Lookup7Seg$spi2.v:67$6$\Lookup7Seg[6:0]$38
+    21/46: $3\digit[1:0]
+    22/46: $2$func$\Lookup7Seg$spi2.v:70$9$\in[3:0]$36
+    23/46: $2$func$\Lookup7Seg$spi2.v:70$9$\Lookup7Seg[6:0]$35
+    24/46: $2$func$\Lookup7Seg$spi2.v:69$8$\in[3:0]$34
+    25/46: $2$func$\Lookup7Seg$spi2.v:69$8$\Lookup7Seg[6:0]$33
+    26/46: $2$func$\Lookup7Seg$spi2.v:68$7$\in[3:0]$32
+    27/46: $2$func$\Lookup7Seg$spi2.v:68$7$\Lookup7Seg[6:0]$31
+    28/46: $2$func$\Lookup7Seg$spi2.v:67$6$\in[3:0]$30
+    29/46: $2$func$\Lookup7Seg$spi2.v:67$6$\Lookup7Seg[6:0]$29
+    30/46: $2\digit[1:0]
+    31/46: $2\bitcnt[3:0]
+    32/46: $2\DO[0:0]
+    33/46: $1$func$\Lookup7Seg$spi2.v:70$9$\in[3:0]$27
+    34/46: $1$func$\Lookup7Seg$spi2.v:70$9$\Lookup7Seg[6:0]$26
+    35/46: $1$func$\Lookup7Seg$spi2.v:69$8$\in[3:0]$25
+    36/46: $1$func$\Lookup7Seg$spi2.v:69$8$\Lookup7Seg[6:0]$24
+    37/46: $1$func$\Lookup7Seg$spi2.v:68$7$\in[3:0]$23
+    38/46: $1$func$\Lookup7Seg$spi2.v:68$7$\Lookup7Seg[6:0]$22
+    39/46: $1$func$\Lookup7Seg$spi2.v:67$6$\in[3:0]$21
+    40/46: $1$func$\Lookup7Seg$spi2.v:67$6$\Lookup7Seg[6:0]$20
+    41/46: $1\bitcnt[3:0]
+    42/46: $1\digit[1:0]
+    43/46: $1\DO[0:0]
+    44/46: $0\shiftreg[15:0]
+    45/46: $0\LATCH[0:0]
+    46/46: $0\SCK[0:0]
+Creating decoders for process `\top.$proc$spi2.v:15$5'.
+Creating decoders for process `\top.$proc$spi2.v:14$4'.
+Creating decoders for process `\top.$proc$spi2.v:16$1'.
+
+2.3.7. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.3.8. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\shift595.\SCK' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$559' with positive edge clock.
+Creating register for signal `\shift595.\LATCH' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$560' with positive edge clock.
+Creating register for signal `\shift595.\DO' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$561' with positive edge clock.
+Creating register for signal `\shift595.\digit' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$562' with positive edge clock.
+Creating register for signal `\shift595.\bitcnt' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$563' with positive edge clock.
+Creating register for signal `\shift595.\shiftreg' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$564' with positive edge clock.
+Creating register for signal `\shift595.$func$\Lookup7Seg$spi2.v:67$6$\Lookup7Seg' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$565' with positive edge clock.
+Creating register for signal `\shift595.$func$\Lookup7Seg$spi2.v:67$6$\in' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$566' with positive edge clock.
+Creating register for signal `\shift595.$func$\Lookup7Seg$spi2.v:68$7$\Lookup7Seg' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$567' with positive edge clock.
+Creating register for signal `\shift595.$func$\Lookup7Seg$spi2.v:68$7$\in' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$568' with positive edge clock.
+Creating register for signal `\shift595.$func$\Lookup7Seg$spi2.v:69$8$\Lookup7Seg' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$569' with positive edge clock.
+Creating register for signal `\shift595.$func$\Lookup7Seg$spi2.v:69$8$\in' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$570' with positive edge clock.
+Creating register for signal `\shift595.$func$\Lookup7Seg$spi2.v:70$9$\Lookup7Seg' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$571' with positive edge clock.
+Creating register for signal `\shift595.$func$\Lookup7Seg$spi2.v:70$9$\in' using process `\shift595.$proc$spi2.v:58$10'.
+  created $dff cell `$procdff$572' with positive edge clock.
+Creating register for signal `\top.\divider' using process `\top.$proc$spi2.v:16$1'.
+  created $dff cell `$procdff$573' with positive edge clock.
+Creating register for signal `\top.\stb' using process `\top.$proc$spi2.v:16$1'.
+  created $dff cell `$procdff$574' with positive edge clock.
+
+2.3.9. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `shift595.$proc$spi2.v:55$71'.
+Removing empty process `shift595.$proc$spi2.v:54$70'.
+Removing empty process `shift595.$proc$spi2.v:53$69'.
+Removing empty process `shift595.$proc$spi2.v:51$68'.
+Removing empty process `shift595.$proc$spi2.v:49$67'.
+Removing empty process `shift595.$proc$spi2.v:48$66'.
+Found and cleaned up 8 empty switches in `\shift595.$proc$spi2.v:58$10'.
+Removing empty process `shift595.$proc$spi2.v:58$10'.
+Removing empty process `top.$proc$spi2.v:15$5'.
+Removing empty process `top.$proc$spi2.v:14$4'.
+Removing empty process `top.$proc$spi2.v:16$1'.
+Cleaned up 8 empty switches.
+
+2.4. Executing FLATTEN pass (flatten design).
+Using template shift595 for cells of type shift595.
+<suppressed ~1 debug messages>
+No more expansions possible.
+Deleting now unused module shift595.
+
+2.5. Executing TRIBUF pass.
+
+2.6. Executing DEMINOUT pass (demote inout ports to input or output).
+
+2.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+<suppressed ~41 debug messages>
+
+2.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+Removed 89 unused cells and 277 unused wires.
+<suppressed ~90 debug messages>
+
+2.9. Executing CHECK pass (checking for obvious problems).
+checking module top..
+found and reported 0 problems.
+
+2.10. Executing OPT pass (performing simple optimizations).
+
+2.10.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.10.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.10.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$204.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$206.
+    dead port 1/2 on $mux $techmap\disp1.$procmux$208.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$210.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$240.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$242.
+    dead port 1/2 on $mux $techmap\disp1.$procmux$244.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$246.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$276.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$278.
+    dead port 1/2 on $mux $techmap\disp1.$procmux$280.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$282.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$312.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$314.
+    dead port 1/2 on $mux $techmap\disp1.$procmux$316.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$318.
+    dead port 1/2 on $mux $techmap\disp1.$procmux$421.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$423.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$477.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$483.
+    dead port 2/2 on $mux $techmap\disp1.$procmux$489.
+Removed 21 multiplexer ports.
+<suppressed ~6 debug messages>
+
+2.10.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \top.
+Performed a total of 0 changes.
+
+2.10.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.10.6. Executing OPT_RMDFF pass (remove dff with constant values).
+
+2.10.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+Removed 0 unused cells and 21 unused wires.
+<suppressed ~1 debug messages>
+
+2.10.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.10.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.10.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~6 debug messages>
+
+2.10.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \top.
+Performed a total of 0 changes.
+
+2.10.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.10.13. Executing OPT_RMDFF pass (remove dff with constant values).
+
+2.10.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.10.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.10.16. Finished OPT passes. (There is nothing left to do.)
+
+2.11. Executing WREDUCE pass (reducing word size of cells).
+Removed top 31 bits (of 32) from port B of cell top.$add$spi2.v:17$2 ($add).
+Removed top 22 bits (of 32) from port Y of cell top.$add$spi2.v:17$2 ($add).
+Removed top 31 bits (of 32) from port B of cell top.$techmap\disp1.$add$spi2.v:76$63 ($add).
+Removed top 28 bits (of 32) from port Y of cell top.$techmap\disp1.$add$spi2.v:76$63 ($add).
+Removed top 1 bits (of 2) from port B of cell top.$techmap\disp1.$eq$spi2.v:68$51 ($eq).
+Removed top 31 bits (of 32) from port B of cell top.$techmap\disp1.$add$spi2.v:66$46 ($add).
+Removed top 30 bits (of 32) from port Y of cell top.$techmap\disp1.$add$spi2.v:66$46 ($add).
+Removed top 30 bits (of 32) from wire top.$techmap\disp1.$add$spi2.v:66$46_Y.
+Removed top 28 bits (of 32) from wire top.$techmap\disp1.$add$spi2.v:76$63_Y.
+
+2.12. Executing PEEPOPT pass (run peephole optimizers).
+
+2.13. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+Removed 0 unused cells and 3 unused wires.
+<suppressed ~1 debug messages>
+
+2.14. Executing SHARE pass (SAT-based resource sharing).
+
+2.15. Executing TECHMAP pass (map to technology primitives).
+
+2.15.1. Executing Verilog-2005 frontend: /usr/local/bin/../share/yosys/cmp2lut.v
+Parsing Verilog input from `/usr/local/bin/../share/yosys/cmp2lut.v' to AST representation.
+Generating RTLIL representation for module `\_90_lut_cmp_'.
+Successfully finished Verilog frontend.
+
+2.15.2. Continuing TECHMAP pass.
+No more expansions possible.
+
+2.16. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.17. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.18. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module top:
+  creating $macc model for $add$spi2.v:17$2 ($add).
+  creating $macc model for $techmap\disp1.$add$spi2.v:66$46 ($add).
+  creating $macc model for $techmap\disp1.$add$spi2.v:76$63 ($add).
+  creating $alu model for $macc $techmap\disp1.$add$spi2.v:76$63.
+  creating $alu model for $macc $techmap\disp1.$add$spi2.v:66$46.
+  creating $alu model for $macc $add$spi2.v:17$2.
+  creating $alu cell for $add$spi2.v:17$2: $auto$alumacc.cc:485:replace_alu$577
+  creating $alu cell for $techmap\disp1.$add$spi2.v:66$46: $auto$alumacc.cc:485:replace_alu$580
+  creating $alu cell for $techmap\disp1.$add$spi2.v:76$63: $auto$alumacc.cc:485:replace_alu$583
+  created 3 $alu and 0 $macc cells.
+
+2.19. Executing OPT pass (performing simple optimizations).
+
+2.19.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.19.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.19.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~6 debug messages>
+
+2.19.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \top.
+Performed a total of 0 changes.
+
+2.19.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.19.6. Executing OPT_RMDFF pass (remove dff with constant values).
+
+2.19.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.19.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.19.9. Finished OPT passes. (There is nothing left to do.)
+
+2.20. Executing FSM pass (extract and optimize FSM).
+
+2.20.1. Executing FSM_DETECT pass (finding FSMs in design).
+
+2.20.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+2.20.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+2.20.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.20.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+2.20.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+2.20.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+2.20.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+2.21. Executing OPT pass (performing simple optimizations).
+
+2.21.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.21.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.21.3. Executing OPT_RMDFF pass (remove dff with constant values).
+
+2.21.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.21.5. Finished fast OPT passes.
+
+2.22. Executing MEMORY pass.
+
+2.22.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+2.22.2. Executing MEMORY_DFF pass (merging $dff cells to $memrd and $memwr).
+
+2.22.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.22.4. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+2.22.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.22.6. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+2.23. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.24. Executing MEMORY_BRAM pass (mapping $mem cells to block memories).
+
+2.25. Executing TECHMAP pass (map to technology primitives).
+
+2.25.1. Executing Verilog-2005 frontend: /usr/local/bin/../share/yosys/ice40/brams_map.v
+Parsing Verilog input from `/usr/local/bin/../share/yosys/ice40/brams_map.v' to AST representation.
+Generating RTLIL representation for module `\$__ICE40_RAM4K'.
+Generating RTLIL representation for module `\$__ICE40_RAM4K_M0'.
+Generating RTLIL representation for module `\$__ICE40_RAM4K_M123'.
+Successfully finished Verilog frontend.
+
+2.25.2. Continuing TECHMAP pass.
+No more expansions possible.
+
+2.26. Executing ICE40_BRAMINIT pass.
+
+2.27. Executing OPT pass (performing simple optimizations).
+
+2.27.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.27.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.27.3. Executing OPT_RMDFF pass (remove dff with constant values).
+
+2.27.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.27.5. Finished fast OPT passes.
+
+2.28. Executing MEMORY_MAP pass (converting $mem cells to logic and flip-flops).
+
+2.29. Executing OPT pass (performing simple optimizations).
+
+2.29.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.29.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.29.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~6 debug messages>
+
+2.29.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \top.
+Performed a total of 0 changes.
+
+2.29.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.29.6. Executing OPT_RMDFF pass (remove dff with constant values).
+
+2.29.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.29.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.29.9. Finished OPT passes. (There is nothing left to do.)
+
+2.30. Executing ICE40_WRAPCARRY pass (wrap carries).
+
+2.31. Executing TECHMAP pass (map to technology primitives).
+
+2.31.1. Executing Verilog-2005 frontend: /usr/local/bin/../share/yosys/techmap.v
+Parsing Verilog input from `/usr/local/bin/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `\$__div_mod_u'.
+Generating RTLIL representation for module `\$__div_mod'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_pmux'.
+Generating RTLIL representation for module `\_90_lut'.
+Successfully finished Verilog frontend.
+
+2.31.2. Executing Verilog-2005 frontend: /usr/local/bin/../share/yosys/ice40/arith_map.v
+Parsing Verilog input from `/usr/local/bin/../share/yosys/ice40/arith_map.v' to AST representation.
+Generating RTLIL representation for module `\_80_ice40_alu'.
+Successfully finished Verilog frontend.
+
+2.31.3. Continuing TECHMAP pass.
+Using template $paramod\_90_alu\A_SIGNED=0\B_SIGNED=0\A_WIDTH=1\B_WIDTH=2\Y_WIDTH=2 for cells of type $alu.
+Using template $paramod\_80_ice40_alu\A_SIGNED=0\B_SIGNED=0\A_WIDTH=1\B_WIDTH=10\Y_WIDTH=10 for cells of type $alu.
+Using extmapper simplemap for cells of type $logic_not.
+Using extmapper simplemap for cells of type $dff.
+Using extmapper simplemap for cells of type $mux.
+Using extmapper simplemap for cells of type $eq.
+Using template $paramod\_80_ice40_alu\A_SIGNED=0\B_SIGNED=0\A_WIDTH=1\B_WIDTH=4\Y_WIDTH=4 for cells of type $alu.
+Using extmapper simplemap for cells of type $pos.
+Using extmapper simplemap for cells of type $not.
+Using extmapper simplemap for cells of type $xor.
+Using template $paramod\_90_lcu\WIDTH=2 for cells of type $lcu.
+Using extmapper simplemap for cells of type $and.
+Using extmapper simplemap for cells of type $or.
+No more expansions possible.
+<suppressed ~225 debug messages>
+
+2.32. Executing ICE40_OPT pass (performing simple optimizations).
+
+2.32.1. Running ICE40 specific optimizations.
+
+2.32.2. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+<suppressed ~121 debug messages>
+
+2.32.3. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+<suppressed ~9 debug messages>
+Removed a total of 3 cells.
+
+2.32.4. Executing OPT_RMDFF pass (remove dff with constant values).
+
+2.32.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+Removed 24 unused cells and 71 unused wires.
+<suppressed ~25 debug messages>
+
+2.32.6. Rerunning OPT passes. (Removed registers in this run.)
+
+2.32.7. Running ICE40 specific optimizations.
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) top.$auto$alumacc.cc:485:replace_alu$577.slice[0].fadd: CO=\divider [0]
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) top.$auto$alumacc.cc:485:replace_alu$583.slice[0].fadd: CO=\disp1.bitcnt [0]
+
+2.32.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.32.9. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.32.10. Executing OPT_RMDFF pass (remove dff with constant values).
+
+2.32.11. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.32.12. Rerunning OPT passes. (Removed registers in this run.)
+
+2.32.13. Running ICE40 specific optimizations.
+
+2.32.14. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.32.15. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.32.16. Executing OPT_RMDFF pass (remove dff with constant values).
+
+2.32.17. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.32.18. Finished OPT passes. (There is nothing left to do.)
+
+2.33. Executing DFFSR2DFF pass (mapping DFFSR cells to simpler FFs).
+
+2.34. Executing DFF2DFFE pass (transform $dff to $dffe where applicable).
+Selected cell types for direct conversion:
+  $_DFF_PP1_ -> $__DFFE_PP1
+  $_DFF_PP0_ -> $__DFFE_PP0
+  $_DFF_PN1_ -> $__DFFE_PN1
+  $_DFF_PN0_ -> $__DFFE_PN0
+  $_DFF_NP1_ -> $__DFFE_NP1
+  $_DFF_NP0_ -> $__DFFE_NP0
+  $_DFF_NN1_ -> $__DFFE_NN1
+  $_DFF_NN0_ -> $__DFFE_NN0
+  $_DFF_N_ -> $_DFFE_NP_
+  $_DFF_P_ -> $_DFFE_PP_
+Transforming FF to FF+Enable cells in module top:
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$672 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [0] -> \disp1.shiftreg [0].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$673 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [1] -> \disp1.shiftreg [1].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$674 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [2] -> \disp1.shiftreg [2].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$675 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [3] -> \disp1.shiftreg [3].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$676 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [4] -> \disp1.shiftreg [4].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$677 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [5] -> \disp1.shiftreg [5].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$678 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [6] -> \disp1.shiftreg [6].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$679 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [7] -> \disp1.shiftreg [7].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$680 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [8] -> \disp1.shiftreg [8].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$681 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [9] -> \disp1.shiftreg [9].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$682 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [10] -> \disp1.shiftreg [10].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$683 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [11] -> \disp1.shiftreg [11].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$684 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [12] -> \disp1.shiftreg [12].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$685 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [13] -> \disp1.shiftreg [13].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$686 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [14] -> \disp1.shiftreg [14].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$687 to $_DFFE_PP_ for $techmap\disp1.$0\shiftreg[15:0] [15] -> \disp1.shiftreg [15].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$688 to $_DFFE_PP_ for $techmap\disp1.$0\bitcnt[3:0] [0] -> \disp1.bitcnt [0].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$689 to $_DFFE_PP_ for $techmap\disp1.$0\bitcnt[3:0] [1] -> \disp1.bitcnt [1].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$690 to $_DFFE_PP_ for $techmap\disp1.$0\bitcnt[3:0] [2] -> \disp1.bitcnt [2].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$691 to $_DFFE_PP_ for $techmap\disp1.$0\bitcnt[3:0] [3] -> \disp1.bitcnt [3].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$692 to $_DFFE_PP_ for $techmap\disp1.$0\digit[1:0] [0] -> \disp1.digit [0].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$693 to $_DFFE_PP_ for $techmap\disp1.$0\digit[1:0] [1] -> \disp1.digit [1].
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$694 to $_DFFE_PP_ for $techmap\disp1.$0\DO[0:0] -> \disp1.DO.
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$695 to $_DFFE_PP_ for $techmap\disp1.$0\LATCH[0:0] -> \disp1.LATCH.
+  converting $_DFF_P_ cell $auto$simplemap.cc:420:simplemap_dff$696 to $_DFFE_PP_ for $techmap\disp1.$0\SCK[0:0] -> \disp1.SCK.
+
+2.35. Executing TECHMAP pass (map to technology primitives).
+
+2.35.1. Executing Verilog-2005 frontend: /usr/local/bin/../share/yosys/ice40/cells_map.v
+Parsing Verilog input from `/usr/local/bin/../share/yosys/ice40/cells_map.v' to AST representation.
+Generating RTLIL representation for module `\$_DFF_N_'.
+Generating RTLIL representation for module `\$_DFF_P_'.
+Generating RTLIL representation for module `\$_DFFE_NN_'.
+Generating RTLIL representation for module `\$_DFFE_PN_'.
+Generating RTLIL representation for module `\$_DFFE_NP_'.
+Generating RTLIL representation for module `\$_DFFE_PP_'.
+Generating RTLIL representation for module `\$_DFF_NN0_'.
+Generating RTLIL representation for module `\$_DFF_NN1_'.
+Generating RTLIL representation for module `\$_DFF_PN0_'.
+Generating RTLIL representation for module `\$_DFF_PN1_'.
+Generating RTLIL representation for module `\$_DFF_NP0_'.
+Generating RTLIL representation for module `\$_DFF_NP1_'.
+Generating RTLIL representation for module `\$_DFF_PP0_'.
+Generating RTLIL representation for module `\$_DFF_PP1_'.
+Generating RTLIL representation for module `\$__DFFE_NN0'.
+Generating RTLIL representation for module `\$__DFFE_NN1'.
+Generating RTLIL representation for module `\$__DFFE_PN0'.
+Generating RTLIL representation for module `\$__DFFE_PN1'.
+Generating RTLIL representation for module `\$__DFFE_NP0'.
+Generating RTLIL representation for module `\$__DFFE_NP1'.
+Generating RTLIL representation for module `\$__DFFE_PP0'.
+Generating RTLIL representation for module `\$__DFFE_PP1'.
+Successfully finished Verilog frontend.
+
+2.35.2. Continuing TECHMAP pass.
+Using template \$_DFF_P_ for cells of type $_DFF_P_.
+Using template \$_DFFE_PP_ for cells of type $_DFFE_PP_.
+No more expansions possible.
+<suppressed ~36 debug messages>
+
+2.36. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+<suppressed ~177 debug messages>
+
+2.37. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping top.$auto$alumacc.cc:485:replace_alu$577.slice[0].fadd ($lut).
+Mapping top.$auto$alumacc.cc:485:replace_alu$583.slice[0].fadd ($lut).
+
+2.38. Executing ICE40_FFINIT pass (implement FF init values).
+Handling FF init values in top.
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$696 (SB_DFFE): \disp1.SCK = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$663 (SB_DFF): \divider [2] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$664 (SB_DFF): \divider [3] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$665 (SB_DFF): \divider [4] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$666 (SB_DFF): \divider [5] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$667 (SB_DFF): \divider [6] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$668 (SB_DFF): \divider [7] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$669 (SB_DFF): \divider [8] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$670 (SB_DFF): \divider [9] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$673 (SB_DFFE): \disp1.shiftreg [1] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$661 (SB_DFF): \divider [0] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$671 (SB_DFF): \stb = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$674 (SB_DFFE): \disp1.shiftreg [2] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$675 (SB_DFFE): \disp1.shiftreg [3] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$676 (SB_DFFE): \disp1.shiftreg [4] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$677 (SB_DFFE): \disp1.shiftreg [5] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$678 (SB_DFFE): \disp1.shiftreg [6] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$679 (SB_DFFE): \disp1.shiftreg [7] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$680 (SB_DFFE): \disp1.shiftreg [8] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$681 (SB_DFFE): \disp1.shiftreg [9] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$682 (SB_DFFE): \disp1.shiftreg [10] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$683 (SB_DFFE): \disp1.shiftreg [11] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$684 (SB_DFFE): \disp1.shiftreg [12] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$685 (SB_DFFE): \disp1.shiftreg [13] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$686 (SB_DFFE): \disp1.shiftreg [14] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$687 (SB_DFFE): \disp1.shiftreg [15] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$689 (SB_DFFE): \disp1.bitcnt [1] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$662 (SB_DFF): \divider [1] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$690 (SB_DFFE): \disp1.bitcnt [2] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$691 (SB_DFFE): \disp1.bitcnt [3] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$693 (SB_DFFE): \disp1.digit [1] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$688 (SB_DFFE): \disp1.bitcnt [0] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$672 (SB_DFFE): \disp1.shiftreg [0] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$692 (SB_DFFE): \disp1.digit [0] = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$694 (SB_DFFE): \disp1.DO = 0
+FF init value for cell $auto$simplemap.cc:420:simplemap_dff$695 (SB_DFFE): \disp1.LATCH = 0
+
+2.39. Executing ICE40_FFSSR pass (merge synchronous set/reset into FF cells).
+Merging set/reset $_MUX_ cells into SB_FFs in top.
+  Merging $auto$simplemap.cc:277:simplemap_mux$722 (A=1'0, B=\disp1.shiftreg [3], S=\disp1.SCK) into $auto$simplemap.cc:420:simplemap_dff$676 (SB_DFFE).
+  Merging $auto$simplemap.cc:277:simplemap_mux$723 (A=1'0, B=\disp1.shiftreg [4], S=\disp1.SCK) into $auto$simplemap.cc:420:simplemap_dff$677 (SB_DFFE).
+  Merging $auto$simplemap.cc:277:simplemap_mux$724 (A=1'0, B=\disp1.shiftreg [5], S=\disp1.SCK) into $auto$simplemap.cc:420:simplemap_dff$678 (SB_DFFE).
+  Merging $auto$simplemap.cc:277:simplemap_mux$725 (A=1'0, B=\disp1.shiftreg [6], S=\disp1.SCK) into $auto$simplemap.cc:420:simplemap_dff$679 (SB_DFFE).
+  Merging $auto$simplemap.cc:277:simplemap_mux$726 (A=1'1, B=\disp1.shiftreg [7], S=\disp1.SCK) into $auto$simplemap.cc:420:simplemap_dff$680 (SB_DFFE).
+  Merging $auto$simplemap.cc:277:simplemap_mux$729 (A=1'1, B=\disp1.shiftreg [10], S=\disp1.SCK) into $auto$simplemap.cc:420:simplemap_dff$683 (SB_DFFE).
+  Merging $auto$simplemap.cc:277:simplemap_mux$732 (A=1'1, B=\disp1.shiftreg [13], S=\disp1.SCK) into $auto$simplemap.cc:420:simplemap_dff$686 (SB_DFFE).
+  Merging $auto$simplemap.cc:277:simplemap_mux$718 (A=$techmap\disp1.$procmux$537_Y [0], B=1'0, S=\disp1.SCK) into $auto$simplemap.cc:420:simplemap_dff$672 (SB_DFFE).
+
+2.40. Executing ICE40_OPT pass (performing simple optimizations).
+
+2.40.1. Running ICE40 specific optimizations.
+
+2.40.2. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+<suppressed ~34 debug messages>
+
+2.40.3. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+<suppressed ~897 debug messages>
+Removed a total of 299 cells.
+
+2.40.4. Executing OPT_RMDFF pass (remove dff with constant values).
+
+2.40.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+Removed 8 unused cells and 436 unused wires.
+<suppressed ~9 debug messages>
+
+2.40.6. Rerunning OPT passes. (Removed registers in this run.)
+
+2.40.7. Running ICE40 specific optimizations.
+
+2.40.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module top.
+
+2.40.9. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\top'.
+Removed a total of 0 cells.
+
+2.40.10. Executing OPT_RMDFF pass (remove dff with constant values).
+
+2.40.11. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \top..
+
+2.40.12. Finished OPT passes. (There is nothing left to do.)
+
+2.41. Executing TECHMAP pass (map to technology primitives).
+
+2.41.1. Executing Verilog-2005 frontend: /usr/local/bin/../share/yosys/ice40/latches_map.v
+Parsing Verilog input from `/usr/local/bin/../share/yosys/ice40/latches_map.v' to AST representation.
+Generating RTLIL representation for module `\$_DLATCH_N_'.
+Generating RTLIL representation for module `\$_DLATCH_P_'.
+Successfully finished Verilog frontend.
+
+2.41.2. Continuing TECHMAP pass.
+No more expansions possible.
+
+2.42. Executing ABC pass (technology mapping using ABC).
+
+2.42.1. Extracting gate netlist of module `\top' to `<abc-temp-dir>/input.blif'..
+Extracted 79 gates and 109 wires to a netlist network with 29 inputs and 19 outputs.
+
+2.42.1.1. Executing ABC.
+Running ABC command: <yosys-exe-dir>/yosys-abc -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_lut <abc-temp-dir>/lutdefs.txt 
+ABC: + strash 
+ABC: + ifraig 
+ABC: + scorr 
+ABC: Warning: The network is combinational (run "fraig" or "fraig_sweep").
+ABC: + dc2 
+ABC: + dretime 
+ABC: + retime 
+ABC: + strash 
+ABC: + dch -f 
+ABC: + if 
+ABC: + mfs2 
+ABC: + lutpack -S 1 
+ABC: + dress 
+ABC: Total number of equiv classes                =      20.
+ABC: Participating nodes from both networks       =      51.
+ABC: Participating nodes from the first network   =      19. (  79.17 % of nodes)
+ABC: Participating nodes from the second network  =      32. ( 133.33 % of nodes)
+ABC: Node pairs (any polarity)                    =      19. (  79.17 % of names can be moved)
+ABC: Node pairs (same polarity)                   =      19. (  79.17 % of names can be moved)
+ABC: Total runtime =     0.00 sec
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+2.42.1.2. Re-integrating ABC results.
+ABC RESULTS:              $lut cells:       23
+ABC RESULTS:        internal signals:       61
+ABC RESULTS:           input signals:       29
+ABC RESULTS:          output signals:       19
+Removing temp directory.
+
+2.43. Executing TECHMAP pass (map to technology primitives).
+
+2.43.1. Executing Verilog-2005 frontend: /usr/local/bin/../share/yosys/ice40/cells_map.v
+Parsing Verilog input from `/usr/local/bin/../share/yosys/ice40/cells_map.v' to AST representation.
+Generating RTLIL representation for module `\$_DFF_N_'.
+Generating RTLIL representation for module `\$_DFF_P_'.
+Generating RTLIL representation for module `\$_DFFE_NN_'.
+Generating RTLIL representation for module `\$_DFFE_PN_'.
+Generating RTLIL representation for module `\$_DFFE_NP_'.
+Generating RTLIL representation for module `\$_DFFE_PP_'.
+Generating RTLIL representation for module `\$_DFF_NN0_'.
+Generating RTLIL representation for module `\$_DFF_NN1_'.
+Generating RTLIL representation for module `\$_DFF_PN0_'.
+Generating RTLIL representation for module `\$_DFF_PN1_'.
+Generating RTLIL representation for module `\$_DFF_NP0_'.
+Generating RTLIL representation for module `\$_DFF_NP1_'.
+Generating RTLIL representation for module `\$_DFF_PP0_'.
+Generating RTLIL representation for module `\$_DFF_PP1_'.
+Generating RTLIL representation for module `\$__DFFE_NN0'.
+Generating RTLIL representation for module `\$__DFFE_NN1'.
+Generating RTLIL representation for module `\$__DFFE_PN0'.
+Generating RTLIL representation for module `\$__DFFE_PN1'.
+Generating RTLIL representation for module `\$__DFFE_NP0'.
+Generating RTLIL representation for module `\$__DFFE_NP1'.
+Generating RTLIL representation for module `\$__DFFE_PP0'.
+Generating RTLIL representation for module `\$__DFFE_PP1'.
+Generating RTLIL representation for module `\$__ICE40_CARRY_WRAPPER'.
+Successfully finished Verilog frontend.
+
+2.43.2. Continuing TECHMAP pass.
+Using template $paramod\$__ICE40_CARRY_WRAPPER\LUT=16'0110100110010110 for cells of type $__ICE40_CARRY_WRAPPER.
+No more expansions possible.
+<suppressed ~23 debug messages>
+Removed 2 unused cells and 156 unused wires.
+
+2.44. Executing OPT_LUT pass (optimize LUTs).
+Discovering LUTs.
+Number of LUTs:       35
+  1-LUT                4
+  2-LUT                5
+  3-LUT               16
+  4-LUT               10
+  with \SB_CARRY      10
+
+Eliminating LUTs.
+Number of LUTs:       35
+  1-LUT                4
+  2-LUT                5
+  3-LUT               16
+  4-LUT               10
+  with \SB_CARRY      10
+
+Combining LUTs.
+Number of LUTs:       35
+  1-LUT                4
+  2-LUT                5
+  3-LUT               16
+  4-LUT               10
+  with \SB_CARRY      10
+
+Eliminated 0 LUTs.
+Combined 0 LUTs.
+<suppressed ~113 debug messages>
+
+2.45. Executing TECHMAP pass (map to technology primitives).
+
+2.45.1. Executing Verilog-2005 frontend: /usr/local/bin/../share/yosys/ice40/cells_map.v
+Parsing Verilog input from `/usr/local/bin/../share/yosys/ice40/cells_map.v' to AST representation.
+Generating RTLIL representation for module `\$_DFF_N_'.
+Generating RTLIL representation for module `\$_DFF_P_'.
+Generating RTLIL representation for module `\$_DFFE_NN_'.
+Generating RTLIL representation for module `\$_DFFE_PN_'.
+Generating RTLIL representation for module `\$_DFFE_NP_'.
+Generating RTLIL representation for module `\$_DFFE_PP_'.
+Generating RTLIL representation for module `\$_DFF_NN0_'.
+Generating RTLIL representation for module `\$_DFF_NN1_'.
+Generating RTLIL representation for module `\$_DFF_PN0_'.
+Generating RTLIL representation for module `\$_DFF_PN1_'.
+Generating RTLIL representation for module `\$_DFF_NP0_'.
+Generating RTLIL representation for module `\$_DFF_NP1_'.
+Generating RTLIL representation for module `\$_DFF_PP0_'.
+Generating RTLIL representation for module `\$_DFF_PP1_'.
+Generating RTLIL representation for module `\$__DFFE_NN0'.
+Generating RTLIL representation for module `\$__DFFE_NN1'.
+Generating RTLIL representation for module `\$__DFFE_PN0'.
+Generating RTLIL representation for module `\$__DFFE_PN1'.
+Generating RTLIL representation for module `\$__DFFE_NP0'.
+Generating RTLIL representation for module `\$__DFFE_NP1'.
+Generating RTLIL representation for module `\$__DFFE_PP0'.
+Generating RTLIL representation for module `\$__DFFE_PP1'.
+Generating RTLIL representation for module `\$lut'.
+Generating RTLIL representation for module `\$__ICE40_CARRY_WRAPPER'.
+Successfully finished Verilog frontend.
+
+2.45.2. Continuing TECHMAP pass.
+Using template $paramod\$lut\WIDTH=4\LUT=16'0110100110010110 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=3\LUT=8'10000000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=3\LUT=8'00000001 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=4\LUT=16'0000000000000001 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=2\LUT=4'0110 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=3\LUT=8'10100011 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=3\LUT=8'11000101 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=1\LUT=2'01 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=2\LUT=4'1000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=4\LUT=16'1111100000000000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=4\LUT=16'0100000000000000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=4\LUT=16'1000111100000000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=4\LUT=16'0001000000000000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=4\LUT=16'1111000001000100 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=4\LUT=16'1111000000010001 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=4\LUT=16'1111000001110111 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=4\LUT=16'1111000010001000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=3\LUT=8'11001010 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=2\LUT=4'0100 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=3\LUT=8'10101100 for cells of type $lut.
+No more expansions possible.
+<suppressed ~295 debug messages>
+Removed 0 unused cells and 70 unused wires.
+
+2.46. Executing AUTONAME pass.
+Renamed 428 objects in module top (12 iterations).
+<suppressed ~109 debug messages>
+
+2.47. Executing HIERARCHY pass (managing design hierarchy).
+
+2.47.1. Analyzing design hierarchy..
+Top module:  \top
+
+2.47.2. Analyzing design hierarchy..
+Top module:  \top
+Removed 0 unused modules.
+
+2.48. Printing statistics.
+
+=== top ===
+
+   Number of wires:                 44
+   Number of wire bits:             93
+   Number of public wires:          44
+   Number of public wire bits:      93
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 81
+     SB_CARRY                       10
+     SB_DFF                         11
+     SB_DFFE                        17
+     SB_DFFESR                       5
+     SB_DFFESS                       3
+     SB_LUT4                        35
+
+2.49. Executing CHECK pass (checking for obvious problems).
+checking module top..
+found and reported 0 problems.
+
+2.50. Executing JSON backend.
+
+End of script. Logfile hash: 5ed1827bae
+CPU: user 0.56s system 0.09s, MEM: 50.32 MB total, 17.61 MB resident
+Yosys 0.9+932 (git sha1 db226870, clang 6.0.0-1ubuntu2 -fPIC -Os)
+Time spent: 34% 11x read_verilog (0 sec), 14% 18x opt_expr (0 sec), ...
+docker run --rm -it -w /root -v/Users/mats/Documents/Projects/PDP8-X/verilog/spi/:/root cranphin/icestorm nextpnr-ice40 --hx1k --package vq100 --opt-timing --pcf ice40hx1k-evb.pcf --json spi2.json --asc spi2.asc
+Info: Importing module top
+Info: Rule checker, verifying imported design
+Info: Checksum: 0x5d1d20b7
+
+Info: constrained 'CLK' to bel 'X0/Y8/io1'
+Warning: unmatched constraint 'BUT1' (on line 5)
+Warning: unmatched constraint 'BUT2' (on line 6)
+Info: constrained 'LED1' to bel 'X9/Y0/io1'
+Info: constrained 'LED2' to bel 'X13/Y3/io1'
+Warning: unmatched constraint 'RAMOE' (on line 13)
+Warning: unmatched constraint 'RAMWE' (on line 14)
+Warning: unmatched constraint 'RAMCS' (on line 15)
+Warning: unmatched constraint 'DAT[0]' (on line 17)
+Warning: unmatched constraint 'DAT[1]' (on line 18)
+Warning: unmatched constraint 'DAT[2]' (on line 19)
+Warning: unmatched constraint 'DAT[3]' (on line 20)
+Warning: unmatched constraint 'DAT[4]' (on line 21)
+Warning: unmatched constraint 'DAT[5]' (on line 22)
+Warning: unmatched constraint 'DAT[6]' (on line 23)
+Warning: unmatched constraint 'DAT[7]' (on line 24)
+Warning: unmatched constraint 'DAT[8]' (on line 25)
+Warning: unmatched constraint 'DAT[9]' (on line 26)
+Warning: unmatched constraint 'DAT[10]' (on line 27)
+Warning: unmatched constraint 'DAT[11]' (on line 28)
+Warning: unmatched constraint 'DAT[12]' (on line 29)
+Warning: unmatched constraint 'DAT[13]' (on line 30)
+Warning: unmatched constraint 'DAT[14]' (on line 31)
+Warning: unmatched constraint 'DAT[15]' (on line 32)
+Warning: unmatched constraint 'ADR[0]' (on line 34)
+Warning: unmatched constraint 'ADR[1]' (on line 35)
+Warning: unmatched constraint 'ADR[2]' (on line 36)
+Warning: unmatched constraint 'ADR[3]' (on line 37)
+Warning: unmatched constraint 'ADR[4]' (on line 38)
+Warning: unmatched constraint 'ADR[5]' (on line 39)
+Warning: unmatched constraint 'ADR[6]' (on line 40)
+Warning: unmatched constraint 'ADR[7]' (on line 41)
+Warning: unmatched constraint 'ADR[8]' (on line 42)
+Warning: unmatched constraint 'ADR[9]' (on line 43)
+Warning: unmatched constraint 'ADR[10]' (on line 44)
+Warning: unmatched constraint 'ADR[11]' (on line 45)
+Warning: unmatched constraint 'ADR[12]' (on line 46)
+Warning: unmatched constraint 'ADR[13]' (on line 47)
+Warning: unmatched constraint 'ADR[14]' (on line 48)
+Warning: unmatched constraint 'ADR[15]' (on line 49)
+Warning: unmatched constraint 'ADR[16]' (on line 50)
+Warning: unmatched constraint 'ADR[17]' (on line 51)
+Info: constrained 'PIN5' to bel 'X0/Y14/io1'
+Info: constrained 'PIN7' to bel 'X0/Y14/io0'
+Info: constrained 'PIN9' to bel 'X0/Y13/io1'
+Warning: unmatched constraint 'PIN11' (on line 66)
+Warning: unmatched constraint 'PIN13' (on line 68)
+Warning: unmatched constraint 'PIN14' (on line 69)
+Warning: unmatched constraint 'PIN15' (on line 70)
+Warning: unmatched constraint 'PIN16' (on line 71)
+Warning: unmatched constraint 'PIN17' (on line 72)
+Warning: unmatched constraint 'PIN18' (on line 73)
+Warning: unmatched constraint 'PIN19' (on line 74)
+Warning: unmatched constraint 'PIN20' (on line 75)
+Warning: unmatched constraint 'PIN21' (on line 76)
+Warning: unmatched constraint 'PIN22' (on line 77)
+Warning: unmatched constraint 'PIN23' (on line 78)
+Warning: unmatched constraint 'PIN24' (on line 79)
+Warning: unmatched constraint 'PIN25' (on line 80)
+Warning: unmatched constraint 'PIN26' (on line 81)
+Warning: unmatched constraint 'PIN27' (on line 82)
+Warning: unmatched constraint 'PIN28' (on line 83)
+Warning: unmatched constraint 'PIN29' (on line 84)
+Warning: unmatched constraint 'PIN30' (on line 85)
+Warning: unmatched constraint 'PIN31' (on line 86)
+Warning: unmatched constraint 'PIN32' (on line 87)
+Warning: unmatched constraint 'PIN33' (on line 88)
+Warning: unmatched constraint 'PIN34' (on line 89)
+
+Info: Packing constants..
+Info: Packing IOs..
+Info: Packing LUT-FFs..
+Info:       13 LCs used as LUT4 only
+Info:       22 LCs used as LUT4 and DFF
+Info: Packing non-LUT FFs..
+Info:       14 LCs used as DFF only
+Info: Packing carries..
+Info:        0 LCs used as CARRY only
+Info: Packing RAMs..
+Info: Placing PLLs..
+Info: Packing special functions..
+Info: Promoting globals..
+Info: promoting CLK$SB_IO_IN (fanout 36)
+Info: promoting disp1.digit_SB_DFFE_Q_E_SB_LUT4_O_I2_SB_LUT4_I3_O [cen] (fanout 16)
+Info: Constraining chains...
+Info:        2 LCs used to legalise carry chains.
+Info: Checksum: 0xadb7ed1e
+
+Info: Annotating ports with timing budgets for target frequency 12.00 MHz
+Info: Checksum: 0x0f0f33d8
+
+Info: Device utilisation:
+Info: 	         ICESTORM_LC:    53/ 1280     4%
+Info: 	        ICESTORM_RAM:     0/   16     0%
+Info: 	               SB_IO:     6/  112     5%
+Info: 	               SB_GB:     2/    8    25%
+Info: 	        ICESTORM_PLL:     0/    1     0%
+Info: 	         SB_WARMBOOT:     0/    1     0%
+
+Info: Placed 6 cells based on constraints.
+Info: Creating initial placement for remaining 55 cells.
+Info:   initial placement placed 55/55 cells
+Info: Initial placement time 0.02s
+Info: Running simulated annealing placer.
+Info:   at iteration #1: temp = 1.000000, timing cost = 11, wirelen = 845
+Info:   at iteration #5: temp = 0.500000, timing cost = 19, wirelen = 764
+Info:   at iteration #10: temp = 0.405000, timing cost = 18, wirelen = 716
+Info:   at iteration #15: temp = 0.295245, timing cost = 17, wirelen = 729
+Info:   at iteration #20: temp = 0.184025, timing cost = 18, wirelen = 748
+Info:   at iteration #25: temp = 0.166082, timing cost = 12, wirelen = 732
+Info:   at iteration #30: temp = 0.142395, timing cost = 17, wirelen = 618
+Info:   at iteration #35: temp = 0.122086, timing cost = 14, wirelen = 568
+Info:   at iteration #40: temp = 0.094468, timing cost = 13, wirelen = 646
+Info:   at iteration #45: temp = 0.076944, timing cost = 14, wirelen = 652
+Info:   at iteration #50: temp = 0.065970, timing cost = 19, wirelen = 629
+Info:   at iteration #55: temp = 0.053733, timing cost = 19, wirelen = 615
+Info:   at iteration #60: temp = 0.043766, timing cost = 10, wirelen = 490
+Info:   at iteration #65: temp = 0.035648, timing cost = 17, wirelen = 592
+Info:   at iteration #70: temp = 0.029035, timing cost = 12, wirelen = 598
+Info:   at iteration #75: temp = 0.022467, timing cost = 18, wirelen = 563
+Info:   at iteration #80: temp = 0.018299, timing cost = 10, wirelen = 527
+Info:   at iteration #85: temp = 0.015690, timing cost = 9, wirelen = 490
+Info:   at iteration #90: temp = 0.014160, timing cost = 11, wirelen = 416
+Info:   at iteration #95: temp = 0.012779, timing cost = 9, wirelen = 485
+Info:   at iteration #100: temp = 0.011533, timing cost = 7, wirelen = 400
+Info:   at iteration #105: temp = 0.009888, timing cost = 7, wirelen = 406
+Info:   at iteration #110: temp = 0.008478, timing cost = 8, wirelen = 385
+Info:   at iteration #115: temp = 0.008054, timing cost = 10, wirelen = 324
+Info:   at iteration #120: temp = 0.007651, timing cost = 5, wirelen = 297
+Info:   at iteration #125: temp = 0.006905, timing cost = 9, wirelen = 289
+Info:   at iteration #130: temp = 0.006905, timing cost = 8, wirelen = 257
+Info: Legalising relative constraints...
+Info:     moved 2 cells, 0 unplaced (after legalising chains)
+Info:        average distance 1.000000
+Info:        maximum distance 1.000000
+Info:     moved 2 cells, 0 unplaced (after replacing ripped up cells)
+Info:        average distance 1.000000
+Info:        maximum distance 1.000000
+Info:   at iteration #135: temp = 0.006232, timing cost = 7, wirelen = 244
+Info:   at iteration #140: temp = 0.005076, timing cost = 7, wirelen = 240
+Info:   at iteration #145: temp = 0.004822, timing cost = 8, wirelen = 203
+Info:   at iteration #150: temp = 0.004822, timing cost = 5, wirelen = 187
+Info:   at iteration #155: temp = 0.004581, timing cost = 6, wirelen = 176
+Info:   at iteration #160: temp = 0.003928, timing cost = 6, wirelen = 176
+Info:   at iteration #165: temp = 0.003545, timing cost = 5, wirelen = 161
+Info:   at iteration #170: temp = 0.003199, timing cost = 5, wirelen = 148
+Info:   at iteration #175: temp = 0.003039, timing cost = 5, wirelen = 130
+Info:   at iteration #180: temp = 0.003039, timing cost = 5, wirelen = 125
+Info:   at iteration #185: temp = 0.001945, timing cost = 5, wirelen = 120
+Info:   at iteration #190: temp = 0.001245, timing cost = 5, wirelen = 117
+Info:   at iteration #195: temp = 0.000637, timing cost = 5, wirelen = 111
+Info:   at iteration #200: temp = 0.000261, timing cost = 5, wirelen = 110
+Info:   at iteration #205: temp = 0.000086, timing cost = 5, wirelen = 110
+Info:   at iteration #210: temp = 0.000028, timing cost = 5, wirelen = 110
+Info:   at iteration #215: temp = 0.000009, timing cost = 5, wirelen = 110
+Info:   at iteration #220: temp = 0.000003, timing cost = 5, wirelen = 110
+Info:   at iteration #225: temp = 0.000001, timing cost = 5, wirelen = 110
+Info:   at iteration #230: temp = 0.000000, timing cost = 5, wirelen = 109
+Info:   at iteration #235: temp = 0.000000, timing cost = 5, wirelen = 109
+Info:   at iteration #240: temp = 0.000000, timing cost = 5, wirelen = 108
+Info:   at iteration #241: temp = 0.000000, timing cost = 5, wirelen = 108 
+Info: SA placement time 0.48s
+
+Info: Max frequency for clock 'CLK$SB_IO_IN_$glb_clk': 160.08 MHz (PASS at 12.00 MHz)
+
+Info: Max delay posedge CLK$SB_IO_IN_$glb_clk -> <async>: 2.50 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 1 endpoint(s)
+Info:          + represents [1,1) endpoint(s)
+Info: [ 77086,  77337) |**************** 
+Info: [ 77337,  77588) | 
+Info: [ 77588,  77839) | 
+Info: [ 77839,  78090) | 
+Info: [ 78090,  78341) | 
+Info: [ 78341,  78592) | 
+Info: [ 78592,  78843) |* 
+Info: [ 78843,  79094) | 
+Info: [ 79094,  79345) | 
+Info: [ 79345,  79596) | 
+Info: [ 79596,  79847) | 
+Info: [ 79847,  80098) |* 
+Info: [ 80098,  80349) |***** 
+Info: [ 80349,  80600) |** 
+Info: [ 80600,  80851) |********* 
+Info: [ 80851,  81102) |***** 
+Info: [ 81102,  81353) |************************** 
+Info: [ 81353,  81604) |* 
+Info: [ 81604,  81855) |****************************** 
+Info: [ 81855,  82106) |*********** 
+Info: Checksum: 0x55243007
+Info: Running timing-driven placement optimisation...
+Info:    Iteration 0...
+Info:    Iteration 1...
+Info:    Iteration 2...
+Info:    Iteration 3...
+Info:    Iteration 4...
+Info:    Iteration 5...
+Info:    Iteration 6...
+Info:    Iteration 7...
+Info:    Iteration 8...
+Info:    Iteration 9...
+Info:    Iteration 10...
+Info:    Iteration 11...
+Info:    Iteration 12...
+Info:    Iteration 13...
+Info:    Iteration 14...
+Info:    Iteration 15...
+Info:    Iteration 16...
+Info:    Iteration 17...
+Info:    Iteration 18...
+Info:    Iteration 19...
+Info:    Iteration 20...
+Info:    Iteration 21...
+Info:    Iteration 22...
+Info:    Iteration 23...
+Info:    Iteration 24...
+Info:    Iteration 25...
+Info:    Iteration 26...
+Info:    Iteration 27...
+Info:    Iteration 28...
+Info:    Iteration 29...
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 152 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs
+Info:        154 |        2        152 |    2   152 |         0
+Info: Routing complete.
+Info: Route time 0.03s
+Info: Checksum: 0xb0851ad9
+
+Info: Critical path report for clock 'CLK$SB_IO_IN_$glb_clk' (posedge -> posedge):
+Info: curr total
+Info:  0.5  0.5  Source disp1.bitcnt_SB_DFFE_Q_3_D_SB_LUT4_O_LC.O
+Info:  0.6  1.1    Net disp1.bitcnt[0] budget 19.306999 ns (8,7) -> (8,8)
+Info:                Sink $nextpnr_ICESTORM_LC_0.I1
+Info:  0.3  1.4  Source $nextpnr_ICESTORM_LC_0.COUT
+Info:  0.0  1.4    Net $nextpnr_ICESTORM_LC_0$O budget 0.000000 ns (8,8) -> (8,8)
+Info:                Sink disp1.bitcnt_SB_DFFE_Q_2_D_SB_LUT4_O_LC.CIN
+Info:  0.1  1.5  Source disp1.bitcnt_SB_DFFE_Q_2_D_SB_LUT4_O_LC.COUT
+Info:  0.0  1.5    Net disp1.bitcnt_SB_DFFE_Q_D_SB_LUT4_O_I3[2] budget 0.000000 ns (8,8) -> (8,8)
+Info:                Sink disp1.bitcnt_SB_DFFE_Q_1_D_SB_LUT4_O_LC.CIN
+Info:  0.1  1.6  Source disp1.bitcnt_SB_DFFE_Q_1_D_SB_LUT4_O_LC.COUT
+Info:  0.3  1.9    Net disp1.bitcnt_SB_DFFE_Q_D_SB_LUT4_O_I3[3] budget 0.260000 ns (8,8) -> (8,8)
+Info:                Sink disp1.bitcnt_SB_DFFE_Q_D_SB_LUT4_O_LC.I3
+Info:  0.3  2.2  Source disp1.bitcnt_SB_DFFE_Q_D_SB_LUT4_O_LC.O
+Info:  0.6  2.8    Net disp1.bitcnt_SB_DFFE_Q_D budget 19.305000 ns (8,8) -> (7,8)
+Info:                Sink disp1.bitcnt_SB_DFFE_Q_D_SB_LUT4_I1_LC.I1
+Info:  0.4  3.2  Source disp1.bitcnt_SB_DFFE_Q_D_SB_LUT4_I1_LC.O
+Info:  0.6  3.8    Net disp1.LATCH_SB_DFFE_Q_E_SB_LUT4_O_I3 budget 19.405001 ns (7,8) -> (7,8)
+Info:                Sink disp1.LATCH_SB_DFFE_Q_E_SB_LUT4_O_LC.I3
+Info:  0.3  4.1  Source disp1.LATCH_SB_DFFE_Q_E_SB_LUT4_O_LC.O
+Info:  1.3  5.4    Net disp1.LATCH_SB_DFFE_Q_E budget 19.445999 ns (7,8) -> (7,7)
+Info:                Sink disp1.LATCH_SB_DFFE_Q_DFFLC.CEN
+Info:  0.1  5.5  Setup disp1.LATCH_SB_DFFE_Q_DFFLC.CEN
+Info: 2.2 ns logic, 3.3 ns routing
+
+Info: Critical path report for cross-domain path 'posedge CLK$SB_IO_IN_$glb_clk' -> '<async>':
+Info: curr total
+Info:  0.5  0.5  Source disp1.LATCH_SB_DFFE_Q_DFFLC.O
+Info:  2.2  2.8    Net PIN7$SB_IO_OUT budget 82.792999 ns (7,7) -> (0,14)
+Info:                Sink PIN7$sb_io.D_OUT_0
+Info: 0.5 ns logic, 2.2 ns routing
+
+Info: Max frequency for clock 'CLK$SB_IO_IN_$glb_clk': 181.62 MHz (PASS at 12.00 MHz)
+
+Info: Max delay posedge CLK$SB_IO_IN_$glb_clk -> <async>: 2.77 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 1 endpoint(s)
+Info:          + represents [1,1) endpoint(s)
+Info: [ 77827,  78030) |* 
+Info: [ 78030,  78233) | 
+Info: [ 78233,  78436) | 
+Info: [ 78436,  78639) | 
+Info: [ 78639,  78842) | 
+Info: [ 78842,  79045) |**************** 
+Info: [ 79045,  79248) | 
+Info: [ 79248,  79451) |** 
+Info: [ 79451,  79654) | 
+Info: [ 79654,  79857) | 
+Info: [ 79857,  80060) |*** 
+Info: [ 80060,  80263) |**** 
+Info: [ 80263,  80466) |*********** 
+Info: [ 80466,  80669) |**** 
+Info: [ 80669,  80872) |******** 
+Info: [ 80872,  81075) |* 
+Info: [ 81075,  81278) |***** 
+Info: [ 81278,  81481) |******** 
+Info: [ 81481,  81684) |***** 
+Info: [ 81684,  81887) |*************************************** 
+62 warnings, 0 errors
+docker run --rm -it -w /root -v/Users/mats/Documents/Projects/PDP8-X/verilog/spi/:/root cranphin/icestorm icetime -d hx1k -mtr spi2.rpt spi2.asc
+// Reading input .asc file..
+// Reading 1k chipdb file..
+// Creating timing netlist..
+// Timing estimate: 5.40 ns (185.11 MHz)
+docker run --rm -it -w /root -v/Users/mats/Documents/Projects/PDP8-X/verilog/spi/:/root cranphin/icestorm icepack spi2.asc spi2.bin
+rm spi2.asc spi2.json

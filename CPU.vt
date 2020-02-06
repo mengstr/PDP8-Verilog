@@ -35,7 +35,7 @@ module CPU_tb();
     initial begin
         $dumpfile("CPU.vcd");
         $dumpvars(0,CPU_tb);
-        #100000 begin $display("DONE after %d instructions",cnt); $finish; end
+        #1000000 begin $display("DONE after %d instructions",cnt); $finish; end
     end
 
 //    always @(dut.theSEQUENCER.stepCnt) begin

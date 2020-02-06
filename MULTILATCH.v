@@ -27,29 +27,17 @@ reg [11:0] holdreg=0;
 assign out1=oe1 ? data : 12'bz;
 assign out2=oe2 ? data : 12'bz;
 
-always @(posedge SYSCLK) begin
-  if (RESET) begin
-    holdreg<=0;
-    data<=0;
-  end else begin
-    if (!hold) holdreg<=in;
-    if (latch) data<=holdreg;
-  end
+always @* begin
+    if (RESET) holdreg=0;
+    if (!hold) holdreg=in;
 end
 
-
-// always @* begin
-//     if (RESET) holdreg=0;
-//     if (!hold) holdreg=in;
-// end
-
-// always @(posedge latch or posedge RESET) begin
-//   if (RESET) begin
-//     data<=0;
-//   end else begin 
-//     data<=holdreg;
-//   end
-// end
-
+always @(posedge latch or posedge RESET) begin
+  if (RESET) begin
+    data<=0;
+  end else begin 
+    data<=holdreg;
+  end
+end
 
 endmodule
