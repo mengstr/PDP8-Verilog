@@ -77,8 +77,6 @@ FRONTPANEL thePanel(
   .PLED1(PLED1), .PLED2(PLED2), .PLED3(PLED3), .PLED4(PLED4), .PLED5(PLED5), .PLED6(PLED6)
  );
 
-assign LED2=1'b1;
-
 wire irqRq;           // Some device is asserting irq
 wire      irqRqIOT34;
 or(irqRq, irqRqIOT34);
@@ -303,13 +301,14 @@ or(ramd2ac_and_, ramd2ac_and05);
 or(ramd2ac_add_, ramd2ac_add05);
 
 wire andaddC;
+wire [11:0] accIn_andadd;
 ADDAND theADDAND(
   .A(accout1),
   .B(busData),
   .CI(1'b0),
   .OE_ADD(ramd2ac_add_),
   .OE_AND(ramd2ac_and_),
-  .S(accIn),
+  .S(accIn_andadd),
   .CO(andaddC)
 );
 
@@ -356,6 +355,8 @@ wire ac2ramd05;
 or (ac2ramd_, ac2ramd05);
 
 wire [11:0] accIn;
+or(accIn, accIn_andadd, accIn_rotater);
+
 wire [11:0] accout1;
 MULTILATCH theACC(
   .RESET(sw_RESET),
@@ -372,7 +373,8 @@ MULTILATCH theACC(
 assign busORacc=
   (oprOSR ? 12'o`OSR : 12'o0000) |
   (mq2orbus_ ? mqout1   : 12'o0000) |
-  busACGTF;
+  busACGTF |
+  busACTTY;
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ACC CLORIN █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -418,12 +420,13 @@ wire        rot2ac05, rot2acIOT0, rot2ac7;
 or(rot2ac_, rot2ac05, rot2acIOT0, rot2ac7);
 
 wire rotaterLO;
+wire [11:0] accIn_rotater;
 ROTATER theRotater(
   .OP({oprRIGHT,oprLEFT,oprX2}),
   .AI(incOut),
   .LI(rotaterLI),
   .OE(rot2ac_),
-  .AO(accIn),
+  .AO(accIn_rotater),
   .LO(rotaterLO)
 );
 
@@ -659,6 +662,7 @@ INTERRUPT theInterrupt(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 604x/604x IOT TTY █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
+wire [11:0] busACTTY;
 TTY theTTY(
   .CLK(SYSCLK),
   .clear(sw_RESET | iotCLR0),
@@ -672,7 +676,9 @@ TTY theTTY(
   .pc_ck(pc_ckIOT34),
   .irq(irqRqIOT34),
   .rx(rx),
-  .tx(tx)
+  .tx(tx),
+  .LED2(LED2),
+  .busACTTY(busACTTY)
 );
 
 

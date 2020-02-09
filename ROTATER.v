@@ -48,7 +48,7 @@ case({OP[2],OP[1],OP[0]})
   endcase
 end
 
-assign AO=OE ? Areg : 12'bzzzzzzzzzzzz;
+assign AO=OE ? Areg : 12'b0;
 assign LO=Lreg;
 
 endmodule

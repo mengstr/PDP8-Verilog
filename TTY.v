@@ -69,7 +69,9 @@ module TTY(
   output pc_ck,
   output irq,
   input rx,
-  output tx
+  output tx,
+  output LED2,
+  output [11:0] busACTTY
 );
 
 reg [7:0] txData=0;
@@ -126,6 +128,8 @@ wire instTLS=(EN2 & (IR==3'o6)); //Teleprinter Load and start
 wire ACbit11=AC[0:0]; // PDP has the bit order reversed
 
 reg lastTxRdy=0;
+reg lastRxRdy=0;
+reg [1:0] cnt=0;
 
 always @(posedge CLK) begin
     if (clear)   begin
@@ -139,35 +143,92 @@ always @(posedge CLK) begin
       if (instTFL) flgPRN<=1; //Teleprinter Flag set
       if (instTFC) flgPRN<=0; //Teleprinter Flag clear
       if (instTPC) begin
-`ifndef VERILATOR
-      // FIXME
-      if (ck1) $display("(%c)", AC & 12'd127);
-`endif
+      // if (ck1) $display("(%c)", AC & 12'd127);
       if (ck1) begin txData<={1'b0,AC[6:0]}; txStb<=1; end;
     end
-      if (instTLS) begin      //Teleprinter Load and start
-        flgPRN<=0;
-`ifndef VERILATOR
-        // FIXME
-        if (ck1) $display("[%c]", AC & 12'd127);
-`endif
-        if (ck1) begin txData<={1'b0,AC[6:0]}; txStb<=1; end;
-      end
-      if (txStb==1) txStb<=0; 
-      if (txRdy & ~lastTxRdy) flgPRN<=1;
-      lastTxRdy<=txRdy;
+    if (instTLS) begin      //Teleprinter Load and start
+      flgPRN<=0;
+      // if (ck1) $display("[%c]", AC & 12'd127);
+      if (ck1) begin txData<={1'b0,AC[6:0]}; txStb<=1; end;
     end
+    if (txStb==1) txStb<=0; 
+    if (txRdy & ~lastTxRdy) flgPRN<=1;
+    lastTxRdy<=txRdy;
+    if (rxRdy) begin
+      cnt<=cnt+1;
+      if (rxRdy & ~lastRxRdy) flgKBD<=1;
+      rxAck<=1;
+    end
+    if (rxAck==1) rxAck<=0; 
+    lastRxRdy<=rxRdy;
+  end
 end
+assign LED2=cnt[0];
+assign busACTTY=12'b0;
 
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6030 - KCF Keyboard Clear Flags
+//  The keyboard flag, signalling input data ready, is cleared. 
 assign done30 = instKCF & ck1;
+
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6031 - KSF Keyboard Skip if Flag
+//  If the keyboard flag is set, indicating that input data is ready, the next instruction in sequence is skipped.
 assign pc_ck31= instKSF & flgKBD & stb1;
 assign done31 = instKSF & ck2;
+
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6032 - KCC Keyboard Clear and read character
+//  The keyboard flag is reset, the accumulator is cleared, and the process of reading the next character of input is initiated.
+//FIXME instKCC
+
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6034 - KRS Keyboard Read Static
+//  The 8-bit character in the keyboard buffer is ored with the accumulator.
+//FIXME instKRS
+
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6035 - KIE Keyboard Interrupt Enable
+//  The accumulator is loaded into the device control register (the interrupt enable and status report control bits). 
 assign done35 = instKIE & ck1;
+
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6036 - KRB Keyboard Read and begin next read
+//  The 8 bit character in the keyboard buffer is transferred to the accumulator, and the keyboard flag is cleared, allowing the 
+//  reading of the next character to begin. In effect, this operation combines the KCC and KRS operations;
+//FIXME instKRB
+
+
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6040 - TFL Teleprinter Flag set
+//  The printer flag, signalling output complete, is set. 
 assign done40 = instTFL & ck1;
+
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6041 - TSF Teleprinter Skip if Flag
+//  If the printer flag is set, indicating output is complete, the next instruction in sequence is skipped. 
 assign pc_ck41= instTSF & flgPRN & stb1;
 assign done41 = instTSF & ck2;
+
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6042 - TCF Teleprinter Clear Flag
+//  The printer flag is reset.
 assign done42 = instTFC & ck1;
+
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6044 - TPC Teleprinter Print Character
+//  The least significant 8-bits of the accumulator is copied to the print buffer, initiating output. 
 assign done44 = instTPC & ck1;
+
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6045 - TSK Teleprinter Skip
+//  If either the print flag or the keyboard flag are set, the next instruction in sequence is skipped. 
+// FIXME TSK
+
+// ------------------------------------------------------------------------------------------------------------------------------
+// 6046 - TLS Teleprinter Load and start
+//  The least significant 8 bits of the accumulator are copied to the print buffer, initiating output, and the printer flag is 
+//  reset. In effect, this operation combines the TCF and TPC operations.
 assign done46 = instTLS & ck1;
 
 endmodule
@@ -195,37 +256,3 @@ endmodule
 //
 //-----------------------------
 //
-
-//            TTYin TTYou INT NO
-//            IE IO IE IO BUS INT ION
-//----------------------------------------------------
-//IOT TEST 11
-// 4340 CAF   1  0  1  1  1   0   0
-// 4341 TAD   1  0  1  0  0   0   0
-// 4342 DCA   1  0  1  0  0   0   0
-// 4343 ION   1  0  1  0  0   0   0
-// 4344 GTF   1  0  1  0  0   1   1     L-0 AC=0000 
-// 4345 AND   1  0  1  0  0   0   1     L=0 AC=0200
-// 4346 SKON  1  0  1  0  0   0   1     L=0 AC=0200
-// 4350 BSW   1  0  1  0  0   0   0     L=0 AC=0200
-// 4351 RTR   1  0  1  0  0   0   0     L=0 AC=0002
-// 4352 SZL   1  0  1  0  0   0   0     L=1 AC=0000
-// 4354 SZA   1  0  1  0  0   0   0     L=1 AC=0000
-// 4355 JMP   1  0  1  0  0   0   0     L=1 AC=0000
-//
-//IOT TEST 12
-// 4360 7320  1  0  1  0  0   0   0     L=1 AC=0000
-// 4361 TAD   1  0  1  0  0   0   0     L=1 AC=0000
-// 4362 DCA   1  0  1  0  0   0   0     L=1 AC=4376
-// 4363 RTF   1  0  1  0  0   0   0     L=1 AC=0000
-// 4364 SKP   1  0  1  0  0   1   1     L=0 AC=0000
-// 4366 SNL   1  0  1  0  0   1   1     L=0 AC=0000
-// 4367 SNA   1  0  1  0  0   1   1     L=0 AC=0000
-// 4371 SKON  1  0  1  0  0   1   1     L=0 AC=0000
-// 4373 JMPi  1  0  1  0  0   1   0     L=0 AC=0000
-// 4400 CAF   1  0  1  0  0   0   0     L=0 AC=0000
-// 4401 TAD   1  0  1  0  0   0   0     L=0 AC=0000
-//
-
-
-

@@ -24,12 +24,12 @@ all: $(TARGET).bin time
 .PHONY: all upload lint clean
 
 
-$(TARGET).json: $(SOURCES)
+$(TARGET).json: $(SOURCES) RAM.hex
 	@$(ICESTORM) yosys \
 		-DOSR=7777 \
 		-q \
 		-p 'synth_ice40 -top top -json $@' \
-		$^ 2>&1 | tee $(TARGET).yosys
+		$(SOURCES) 2>&1 | tee $(TARGET).yosys
 
 
 $(TARGET).asc: $(TARGET).json
@@ -59,8 +59,8 @@ time:
 
 
 upload:$(TARGET).bin
-	@$(ICEFLASH) $(PORT) -h -e -w $(TARGET).bin -t -g
-#	tio $(PORT) 
+	@$(ICEFLASH) $(PORT) -h -e -w $(TARGET).bin -t -G
+	tio $(PORT) 
 
 
 lint: $(SOURCES)
