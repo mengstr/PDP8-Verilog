@@ -20,7 +20,10 @@ output TO_ROTATER
 );
 
 always @(posedge LINK_CK or posedge CLEAR) begin 
+/* verilator lint_off SYNCASYNCNET */
+  // FIXME
   if (CLEAR) L<=0;
+/* verilator lint_on SYNCASYNCNET */
   else begin
     if (SET==1) L<=FROM_ROTATER;
     else begin

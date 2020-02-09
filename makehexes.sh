@@ -1,5 +1,10 @@
 #!/bin/bash
 
+echo "Converting tty1.pal"
+../tools/palbart ../asm/tty1.pal
+mv -f ../asm/tty1.bin ../bin/
+./tape2hexram.sh < ../bin/tty1.bin              > RAM.tty1.hex
+
 echo "Converting D0AB-InstTest-1.pt"
 ./tape2hexram.sh < ../bin/D0AB-InstTest-1.pt    > RAM.Inst1.hex
 # Patch initial HLT to be a NOP inestead

@@ -1,75 +1,100 @@
-# Current directory
-DIR:=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-# Start docker and map to current directory
-DOCKER:=docker run --rm -it -w /root -v$(DIR):/root
-# Run container having yosys, nextptr, icepack and icetime
-ICESTORM:=$(DOCKER) cranphin/icestorm
-# Run container having iverilog
-ICARUS:=$(DOCKER) cranphin/iverilog
-# Run container having verilator
-VERILATOR:=$(DOCKER) antonkrug/verilator-slim
+PORT:=/dev/cu.usbmodem48065801
 
-# Building for the iCE40HX1K...
+# Building for the iCE40HX1K in a VQ100 package on the Olimex board
+# having 100 MHz Crystal and target clock at 12.5 MHz
 DEVICE 		:= hx1k
-# ...in a VQ100 package 
 PACKAGE 	:= vq100
+PCF    		:= olimex-pdp8.pcf
+XTAL		:= 100
+CLK			:= 12.5
 
-# all: CLORIN.v
-# IOT-BASE-DECODER.v
-# IR-DECODER.v
-# OPR-DECODER.v
-# PROGRAMCOUNTER.v
-# ROTATER.v
-# SKIP.v
-# tb.v
+TARGET 		:= pdp8
+
+SOURCES		:= $(wildcard *.v)
+DIR         := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+
+DOCKER:=docker run --rm --log-driver=none -a stdout -a stderr -w/work -v$(DIR)/:/work
+ICESTORM:=$(DOCKER) cranphin/icestorm
+ICARUS:=$(DOCKER) cranphin/iverilog
+VERILATOR:=$(DOCKER) --entrypoint /usr/local/bin/verilator verilator/verilator 
+ICEFLASH:=../verilog_old/upload/iceflash 
 
 
-SOURCES		:=	$(wildcard *.v)
-BINS		:= 	$(SOURCES:.v=.bin)
+all: $(TARGET).bin time
+.PHONY: all upload lint clean
 
-all: $(BINS)
 
-%.json: %.v
-	@echo "verilator --top-module $(basename $@) --lint-only $<"
-	@$(VERILATOR) /bin/sh -c "verilator -DNOTOP --top-module $(basename $@) --lint-only $<"
-	@echo yosys -top top -json $@ $<
-	@$(ICESTORM) yosys -q -p 'synth_ice40 -top top -json $@' $<
+$(TARGET).json: $(SOURCES)
+	@$(ICESTORM) yosys \
+		-DOSR=7777 \
+		-q \
+		-p 'synth_ice40 -top top -json $@' \
+		$^ 2>&1 | tee $(TARGET).yosys
 
-%.asc: %.json
-	@echo nextpnr --pcf top.pcf --json $< --asc $@
-	@$(ICESTORM) nextpnr-ice40 --$(DEVICE) --package $(PACKAGE) --pcf dummy.pcf --json $< --asc $@ > $(basename $@).tmp || { cat $(basename $@).tmp; exit 1; }
 
-%.bin: %.asc
-	@echo icepack $< $@
-	@$(ICESTORM) icepack $< $@
+$(TARGET).asc: $(TARGET).json
+	@$(ICESTORM) nextpnr-ice40 \
+		--$(DEVICE) \
+		--package $(PACKAGE) \
+		--pcf $(PCF) \
+		--freq $(CLK) \
+		--pcf-allow-unconstrained \
+		--json $< \
+		--asc $@ 2>&1 | tee $(TARGET).nextpnr 
+		
+
+$(TARGET).bin: $(TARGET).asc
+	@$(ICESTORM) icepack $< $@ 2>&1 | tee $(TARGET).icepack
+
+
+time:
+	@$(ICESTORM) icetime \
+		-d $(DEVICE) \
+		-c $(CLK) \
+		-m \
+		-t \
+		-r $(TARGET).icetime \
+		$(TARGET).asc 2>&1 > $(TARGET).icetime_
+	@cat $(TARGET).icetime_ | grep -A1 'Timing' | sed 's/\/\/ /        /g'
+
+
+upload:$(TARGET).bin
+	@$(ICEFLASH) $(PORT) -h -e -w $(TARGET).bin -t -g
+#	tio $(PORT) 
+
+
+lint: $(SOURCES)
+	@$(VERILATOR) \
+		-Wall \
+		-Wno-UNUSED \
+		-DNOTOP \
+		-DOSR=7777 \
+		--top-module top \
+		--lint-only \
+		$^ 2>&1 | tee $(TARGET).lint
+
+
+clean:
+	@rm -f *.{tmp,tmp2,blif,asc,bin,rpt,dot,png,json,vvp,vcd,svg,out,log,hex}
+	@rm -f pdp8.*
+	@rm -f .*_history
+	@rm -f *~
+
+
+#
+# @echo "verilator --top-module $(basename $@) --lint-only $<"
+# @$(VERILATOR) /bin/sh -c "verilator -DNOTOP --top-module $(basename $@) --lint-only $<"
+#
+# TARGET=CLORIN
+# image:
+# 	@$(ICESTORM) yosys -p "prep; show -stretch -prefix $(TARGET) -format dot" $(TARGET).v > /dev/null
+# 	@$(ICESTORM) dot -Tpng -O $(TARGET).dot > a.a
+#
+# tb:
+# 	@$(ICARUS) iverilog -DTB -o $(TARGET).vvp $(TARGET).v $(TARGET)_tb.v
+# 	@$(ICARUS) vvp $(TARGET).vvp
+#
 #	@echo icetime -d $(DEVICE) -mtr $@ $<
 #	@cat $(basename $@).tmp | /usr/bin/sed -ne '/^Info: Device utilisation:/,$$ p' | /usr/bin/sed -n '/^[[:space:]]*$$/q;p' | sed 's/Info: //g'
 #	@$(ICESTORM) icetime -d $(DEVICE) -mtr $@ $< | grep 'Timing' | sed 's/\/\/ //g'
-
-#%.rpt: %.asc
-# 	@$(ICESTORM) icetime -d $(DEVICE) -mtr $@ $<
-# 	@cat $(PROJ).tmp | /usr/bin/sed -ne '/^Info: Device utilisation:/,$$ p' | /usr/bin/sed -n '/^[[:space:]]*$$/q;p'
-
-PROJ=CLORIN
-image:
-	@$(ICESTORM) yosys -p "prep; show -stretch -prefix $(PROJ) -format dot" $(PROJ).v > /dev/null
-	@$(ICESTORM) dot -Tpng -O $(PROJ).dot > a.a
-
-# prog: $(PROJ).bin
-# 	@../upload/iceflash /dev/cu.usbmodem48065801 -e -w $< -t -g
-
-# tb:
-# 	@$(ICARUS) iverilog -DTB -o $(PROJ).vvp $(PROJ).v $(PROJ)_tb.v
-# 	@$(ICARUS) vvp $(PROJ).vvp
-
-#lint:
-#	@$(VERILATOR) /bin/sh -c "verilator --top-module $(PROJ) --lint-only $(PROJ).v"
-
-clean:
-	@rm -f *.{tmp,blif,asc,bin,rpt,dot,png,json,vvp,vcd}
-
-
-
-
-# .PHONY: all image prog tb lint clean
-
+#

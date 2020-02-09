@@ -2,10 +2,8 @@
 
 FILE=top
 FILES="$(ls [A-Z]*.v)"
-echo $FILES
-exit
 DR="docker run --rm --log-driver=none -a stdout -a stderr -w/work -v${PWD}/:/work"
-PCF=dummy.pcf
+PCF=olimex-pdp8.pcf
 PACKAGE=vq100
 XTAL=100
 CLK=25
@@ -41,11 +39,11 @@ $DR verilator/verilator -Wall -Wno-UNUSED -DNOTOP -DOSR=7777 --top-module top --
 
 if [ "$1" != "test" ]; then
     echo --YOSYSING
-    $DR cranphin/icestorm yosys -DOSR=7777 -p "synth_ice40 -top top -json $FILE.json" $FILE.v $FILES > $FILE.yosys.tmp
+    $DR cranphin/icestorm yosys -E dep.dep -DOSR=7777 -p "synth_ice40 -top top -json $FILE.json" $FILE.v $FILES > $FILE.yosys.tmp
     if [ $? != 0 ]; then echo "err"; cat $FILE.yosys.tmp; exit 1; fi
 
-    echo --PLACEING
-    $DR cranphin/icestorm nextpnr-ice40 --freq $CLK --ignore-loops --hx1k --package $PACKAGE --pcf $PCF --json $FILE.json --asc $FILE.asc > $FILE.nextpnr.tmp 2> $FILE.nextpnr.tmp2 
+
+    $DR cranphin/icestorm nextpnr-ice40 --hx1k --package $PACKAGE --freq $CLK --ignore-loops --pcf $PCF --pcf-allow-unconstrained --json $FILE.json --asc $FILE.asc > $FILE.nextpnr.tmp 2> $FILE.nextpnr.tmp2 
     if [ $? != 0 ]; then cat $FILE.nextpnr.tmp2; exit 1; fi
     cat $FILE.nextpnr.tmp2 | grep "Info: Max frequency for clock"
     cat $FILE.nextpnr.tmp2 | sed -ne '/^Info: Device utilisation:/,$ p' | sed '1d' | sed 's/        //g' | sed -n '/^[[:space:]]*$/q;p' | sed 's/Info: //g'
@@ -77,7 +75,7 @@ if [ "$1" != "test" ]; then
     fi # 'false'
 
     if [ "$1" == "up" ]; then
-        ./upload/iceflash /dev/cu.usbmodem48065801 -h -e -w $FILE.bin -g
+        ../verilog_old/upload/iceflash /dev/cu.usbmodem48065801 -h -e -w $FILE.bin -t -G
         tio /dev/cu.usbmodem48065801 
         exit 0;
     fi

@@ -6,7 +6,7 @@
 
 # Editor backup files 
 *~
-*.tmp
+*.tmp*
 
 # verilog
 *.blif
@@ -19,5 +19,5 @@
 *.vcd
 *.log
 *.hex
-
+pdp8.*
 upload

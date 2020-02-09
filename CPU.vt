@@ -3,18 +3,18 @@
 module CPU_tb();
     reg SYSCLK=0;
     reg reset=0, clear=0, run=0, halt=0;
-    wire [11:0] dutBusPC, dutBusData;
-    wire instAND, instTAD, instISZ, instDCA, instJMS, instJMP, instIOT, instOPR;
+    // wire [11:0] dutBusPC, dutBusData;
+    // wire instAND, instTAD, instISZ, instDCA, instJMS, instJMP, instIOT, instOPR;
 
     CPU dut(
         .SYSCLK(SYSCLK),
         .sw_RESET(reset),
         .sw_CLEAR(clear),
         .sw_RUN(run), 
-        .sw_HALT(halt),
-        .pBusPC(dutBusPC),
-        .pBusData(dutBusData),
-        .pInstAND(instAND), .pInstTAD(instTAD), .pInstISZ(instISZ), .pInstDCA(instDCA), .pInstJMS(instJMS), .pInstJMP(instJMP), .pInstIOT(instIOT), .pInstOPR(instOPR)
+        .sw_HALT(halt)
+        // .pBusPC(dutBusPC),
+        // .pBusData(dutBusData),
+        // .pInstAND(instAND), .pInstTAD(instTAD), .pInstISZ(instISZ), .pInstDCA(instDCA), .pInstJMS(instJMS), .pInstJMP(instJMP), .pInstIOT(instIOT), .pInstOPR(instOPR)
     );
     
   reg [20:0] cnt=0;
@@ -35,7 +35,7 @@ module CPU_tb();
     initial begin
         $dumpfile("CPU.vcd");
         $dumpvars(0,CPU_tb);
-        #100000 begin $display("DONE after %d instructions",cnt); $finish; end
+        #200000 begin $display("DONE after %d instructions",cnt); $finish; end
     end
 
 //    always @(dut.theSEQUENCER.stepCnt) begin

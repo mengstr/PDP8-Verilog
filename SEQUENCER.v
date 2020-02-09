@@ -8,21 +8,23 @@
 `default_nettype none
 
 module SEQUENCER (
-  input SYSCLK,              //
-  input RESET,
+  input SYSCLK,           //
+  input RESET,            //
   input DONE,             // Reset step counter before the natural end at step 31
   input RUN,              // Rising edge starts continous run
   input HALT,             // Rising edge halts at next instruction
-  input [1:0] SEQTYPE,           // ({instIsPPIND,instIsIND}),
+  input [1:0] SEQTYPE,    // ({instIsPPIND,instIsIND}),
   output CK_FETCH, CK_AUTO1, CK_AUTO2, CK_IND,
   output CK_1, CK_2, CK_3, CK_4, CK_5, CK_6,
   output STB_FETCH, STB_AUTO1, STB_AUTO2, STB_IND,
-  output STB_1, STB_2, STB_3, STB_4, STB_5, STB_6
+  output STB_1, STB_2, STB_3, STB_4, STB_5, STB_6,
+  output reg running=0
 );
 
-reg running;              // CPU is running continously
 reg [4:0] stepCnt; 
-
+wire run;
+Debounce_Switch debRun(SYSCLK, RUN, run);
+ 
 always @(posedge SYSCLK) begin 
     if (RESET) begin
         running<=0;
@@ -34,8 +36,8 @@ always @(posedge SYSCLK) begin
     end
     else
     begin
-        if (RUN==1 & running==0) running<=1;
-//            if (HALT & running) running=0;
+        if (run) running<=1;
+        if (HALT) running<=0;
         if (running) begin
             if (stepCnt==1) begin
                 case (SEQTYPE)
@@ -72,3 +74,39 @@ assign STB_5     = !RESET & (stepCnt==17);
 assign STB_6     = !RESET & (stepCnt==19);
 
 endmodule
+
+
+
+/* verilator lint_off DECLFILENAME */
+// FIXME
+module Debounce_Switch (input i_Clk, input i_Switch, output o_Switch);
+ 
+  parameter c_DEBOUNCE_LIMIT = 250000;  // 10 ms at 25 MHz
+   
+  reg [17:0] r_Count = 0;
+  reg r_State = 1'b0;
+ 
+  always @(posedge i_Clk)
+  begin
+    // Switch input is different than internal switch value, so an input is
+    // changing.  Increase the counter until it is stable for enough time.  
+    if (i_Switch !== r_State && r_Count < c_DEBOUNCE_LIMIT)
+      r_Count <= r_Count + 1;
+ 
+    // End of counter reached, switch is stable, register it, reset counter
+    else if (r_Count == c_DEBOUNCE_LIMIT)
+    begin
+      r_State <= i_Switch;
+      r_Count <= 0;
+    end 
+ 
+    // Switches are the same state, reset the counter
+    else
+      r_Count <= 0;
+  end
+ 
+  // Assign internal register to output (debounced!)
+  assign o_Switch = r_State;
+ 
+endmodule
+/* verilator lint_on DECLFILENAME */

@@ -67,8 +67,31 @@ module TTY(
   input stb1,stb2,stb3,stb4,stb5,stb6,
   output done,
   output pc_ck,
-  output irq
+  output irq,
+  input rx,
+  output tx
 );
+
+reg [7:0] txData=0;
+reg txStb=0;
+wire txRdy;
+wire rxRdy;
+wire [7:0] rxData;
+reg rxAck=0;
+
+UART uart(
+    .SYSCLK(CLK),
+    .RESET(1'b0),
+    .txData(txData),
+    .txStb(txStb),
+    .tx(tx),
+    .txRdy(txRdy),
+    .rx(rx),
+    .rxData(rxData),
+    .rxRdy(rxRdy),
+    .rxAck(rxAck)
+);
+
 
 reg [5:0] txtick;
 
@@ -77,8 +100,8 @@ reg flgKBD=0;
 reg flgPRN=0;
 assign irq=(flgTTYIE) & (flgKBD | flgPRN);
 
-wire     done30, done31, done35, done40, done41, done42, done46;
-or(done, done30, done31, done35, done40, done41, done42, done46);
+wire     done30, done31, done35, done40, done41, done42, done44, done46;
+or(done, done30, done31, done35, done40, done41, done42, done44, done46);
 
 wire       pc_ck31, pc_ck41;
 or (pc_ck, pc_ck31, pc_ck41);
@@ -102,24 +125,37 @@ wire instTLS=(EN2 & (IR==3'o6)); //Teleprinter Load and start
 
 wire ACbit11=AC[0:0]; // PDP has the bit order reversed
 
+reg lastTxRdy=0;
+
 always @(posedge CLK) begin
     if (clear)   begin
         flgTTYIE<=1;
         flgKBD<=0;
         flgPRN<=0;
-        txtick<=0;
+        // txtick<=0;
     end else begin
       if (instKIE) flgTTYIE<=ACbit11; ////Keyboard Interrupt Set/Reset
       if (instKCF) flgKBD<=0; //Keyboard Clear Flags
       if (instTFL) flgPRN<=1; //Teleprinter Flag set
       if (instTFC) flgPRN<=0; //Teleprinter Flag clear
+      if (instTPC) begin
+`ifndef VERILATOR
+      // FIXME
+      if (ck1) $display("(%c)", AC & 12'd127);
+`endif
+      if (ck1) begin txData<={1'b0,AC[6:0]}; txStb<=1; end;
+    end
       if (instTLS) begin      //Teleprinter Load and start
         flgPRN<=0;
-        if (ck1) $display("%c", AC & 12'd127);
-        txtick<=63;
+`ifndef VERILATOR
+        // FIXME
+        if (ck1) $display("[%c]", AC & 12'd127);
+`endif
+        if (ck1) begin txData<={1'b0,AC[6:0]}; txStb<=1; end;
       end
-      if (txtick==1) flgPRN<=1;
-      if (txtick!=0) txtick<=txtick-1;
+      if (txStb==1) txStb<=0; 
+      if (txRdy & ~lastTxRdy) flgPRN<=1;
+      lastTxRdy<=txRdy;
     end
 end
 
@@ -131,6 +167,7 @@ assign done40 = instTFL & ck1;
 assign pc_ck41= instTSF & flgPRN & stb1;
 assign done41 = instTSF & ck2;
 assign done42 = instTFC & ck1;
+assign done44 = instTPC & ck1;
 assign done46 = instTLS & ck1;
 
 endmodule

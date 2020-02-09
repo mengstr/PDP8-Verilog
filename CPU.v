@@ -42,21 +42,15 @@ module CPU(
   input sw_CLEAR,    // Clear CPU (button)
   input sw_RUN,      // Start CPU
   input sw_HALT,     // Halt CPU at next instruction
-  output [11:0] pBusPC,
-  output [11:0] pBusData,
-  output pInstAND, pInstTAD, pInstISZ, pInstDCA, pInstJMS, pInstJMP, pInstIOT, pInstOPR
+  input rx,
+  output tx,
+  output LED1, LED2,
+  output GREEN1, GREEN2,
+  output RED1, RED2,
+  output YELLOW1, YELLOW2,
+  output PLED1, PLED2, PLED3, PLED4, PLED5, PLED6
 );
 
-assign pBusPC=busAddress;
-assign pBusData=busData;
-assign pInstAND=instAND;
-assign pInstTAD=instTAD;
-assign pInstISZ=instISZ;
-assign pInstDCA=instDCA;
-assign pInstJMS=instJMS;
-assign pInstJMP=instJMP;
-assign pInstIOT=instIOT;
-assign pInstOPR=instOPR;
 
 // The buses
 wire [11:0] busReg;
@@ -68,15 +62,30 @@ wire [11:0] busLatPC;
 wire [11:0] busPCin;
 wire [11:0] busORacc;
 
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ FRONT PANEL █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+
+FRONTPANEL thePanel(
+  .CLK(SYSCLK),
+  .green(busLatPC),
+  .red(busIR),
+  .yellow(accout1),
+  .GREEN1(GREEN1), .GREEN2(GREEN2),
+  .RED1(RED1), .RED2(RED2),
+  .YELLOW1(YELLOW1), .YELLOW2(YELLOW2),
+  .PLED1(PLED1), .PLED2(PLED2), .PLED3(PLED3), .PLED4(PLED4), .PLED5(PLED5), .PLED6(PLED6)
+ );
+
+assign LED2=1'b1;
+
 wire irqRq;           // Some device is asserting irq
 wire      irqRqIOT34;
 or(irqRq, irqRqIOT34);
 
 //
-// ▁ ▂ ▄ ▅ ▆ ▇ █ SEQUENCER █ ▇ ▆ ▅ ▄ ▂ ▁
+// ▁ ▂ ▄ ▅ ▆ ▇ █ SEQUENCER & START/STOP █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-
-// Signals from the sequencer
 wire ckFetch, ckAuto1, ckAuto2, ckInd;
 wire ck1, ck2, ck3, ck4, ck5, ck6;
 wire stbFetch, stbAuto1, stbAuto2, stbInd;
@@ -90,15 +99,15 @@ SEQUENCER theSEQUENCER(
   .SYSCLK(SYSCLK),
   .RESET(sw_RESET),
   .RUN(sw_RUN),
-  .HALT(sw_HALT),
+  .HALT(sw_HALT | (oprHLT & ck2)),
   .DONE(done_), 
   .SEQTYPE({instIsPPIND,instIsIND}),
   .CK_FETCH(ckFetch), .CK_AUTO1(ckAuto1), .CK_AUTO2(ckAuto2), .CK_IND(ckInd),
   .CK_1(ck1), .CK_2(ck2), .CK_3(ck3), .CK_4(ck4), .CK_5(ck5), .CK_6(ck6),
   .STB_FETCH(stbFetch), .STB_AUTO1(stbAuto1), .STB_AUTO2(stbAuto2), .STB_IND(stbInd), 
-  .STB_1(stb1), .STB_2(stb2), .STB_3(stb3), .STB_4(stb4), .STB_5(stb5), .STB_6(stb6)
+  .STB_1(stb1), .STB_2(stb2), .STB_3(stb3), .STB_4(stb4), .STB_5(stb5), .STB_6(stb6),
+  .running(LED1)
 );
-
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ PROGRAM COUNTER █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -661,7 +670,9 @@ TTY theTTY(
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   .done(doneIOT34),
   .pc_ck(pc_ckIOT34),
-  .irq(irqRqIOT34)
+  .irq(irqRqIOT34),
+  .rx(rx),
+  .tx(tx)
 );
 
 
