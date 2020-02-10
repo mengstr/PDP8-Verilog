@@ -71,7 +71,10 @@ module TTY(
   input rx,
   output tx,
   output LED2,
-  output [11:0] busACTTY
+  output [11:0] ACTTY,
+  output rot2ac,
+  output clr,
+  output ac_ck
 );
 
 reg [7:0] txData=0;
@@ -102,28 +105,38 @@ reg flgKBD=0;
 reg flgPRN=0;
 assign irq=(flgTTYIE) & (flgKBD | flgPRN);
 
-wire     done30, done31, done35, done40, done41, done42, done44, done46;
-or(done, done30, done31, done35, done40, done41, done42, done44, done46);
+wire     done30, done31, done35, done36, done40, done41, done42, done44, done45, done46;
+or(done, done30, done31, done35, done36, done40, done41, done42, done44, done45, done46);
 
-wire       pc_ck31, pc_ck41;
-or (pc_ck, pc_ck31, pc_ck41);
+wire       pc_ck31, pc_ck41, pc_ck45;
+or (pc_ck, pc_ck31, pc_ck41, pc_ck45);
+
+wire       rot2ac36;
+or(rot2ac, rot2ac36);
+
+wire      clr36;
+or(clr, clr36);
+
+wire      ac_ck36;
+or(ac_ck, ac_ck36);
+
 
 wire instKCF=(EN1 & (IR==3'o0)); //Keyboard Clear Flags
 wire instKSF=(EN1 & (IR==3'o1)); //Keyboard Skip if Flag
 wire instKCC=(EN1 & (IR==3'o2)); //Keyboard Clear and read character
-// TODO Handle 6033
+// 6033 is an invalid instruction
 wire instKRS=(EN1 & (IR==3'o4)); //Keyboard Read Static
 wire instKIE=(EN1 & (IR==3'o5)); //Keyboard Interrupt Enable
 wire instKRB=(EN1 & (IR==3'o6)); //Keyboard Read and begin next read
-// TODO Handle 6037
+// 6037 is an invalid instruction
 wire instTFL=(EN2 & (IR==3'o0)); //Teleprinter Flag set
 wire instTSF=(EN2 & (IR==3'o1)); //Teleprinter Skip if Flag
 wire instTFC=(EN2 & (IR==3'o2)); //Teleprinter Flag clear
-// TODO Handle 6043
+// 6043 is an invalid instruction
 wire instTPC=(EN2 & (IR==3'o4)); //Teleprinter Print Character
 wire instTSK=(EN2 & (IR==3'o5)); //Teleprinter Skip
 wire instTLS=(EN2 & (IR==3'o6)); //Teleprinter Load and start
-// TODO Handle 6047
+// 6047 is an invalid instruction
 
 wire ACbit11=AC[0:0]; // PDP has the bit order reversed
 
@@ -140,6 +153,7 @@ always @(posedge CLK) begin
     end else begin
       if (instKIE) flgTTYIE<=ACbit11; ////Keyboard Interrupt Set/Reset
       if (instKCF) flgKBD<=0; //Keyboard Clear Flags
+      if (instKRB) flgKBD<=0; //Keyboard Clear Flags
       if (instTFL) flgPRN<=1; //Teleprinter Flag set
       if (instTFC) flgPRN<=0; //Teleprinter Flag clear
       if (instTPC) begin
@@ -164,7 +178,12 @@ always @(posedge CLK) begin
   end
 end
 assign LED2=cnt[0];
-assign busACTTY=12'b0;
+
+
+
+//  TTY2.PAL tests 6031-KSF, 6032-KCC, 6036-KRB, 6041-TSF, 6046-TLS
+//
+
 
 // ------------------------------------------------------------------------------------------------------------------------------
 // 6030 - KCF Keyboard Clear Flags
@@ -196,7 +215,11 @@ assign done35 = instKIE & ck1;
 // 6036 - KRB Keyboard Read and begin next read
 //  The 8 bit character in the keyboard buffer is transferred to the accumulator, and the keyboard flag is cleared, allowing the 
 //  reading of the next character to begin. In effect, this operation combines the KCC and KRS operations;
-//FIXME instKRB
+assign rot2ac36=   instKRB & ck1; 
+assign ACTTY =     instKRB & ck1 ? {4'b0,  rxData} : 12'b0;
+assign clr36=      instKRB & ck1;
+assign ac_ck36=    instKRB & stb1;
+assign done36=     instKRB & ck2;
 
 
 // ------------------------------------------------------------------------------------------------------------------------------
@@ -223,7 +246,8 @@ assign done44 = instTPC & ck1;
 // ------------------------------------------------------------------------------------------------------------------------------
 // 6045 - TSK Teleprinter Skip
 //  If either the print flag or the keyboard flag are set, the next instruction in sequence is skipped. 
-// FIXME TSK
+assign pc_ck45= instTSF & (flgPRN | flgKBD) & stb1;
+assign done45 = instTSF & ck2;
 
 // ------------------------------------------------------------------------------------------------------------------------------
 // 6046 - TLS Teleprinter Load and start

@@ -6,10 +6,17 @@ DEVICE 		:= hx1k
 PACKAGE 	:= vq100
 PCF    		:= olimex-pdp8.pcf
 XTAL		:= 100
-CLK			:= 12.5
+PNRCLKGOAL  := 25
+
+# CLK_50M, CLK_25M, CLK_12M, CLK_6M, CLK_3M, CLK_1M, 
+# CLK_800K, CLK_400K, CLK_200K, CLK_100K, CLK_50K, 
+# CLK_24K, CLK_12K, CLK_6, CLK_3, CLK_1K
+CLK			:= CLK_400K
+
+BAUD		:= 9600
+
 
 TARGET 		:= pdp8
-
 SOURCES		:= $(wildcard *.v)
 DIR         := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
@@ -25,8 +32,11 @@ all: $(TARGET).bin time
 
 
 $(TARGET).json: $(SOURCES) RAM.hex
-	@$(ICESTORM) yosys \
-		-DOSR=7777 \
+	$(ICESTORM) yosys \
+		-DOSR=0000 \
+		-DAPA \
+		-D$(CLK) \
+		-DBAUD=$(BAUD) \
 		-q \
 		-p 'synth_ice40 -top top -json $@' \
 		$(SOURCES) 2>&1 | tee $(TARGET).yosys
@@ -37,7 +47,7 @@ $(TARGET).asc: $(TARGET).json
 		--$(DEVICE) \
 		--package $(PACKAGE) \
 		--pcf $(PCF) \
-		--freq $(CLK) \
+		--freq $(PNRCLKGOAL) \
 		--pcf-allow-unconstrained \
 		--json $< \
 		--asc $@ 2>&1 | tee $(TARGET).nextpnr 
@@ -50,7 +60,7 @@ $(TARGET).bin: $(TARGET).asc
 time:
 	@$(ICESTORM) icetime \
 		-d $(DEVICE) \
-		-c $(CLK) \
+		-c $(PNRCLKGOAL) \
 		-m \
 		-t \
 		-r $(TARGET).icetime \

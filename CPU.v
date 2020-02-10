@@ -45,6 +45,7 @@ module CPU(
   input rx,
   output tx,
   output LED1, LED2,
+  input REFRESHCLK,
   output GREEN1, GREEN2,
   output RED1, RED2,
   output YELLOW1, YELLOW2,
@@ -67,7 +68,7 @@ wire [11:0] busORacc;
 //
 
 FRONTPANEL thePanel(
-  .CLK(SYSCLK),
+  .REFRESHCLK(REFRESHCLK),
   .green(busLatPC),
   .red(busIR),
   .yellow(accout1),
@@ -347,8 +348,8 @@ ADDAND theADDAND(
 //
 
 wire ac_ck_;
-wire        ac_ck05, ac_ckIOT0, ac_ck7;
-or (ac_ck_, ac_ck05, ac_ckIOT0, ac_ck7);
+wire        ac_ck05, ac_ckIOT0, ac_ck7, ac_ckTTY;
+or (ac_ck_, ac_ck05, ac_ckIOT0, ac_ck7, ac_ckTTY);
 
 wire ac2ramd_;
 wire ac2ramd05;
@@ -385,7 +386,7 @@ wire         cla05, cla7;
 or (claDCA_, cla05, cla7);
 
 wire clorinCLR;
-or (clorinCLR, claDCA_, oprCLA, iotCLR0);
+or (clorinCLR, claDCA_, oprCLA, iotCLR0, clrTTY);
 
 wire [11:0] clorinOut;
 CLORIN theCLORIN(
@@ -416,8 +417,8 @@ INCREMENTER theINCREMENTER(
 //
 
 wire rot2ac_;
-wire        rot2ac05, rot2acIOT0, rot2ac7;
-or(rot2ac_, rot2ac05, rot2acIOT0, rot2ac7);
+wire        rot2ac05, rot2acIOT0, rot2ac7, rot2acTTY;
+or(rot2ac_, rot2ac05, rot2acIOT0, rot2ac7, rot2acTTY);
 
 wire rotaterLO;
 wire [11:0] accIn_rotater;
@@ -663,6 +664,7 @@ INTERRUPT theInterrupt(
 //
 
 wire [11:0] busACTTY;
+wire clrTTY;
 TTY theTTY(
   .CLK(SYSCLK),
   .clear(sw_RESET | iotCLR0),
@@ -678,7 +680,10 @@ TTY theTTY(
   .rx(rx),
   .tx(tx),
   .LED2(LED2),
-  .busACTTY(busACTTY)
+  .ACTTY(busACTTY),
+  .rot2ac(rot2acTTY),
+  .clr(clrTTY),
+  .ac_ck(ac_ckTTY)
 );
 
 

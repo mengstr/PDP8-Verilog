@@ -25,26 +25,41 @@ module UART (
 //               +-------+     +     +     +     +     +     +     +     +------+
 //
 
-parameter XTAL              = 12_500_000;
-// parameter BAUD           = 6_250_000;  // 60
-// parameter BAUD           = 3686400;    // 62
-// parameter BAUD           = 1843200;    // 65
-// parameter BAUD           = 921600;     // 66
-// parameter BAUD           = 460800;     // 68
-// parameter BAUD           = 230400;     // 69
-// parameter BAUD           = 115200;     // 70
-// parameter BAUD           = 76800;      // 72
-// parameter BAUD           = 19200;      // 74
-parameter BAUD           = 9600;       // 76
-// parameter BAUD           = 4800;       // 77
-// parameter BAUD           = 2400;       // 78
-// parameter BAUD           = 1200;       // 80
-// parameter BAUD           = 600;        // 81
-// parameter BAUD           = 300;        // 82
-// parameter BAUD           = 150;        // 84
-// parameter BAUD           = 110;        // 84
-// parameter BAUD           = 75;         // 85
-parameter BAUDDIVIDER8X     = XTAL/(BAUD*8);
+`ifdef CLK_50M
+parameter  XTAL = 100_000_000 / 2;
+`elsif CLK_25M
+parameter  XTAL = 100_000_000 / 4;
+`elsif CLK_12M
+parameter  XTAL = 100_000_000 / 8;
+`elsif CLK_6M
+parameter  XTAL = 100_000_000 / 16;
+`elsif CLK_3M
+parameter  XTAL = 100_000_000 / 32;
+`elsif CLK_1M
+parameter  XTAL = 100_000_000 / 64;
+`elsif CLK_800K
+parameter  XTAL = 100_000_000 / 128;
+`elsif CLK_400K
+parameter  XTAL = 100_000_000 / 256;
+`elsif CLK_200K
+parameter  XTAL = 100_000_000 / 512;
+`elsif CLK_100K
+parameter  XTAL = 100_000_000 / 1024;
+`elsif CLK_50K
+parameter  XTAL = 100_000_000 / 2048;
+`elsif CLK_24K
+parameter  XTAL = 100_000_000 / 4096;
+`elsif CLK_12K
+parameter  XTAL = 100_000_000 / 8192;
+`elsif CLK_6K
+parameter  XTAL = 100_000_000 / 16384;
+`elsif CLK_3K
+parameter  XTAL = 100_000_000 / 32768;
+`elsif CLK_1K
+parameter  XTAL = 100_000_000 / 65536;
+`endif
+
+parameter BAUDDIVIDER8X     = XTAL/(`BAUD*8);
 parameter BAUDDIVIDER_WIDTH = $clog2(BAUDDIVIDER8X);
 
 //

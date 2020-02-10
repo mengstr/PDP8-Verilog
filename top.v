@@ -13,10 +13,44 @@ module top(
   input P62,P63,P64
 );
 
-reg [2:0] fakepll;
-always @(posedge EXTCLK) fakepll<=fakepll+1;
-//wire SYSCLK=fakepll[2]; // 100/4=25 MHz
-wire SYSCLK=fakepll[2]; // 100/8=12.5 MHz
+reg [15:0] xtalDivider;
+always @(posedge EXTCLK) xtalDivider<=xtalDivider+1;
+
+wire REFRESHCLK=xtalDivider[10]; // 100/2024  = 48.82 KHz
+
+`ifdef CLK_50M
+wire SYSCLK=xtalDivider[0];  // 100/2     = 50 MHz
+`elsif CLK_25M
+wire SYSCLK=xtalDivider[1];  // 100/4     = 25 MHz
+`elsif CLK_12M
+wire SYSCLK=xtalDivider[2];  // 100/8     = 12.5 MHz
+`elsif CLK_6M
+wire SYSCLK=xtalDivider[3];  // 100/16    = 6.25 MHz
+`elsif CLK_3M
+wire SYSCLK=xtalDivider[4];  // 100/32    = 3.12 MHz
+`elsif CLK_1M
+wire SYSCLK=xtalDivider[5];  // 100/64    = 1.56 MHz
+`elsif CLK_800K
+wire SYSCLK=xtalDivider[6];  // 100/128   = 781.25 KHz
+`elsif CLK_400K
+wire SYSCLK=xtalDivider[7];  // 100/256   = 390.62 KHz
+`elsif CLK_200K
+wire SYSCLK=xtalDivider[8];  // 100/512   = 195.31 KHz
+`elsif CLK_100K
+wire SYSCLK=xtalDivider[9];  // 100/1024  = 97.65 KHz
+`elsif CLK_50K
+wire SYSCLK=xtalDivider[10]; // 100/2024  = 48.82 KHz
+`elsif CLK_24K
+wire SYSCLK=xtalDivider[11]; // 100/4096  = 24.41 KHz
+`elsif CLK_12K
+wire SYSCLK=xtalDivider[12]; // 100/8192  = 12.20 KHz
+`elsif CLK_6K
+wire SYSCLK=xtalDivider[13]; // 100/16384 = 6.10 KHz
+`elsif CLK_3K
+wire SYSCLK=xtalDivider[14]; // 100/32768 = 3.05 KHz
+`elsif CLK_1K
+wire SYSCLK=xtalDivider[15]; // 100/65536 = 1.52 KHz
+`endif
 
 CPU dut(
   .SYSCLK(SYSCLK),
@@ -29,6 +63,7 @@ CPU dut(
   // .pInstAND(P24), .pInstTAD(P25), .pInstISZ(P26), .pInstDCA(P27), .pInstJMS(P28), .pInstJMP(P29), .pInstIOT(P30), .pInstOPR(P31),
   .rx(RxD), .tx(TxD),
   .LED1(LED1), .LED2(LED2),
+  .REFRESHCLK(REFRESHCLK),
   .GREEN1(GREEN1), .GREEN2(GREEN2),
   .RED1(RED1), .RED2(RED2),
   .YELLOW1(YELLOW1), .YELLOW2(YELLOW2),
