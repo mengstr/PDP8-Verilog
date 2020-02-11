@@ -1,5 +1,5 @@
 //
-// IOTBASEDECODER.v - for the PDP-8 in Verilog project
+// InstructionIOTdecode.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module IOTBASEDECODER (
+module InstructionIOTdecode (
   input [11:0] IR,
   input IOT,
   input CK_FETCH,

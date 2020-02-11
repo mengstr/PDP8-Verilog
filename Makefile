@@ -10,13 +10,17 @@ PNRCLKGOAL  := 25
 EXTCLK_FREQ	:= 100
 EXTCLK_DIV  := 2
 SYSCLK_FREQ := $(shell expr \( $(EXTCLK_FREQ) \* 1000000 \) / $(EXTCLK_DIV) )
-
 BAUD		:= 9600
-
+OSR			:= 0000
+DEFS		:= 	-DOSR=$(OSR) \
+				-DEXTCLK_DIV=$(EXTCLK_DIV) \
+				-DSYSCLK_FREQ=$(SYSCLK_FREQ) \
+				-DBAUD=$(BAUD) 
 
 TARGET 		:= PDP8
 SOURCES		:= $(wildcard *.v)
 DIR         := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+
 
 DOCKER:=docker run --rm --log-driver=none -a stdout -a stderr -w/work -v$(DIR)/:/work
 ICESTORM:=$(DOCKER) cranphin/icestorm
@@ -30,10 +34,7 @@ all: $(TARGET).bin time
 
 $(TARGET).json: $(SOURCES) RAM.hex Makefile $(PCF)
 	$(ICESTORM) yosys \
-		-DOSR=0000 \
-		-DEXTCLK_DIV=$(EXTCLK_DIV) \
-		-DSYSCLK_FREQ=$(SYSCLK_FREQ) \
-		-DBAUD=$(BAUD) \
+		$(DEFS) \
 		-q \
 		-p 'synth_ice40 -top $(TARGET)_top -json $@' \
 		$(SOURCES) 2>&1 | tee yosys.tmp
@@ -76,8 +77,8 @@ lint: $(SOURCES)
 		-Wall \
 		-Wno-UNUSED \
 		-DNOTOP \
-		-DOSR=7777 \
-		--top-module top \
+		$(DEFS) \
+		--top-module $(TARGET)_top \
 		--lint-only \
 		$^ 2>&1 | tee lint.tmp
 
