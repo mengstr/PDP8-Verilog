@@ -85,7 +85,7 @@ wire [7:0] rxData;
 reg rxAck=0;
 
 UART uart(
-    .SYSCLK(CLK),
+    .CLK(CLK),
     .RESET(1'b0),
     .txData(txData),
     .txStb(txStb),

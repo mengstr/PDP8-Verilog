@@ -1,5 +1,5 @@
 //
-// uart.v - for the PDP-8 in Verilog project
+// UART.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,10 +7,10 @@
 `default_nettype none
 
 module UART (
-  input SYSCLK,
+  input CLK,
   input RESET,
   input [7:0] txData, // data to be transmitted serially onto tx
-  input txStb,        // positive going strobe for the txData - 1 SYSCLK
+  input txStb,        // positive going strobe for the txData - 1 CLK
   output tx,          // serial output stream in 8N1 format with high idle
   output txRdy,       // high when the uart is ready to accept new data
   input rx,
@@ -26,27 +26,27 @@ module UART (
 //
 
 
-parameter BAUDDIVIDER8X     = `SYSCLK_FREQ / (`BAUD * 8);
+parameter BAUDDIVIDER8X     = `CLK_FREQ / (`BAUD * 8);
 parameter BAUDDIVIDER_WIDTH = $clog2(BAUDDIVIDER8X);
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ BAUDRATE DIVIDER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-// Divide the SYSCLK down to the 8x baud rate as well as the real baudrate.
+// Divide the CLK down to the 8x baud rate as well as the real baudrate.
 // The 8x baud is used to time the midpoint of the samples in the RX handling.
 
 reg [BAUDDIVIDER_WIDTH-1:0] baud8x=0; 
 reg baudTick8x=0;
 reg [2:0] baudCnt=0;  // Counter to divide the 8xbaud clock to the real baudrate
-reg baudTick=0;       // Strobes at baudrate speed - 1 SYSCLK
+reg baudTick=0;       // Strobes at baudrate speed - 1 CLK
 
-always @(posedge SYSCLK) begin
+always @(posedge CLK) begin
   if (RESET) begin
   end
 end
 
-always @(posedge SYSCLK) begin
+always @(posedge CLK) begin
   baud8x <= baud8x + 1;
   if ({32'b0,baud8x}==BAUDDIVIDER8X-1) begin 
     baud8x <= 0;
@@ -74,7 +74,7 @@ reg [3:0] nextMiddle=0;
 reg rxReady=0;
 reg ping=0;
 
-always @(posedge SYSCLK) begin
+always @(posedge CLK) begin
   if (rxAck) rxReady<=0;
   if (baudTick8x) begin
     if (rxCnt==0) begin
@@ -119,7 +119,7 @@ reg [9:0] txBuf=0;    // The byte being transmitted plus Start and Stop bits
 reg [3:0] txCnt=0;    // Counter for the bits of the byte while transmitting
 reg txTriggered=0;    // Set high at txStb and low when the transmission starts
                       // at the next baudTick
-always @(posedge SYSCLK) begin
+always @(posedge CLK) begin
 
   // If upstream wants to send something, store the data and set the triggered 
   // flag to start waiting for the next baudTick
