@@ -1,44 +1,59 @@
 `timescale 100ns/10ns
+`default_nettype none
 
 module PDP8_tb();
-    reg SYSCLK=0;
+    reg CLK=0;
     reg reset=0, clear=0, run=0, halt=0;
-    // wire [11:0] dutBusPC, dutBusData;
-    // wire instAND, instTAD, instISZ, instDCA, instJMS, instJMP, instIOT, instOPR;
-
-    PDP8 dut(
-        .SYSCLK(SYSCLK),
-        .sw_RESET(reset),
-        .sw_CLEAR(clear),
-        .sw_RUN(run), 
-        .sw_HALT(halt)
-    );
+    reg RxD=1;
+    wire TxD;
+    wire LED1, LED2;
+    reg REFRESHCLK=0;
+    wire GREEN1, GREEN2, RED1, RED2, YELLOW1, YELLOW2;
+    wire PLED1, PLED2, PLED3, PLED4, PLED5, PLED6;
+    
+PDP8 dut(
+  .CLK(CLK),
+  .sw_RESET(reset),
+  .sw_CLEAR(clear),
+  .sw_RUN(run), 
+  .sw_HALT(halt),
+  .rx(RxD), .tx(TxD),
+  .LED1(LED1), .LED2(LED2),
+  .REFRESHCLK(REFRESHCLK),
+  .GREEN1(GREEN1), .GREEN2(GREEN2),
+  .RED1(RED1), .RED2(RED2),
+  .YELLOW1(YELLOW1), .YELLOW2(YELLOW2),
+  .PLED1(PLED1), .PLED2(PLED2), .PLED3(PLED3), .PLED4(PLED4), .PLED5(PLED5), .PLED6(PLED6)
+  );
     
   reg [20:0] cnt=0;
 
     always begin
-        #1 SYSCLK<=~SYSCLK;
+        #1 CLK<=~CLK;
     end
 
     // Clear/reset the entire system
     initial begin 
-        reset=1; #5 reset=0; 
+        reset=1; 
+        clear=1; 
+        #100;
+        reset=0; 
+        clear=0; 
+        #100;
+        run=1; 
+        #100;
+        run=0; 
     end  
     
-    initial begin 
-        #10 run=1; #5 run=0; 
-    end
-
     initial begin
         $dumpfile("PDP8.vcd");
         $dumpvars(0,PDP8_tb);
         #200000 begin $display("DONE after %d instructions",cnt); $finish; end
     end
 
-//    always @(dut.theSEQUENCER.stepCnt) begin
-    always @(dut.SYSCLK) begin
+    always @(CLK) begin
         if (dut.theSEQUENCER.stepCnt==5'd30) begin $display("Unhandled OP"); $finish; end
-        if (dut.theSEQUENCER.stepCnt==5'd1 && dut.SYSCLK==0) begin:PRN    
+        if (dut.theSEQUENCER.stepCnt==5'd1 && dut.CLK==0) begin:PRN    
         cnt<=cnt+1;
 //      if ((cnt%1000)==0) $display("%d",cnt);
  `ifdef TRACE
@@ -56,7 +71,6 @@ module PDP8_tb();
             if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bz)) begin $display("Z in theACC.data"); $finish; end
         end
             if (dut.theSEQUENCER.stepCnt==5'd8 & dut.busIR==12'o7402) begin $display("end by HLT after %d instructions",cnt); $finish; end
-//        if ((dut.theSEQUENCER.running==1'b1) && ($countbits(dut.busData,'x)>0)) begin $display("X in dut.busRamD"); $finish; end
 
     end
     

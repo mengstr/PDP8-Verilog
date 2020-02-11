@@ -328,7 +328,8 @@ wire ac2ramd05;
 or (ac2ramd_, ac2ramd05);
 
 wire [11:0] accIn;
-or(accIn, accIn_andadd, accIn_rotater);
+assign accIn = accIn_andadd | accIn_rotater;
+//or(accIn, accIn_andadd, accIn_rotater);
 
 wire [11:0] accout1;
 MultiLatch theACC(

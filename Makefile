@@ -12,9 +12,11 @@ EXTCLK_DIV  := 2
 SYSCLK_FREQ := $(shell expr \( $(EXTCLK_FREQ) \* 1000000 \) / $(EXTCLK_DIV) )
 BAUD		:= 9600
 OSR			:= 0000
+DEBOUNCECNT	:= 250000 
 DEFS		:= 	-DOSR=$(OSR) \
 				-DEXTCLK_DIV=$(EXTCLK_DIV) \
 				-DSYSCLK_FREQ=$(SYSCLK_FREQ) \
+				-DDEBOUNCECNT=$(DEBOUNCECNT) \
 				-DBAUD=$(BAUD) 
 
 TARGET 		:= PDP8
@@ -30,7 +32,7 @@ ICEFLASH:=../verilog_old/upload/iceflash
 
 
 all: $(TARGET).bin time
-.PHONY: all upload lint clean
+.PHONY: all upload lint clean test
 
 $(TARGET).json: $(SOURCES) RAM.hex Makefile $(PCF)
 	$(ICESTORM) yosys \
@@ -83,10 +85,21 @@ lint: $(SOURCES)
 		$^ 2>&1 | tee lint.tmp
 
 
+test:
+	$(ICARUS) iverilog -g2012 \
+		-DOSR=7777 -DEXTCLK_DIV=2 -DSYSCLK_FREQ=50000000 -DBAUD=9600 -DDEBOUNCECNT=10 \
+		-DTRACE  \
+		-o $(TARGET).vvp \
+		$(TARGET).vt $(filter-out $(TARGET)_top.v, $(SOURCES))
+	$(ICARUS) vvp $(TARGET).vvp | tools/showop.sh | tee test.tmp
+
+
 clean:
 	@rm -f *.{tmp,blif,asc,bin,rpt,dot,png,json,vvp,vcd,svg,out,log}
 	@rm -f .*_history
 	@rm -f *~
+
+
 
 
 #
