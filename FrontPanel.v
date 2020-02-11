@@ -1,5 +1,5 @@
 //
-// FRONTPANEL.v - for the PDP-8 in Verilog project
+// FrontPanel.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module FRONTPANEL(
+module FrontPanel(
   input REFRESHCLK,
   input [11:0]green,
   input [11:0]red,

@@ -1,5 +1,5 @@
 //
-// INCREMENTER.v - for the PDP-8 in Verilog project
+// Incrementer.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module INCREMENTER (
+module Incrementer (
   input [11:0] IN,
   input INC,
   input OE,

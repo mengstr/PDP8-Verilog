@@ -1,5 +1,5 @@
 //
-// MULTILATCH.v - for the PDP-8 in Verilog project
+// MultiLatch.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -11,7 +11,7 @@
 // 12 bit asynch clear register with 2 outputs having separate enables
 //
 
-module MULTILATCH (
+module MultiLatch (
   input RESET,
   input SYSCLK, 
   input [11:0] in,
@@ -36,20 +36,5 @@ always @(posedge SYSCLK) begin
     if (latch) data<=holdreg;
   end
 end
-
-
-// always @* begin
-//     if (RESET) holdreg=0;
-//     if (!hold) holdreg=in;
-// end
-
-// always @(posedge latch or posedge RESET) begin
-//   if (RESET) begin
-//     data<=0;
-//   end else begin 
-//     data<=holdreg;
-//   end
-// end
-
 
 endmodule

@@ -1,5 +1,5 @@
 //
-// INTERRUPT.v - for the PDP-8 in Verilog project
+// InstructionIOT600x.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -56,7 +56,7 @@
 //            If EAE is present, then it is set to mode "A" and the "GT" flag is cleared.
 //
 
-module INTERRUPT(
+module InstructionIOT600x(
   input SYSCLK,
   input RESET,
   input CLEAR,
@@ -81,11 +81,9 @@ module INTERRUPT(
   output irqOverride
 );
 
-
 reg IE;
 reg IEdly1, IEdly2;
 reg irqActive;
-
 
 wire        link_ck5, link_ck7;
 or(link_ck, link_ck5, link_ck7);
@@ -142,12 +140,18 @@ assign GIE=IE & ~IEdly1 & ~IEdly2;
 assign preIrq=GIE & irqRq;
 assign irqOverride=preIrq & (irqActive | ckFetch);
 
+//                            1     1      2     2      3     3      4     4      5     5      6     6
+//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 assign pc_ck0=    instSKON & stb1 & IE;           // 6000 SKON
 assign done0=     instSKON & ck2;
 
+//                            1     1      2     2      3     3      4     4      5     5      6     6
+//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 assign done1 =    instION & ck2;                  // 6001 ION
 assign done2 =    instIOF & ck2;                  // 6002 IOF
 
+//                            1     1      2     2      3     3      4     4      5     5      6     6
+//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 assign pc_ck3=    instSRQ & stb1 & irqRq;         // 6003 SRQ
 assign done3=     instSRQ & ck2;
 
@@ -157,26 +161,29 @@ reg GT=0;       // TODO Greater Than
 reg II=0;       // TODO Interrupt Inhibit bit 
 reg U=0;        // TODO User mode flag
 
+//                            1     1      2     2      3     3      4     4      5     5      6     6
+//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 assign rot2ac4=   instGTF & ck1;                  // 6004 GTF
 assign ACGTF =    instGTF & ck1 ? {LINK, GT, irqRq, II, IE , U, 1'b0, IF, 1'b0, DF} : 12'b0;
 assign clr4=      instGTF & ck1;
 assign ac_ck4=    instGTF & stb1;
 assign done4=     instGTF & ck2;
 
+//                            1     1      2     2      3     3      4     4      5     5      6     6
+//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 assign linkclr5=  instRTF & ck1;                  // 6005 RTF
 assign linkcml5=  instRTF & ck1 & AC[11]; // GIE is updated in the always @(posedge
 assign link_ck5=  instRTF & stb1;
 assign done5 =    instRTF & ck2;
 
+//                            1     1      2     2      3     3      4     4      5     5      6     6
+//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 assign rot2ac7=   instCAF & ck1;                  // 6007 CAF
 assign clr7=      instCAF & ck1;
 assign linkclr7=  instCAF & ck1;
 assign ac_ck7=    instCAF & stb1;
 assign link_ck7=  instCAF & stb1;
 assign done7=     instCAF & ck2;
-
-//                            1     1      2     2      3     3      4     4      5     5      6     6
-//                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 
 endmodule
 

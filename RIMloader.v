@@ -1,9 +1,10 @@
 //
-// LOADER.v - for the PDP-8 in Verilog project
+// RIMloader.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
+
 `default_nettype none
 
 
@@ -20,7 +21,7 @@
 // Release control over RAM address and data busses
 //
 
-module LOADER(
+module RIMloader(
  output [11:0] address,
  output reg [11:0] data,
  output we

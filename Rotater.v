@@ -1,5 +1,5 @@
 //
-// ROATAER.v - for the PDP-8 in Verilog project
+// Rotater.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module ROTATER (
+module Rotater (
   input [2:0] OP,
   input [11:0] AI,
   input LI,

@@ -1,5 +1,5 @@
 //
-// CLORIN.v - for the PDP-8 in Verilog project
+// ClrOrInv.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module CLORIN (
+module ClrOrInv (
   input [11:0] IN,
   input CLR,
   input [11:0] DOR,

@@ -1,5 +1,5 @@
 //
-// ADDAND.v - for the PDP-8 in Verilog project
+// AddAnd.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module ADDAND (
+module AddAnd (
   input [11:0] A,
   input [11:0] B,
   input CI,

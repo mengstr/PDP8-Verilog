@@ -1,5 +1,5 @@
 //
-// PROGRAMCOUNTER.v - for the PDP-8 in Verilog project
+// ProgramCounter.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module PROGRAMCOUNTER (
+module ProgramCounter (
   input SYSCLK,
   input RESET,
   input [11:0] IN,

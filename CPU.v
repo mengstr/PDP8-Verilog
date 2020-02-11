@@ -27,7 +27,7 @@
 // INCREMENTER      comb  [IN]                -> [zOUT] C
 // PROGRAMCOUNTER   seq   [IN]                -> [PC] [PCLAT]
 // SEQUENCER
-// MULTILATCH
+// MultiLatch
 // LINK
 // INTERRUPT
 // RAM
@@ -67,7 +67,7 @@ wire [11:0] busORacc;
 // ▁ ▂ ▄ ▅ ▆ ▇ █ FRONT PANEL █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-FRONTPANEL thePanel(
+FrontPanel thePanel(
   .REFRESHCLK(REFRESHCLK),
   .green(busLatPC),
   .red(busIR),
@@ -94,7 +94,7 @@ wire done_;
 wire      done05, doneIOT0, doneIOT34, done7, doneIgnore;
 or(done_, done05, doneIOT0, doneIOT34, done7, doneIgnore);
  
-SEQUENCER theSEQUENCER(
+Sequencer theSEQUENCER(
   .SYSCLK(SYSCLK),
   .RESET(sw_RESET),
   .RUN(sw_RUN),
@@ -120,7 +120,7 @@ wire pc_ck_;
 wire       pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7;
 or(pc_ck_, pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7);
 
-PROGRAMCOUNTER thePC(
+ProgramCounter thePC(
   .SYSCLK(SYSCLK),
   .RESET(sw_RESET),
   .IN(busPCin),
@@ -184,7 +184,7 @@ wire inIrq=(busIR==12'o4000) | irqOverride;
 wire instIsPPIND, instIsIND, instIsDIR, instIsMP;
 wire instAND, instTAD, instISZ, instDCA, instJMS, instJMP, instIOT, instOPR;
 
-IRDECODER theIRDECODER(
+IRdecode theIRDECODER(
   .RESET(sw_RESET),
   .PCLATCHED(busLatPC),
   .IR(busIR),
@@ -205,7 +205,7 @@ wire oprMQL, oprSWP, oprMQA, oprSCA; // OPR 3
 wire oprSCL, oprMUY, oprDVI, oprNMI, oprSHL, oprASL, oprLSR; // OPR 3
 wire oprCLA;
 
-OPRDECODER  theOPRDECODER(
+OPRdecoder  theOPRDECODER(
   .IR(busIR[8:0]),
   .OPR(instOPR),
   .opr1(opr1), .opr2(opr2), .opr3(opr3),
@@ -222,7 +222,7 @@ OPRDECODER  theOPRDECODER(
 //
 wire doSkip;
 
-SKIP theSKIP(
+Skip theSKIP(
   .AC(accout1),
   .LINK(link),
   .SZASNA(oprSZASNA),
@@ -251,7 +251,7 @@ or (mq2orbus_, mq2orbus7);
 
 wire [11:0] mqout1;
 /* verilator lint_off PINMISSING */
-MULTILATCH theMQ(
+MultiLatch theMQ(
   .RESET(sw_RESET),
   .SYSCLK(SYSCLK),
   .in(accout1),
@@ -276,7 +276,7 @@ or(link_ck_, link_ck05, link_ckIOT0, link_ck7);
 wire link;
 wire rotaterLI;
 
-LINK theLINK(
+Link theLINK(
   .SYSCLK(SYSCLK),
   .RESET(sw_RESET),
   .CLEAR(sw_RESET), //FIXME
@@ -303,7 +303,7 @@ or(ramd2ac_add_, ramd2ac_add05);
 
 wire andaddC;
 wire [11:0] accIn_andadd;
-ADDAND theADDAND(
+AddAnd theADDAND(
   .A(accout1),
   .B(busData),
   .CI(1'b0),
@@ -359,7 +359,7 @@ wire [11:0] accIn;
 or(accIn, accIn_andadd, accIn_rotater);
 
 wire [11:0] accout1;
-MULTILATCH theACC(
+MultiLatch theACC(
   .RESET(sw_RESET),
   .SYSCLK(SYSCLK),
   .in(accIn),
@@ -389,7 +389,7 @@ wire clorinCLR;
 or (clorinCLR, claDCA_, oprCLA, iotCLR0, clrTTY);
 
 wire [11:0] clorinOut;
-CLORIN theCLORIN(
+ClrOrInv theCLORIN(
   .IN(accout1),
   .CLR(clorinCLR),
   .DOR(busORacc),
@@ -404,7 +404,7 @@ CLORIN theCLORIN(
 //wire [11:0] incOut;
 wire [11:0] incOut;
 wire incC;
-INCREMENTER theINCREMENTER(
+Incrementer theINCREMENTER(
   .IN(clorinOut),
   .INC(oprIAC),
   .OE(1'b1),
@@ -422,7 +422,7 @@ or(rot2ac_, rot2ac05, rot2acIOT0, rot2ac7, rot2acTTY);
 
 wire rotaterLO;
 wire [11:0] accIn_rotater;
-ROTATER theRotater(
+Rotater theRotater(
   .OP({oprRIGHT,oprLEFT,oprX2}),
   .AI(incOut),
   .LI(rotaterLI),
@@ -449,7 +449,7 @@ wire ind2rama_;
 wire          ind2rama05;
 or(ind2rama_, ind2rama05);
 
-MULTILATCH theIndReg(
+MultiLatch theIndReg(
   .RESET(sw_RESET),
   .SYSCLK(SYSCLK),
   .in(busData),
@@ -474,7 +474,7 @@ wire ld2inc05;
 or (ld2inc_ ,ld2inc05);
 
 /* verilator lint_off PINMISSING */
-MULTILATCH theDataReg(
+MultiLatch theDataReg(
   .RESET(sw_RESET),
   .SYSCLK(SYSCLK),
   .in(busData),
@@ -496,7 +496,7 @@ wire inc2ramdIFI, inc2ramd05;
 or (inc2ramd_, inc2ramdIFI, inc2ramd05);
 
 wire incZero;
-INCREMENTER theBUSINCREMENTER(
+Incrementer theBUSINCREMENTER(
   .IN(busReg),
   .INC(1'b1),
   .OE(inc2ramd_),
@@ -543,7 +543,7 @@ assign busData    = pclat2ramd_ ? busLatPC : 12'bzzzzzzzzzzzz;
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - FETCH & INDEXING █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-INSTFETCHIND theinstFI (
+InstructionFetch theinstFI (
    .instIsIND(instIsIND),
    .instIsPPIND(instIsPPIND),
    .ckFetch(ckFetch), .ckAuto1(ckAuto1), .ckAuto2(ckAuto2), .ckInd(ckInd),
@@ -563,7 +563,7 @@ INSTFETCHIND theinstFI (
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 7xxx OPR █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-INST7 theinst7 (
+InstructionOPR theinst7 (
   .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   .doSkip(doSkip),
@@ -591,7 +591,7 @@ INST7 theinst7 (
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 0,1,2,3,4,5xxx  █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-INST0_5 theinst0_5 (
+Instructions theinst0_5 (
  .instIsDIR(instIsDIR), .instIsIND(instIsIND), .instIsPPIND(instIsPPIND),
  .instAND(instAND), .instDCA(instDCA), .instISZ(instISZ), .instJMP(instJMP), .instJMS(instJMS), .instTAD(instTAD),
   .incZero(incZero),
@@ -634,7 +634,8 @@ wire linkcmlIOT0;
 wire [11:0] busACGTF;
 wire irqOverride;
 wire GIE;
-INTERRUPT theInterrupt(
+
+InstructionIOT600x theInterrupt(
   .SYSCLK(SYSCLK),
   .RESET(sw_RESET),
   .CLEAR(sw_CLEAR),
@@ -660,12 +661,12 @@ INTERRUPT theInterrupt(
 );
 
 //
-// ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 604x/604x IOT TTY █ ▇ ▆ ▅ ▄ ▂ ▁
+// ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 603x/604x IOT TTY █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
 wire [11:0] busACTTY;
 wire clrTTY;
-TTY theTTY(
+InstructionIOT603x theTTY(
   .CLK(SYSCLK),
   .clear(sw_RESET | iotCLR0),
   .EN1(instIOT & (busIR[8:3]==6'o03)),

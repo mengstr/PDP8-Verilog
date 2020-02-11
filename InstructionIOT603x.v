@@ -1,5 +1,5 @@
 //
-// TTY.v - for the PDP-8 in Verilog project
+// InstructionIOT603x - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -56,7 +56,7 @@
 //
 
 
-module TTY(
+module InstructionIOT603x(
   input CLK,
   input clear,
   input EN1,                             // High when this module is to be activated  603x

@@ -1,5 +1,5 @@
 //
-// INST0_5.v - for the PDP-8 in Verilog project
+// Instructions.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module INST0_5 (
+module Instructions (
   input instIsDIR, instIsIND, instIsPPIND,
   input instAND, instDCA, instISZ, instJMP, instJMS, instTAD,
   input incZero,

@@ -1,5 +1,5 @@
 //
-// IRDECODER.v - for the PDP-8 in Verilog project
+// IRdecode.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module IRDECODER  (
+module IRdecode (
   input RESET,
   input [11:0]PCLATCHED,
   input [11:0]IR,
@@ -42,6 +42,5 @@ assign PPIND = !RESET & ~IOT & ~OPR & IR[8] &  isPP;
 assign IND   = !RESET & ~IOT & ~OPR & IR[8] & ~isPP;
 assign DIR   = !RESET & ~IR[8];
 assign MP    = !RESET &  IR[7];
-
 
 endmodule

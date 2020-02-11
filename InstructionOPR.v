@@ -1,5 +1,5 @@
 //
-// INST7.v - for the PDP-8 in Verilog project
+// InstructionOPR.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module INST7 (
+module InstructionOPR (
   input ck1, ck2, ck3, ck4, ck5, ck6,
   input stb1,stb2,stb3,stb4,stb5,stb6,
   input doSkip,

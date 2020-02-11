@@ -1,5 +1,5 @@
 //
-// INSTFETCHIND.v - for the PDP-8 in Verilog project
+// InstructionFetch.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module INSTFETCHIND (
+module InstructionFetch (
   input instIsIND,
   input instIsPPIND,
   input ckFetch, ckAuto1, ckAuto2, ckInd,
