@@ -6,7 +6,7 @@
 
 `default_nettype none
 
-module CPU(
+module PDP8(
   input CLK,
   input sw_RESET,    // Reset CPU (power on reset)
   input sw_CLEAR,    // Clear CPU (button)

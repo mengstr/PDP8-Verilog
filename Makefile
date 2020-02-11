@@ -14,7 +14,7 @@ SYSCLK_FREQ := $(shell expr \( $(EXTCLK_FREQ) \* 1000000 \) / $(EXTCLK_DIV) )
 BAUD		:= 9600
 
 
-TARGET 		:= pdp8
+TARGET 		:= PDP8
 SOURCES		:= $(wildcard *.v)
 DIR         := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
@@ -35,7 +35,7 @@ $(TARGET).json: $(SOURCES) RAM.hex Makefile $(PCF)
 		-DSYSCLK_FREQ=$(SYSCLK_FREQ) \
 		-DBAUD=$(BAUD) \
 		-q \
-		-p 'synth_ice40 -top top -json $@' \
+		-p 'synth_ice40 -top $(TARGET)_top -json $@' \
 		$(SOURCES) 2>&1 | tee yosys.tmp
 
 

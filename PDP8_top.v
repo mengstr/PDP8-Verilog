@@ -1,12 +1,12 @@
 //
-// top.v - for the PDP-8 in Verilog project
+// PDP8_top.v - for the PDP-8 in Verilog project
 //
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
 `default_nettype none
 
-module top(
+module PDP8_top(
   input EXTCLK,
   input nBUT1, nBUT2,
   output reg LED1, LED2,
@@ -24,7 +24,7 @@ always @(posedge EXTCLK) xtalDivider<=xtalDivider+1;
 wire REFRESHCLK = xtalDivider[10]; // 100M/2048 = 48.82 KHz
 wire CLK        = xtalDivider[$clog2(`EXTCLK_DIV)-1]; 
 
-CPU dut(
+PDP8 cpu(
   .CLK(CLK),
   .sw_RESET(~nBUT2),
   .sw_CLEAR(~nBUT2),
