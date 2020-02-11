@@ -14,7 +14,7 @@ module RAM(
   output [11:0] dataO
 );
 
-initial $readmemh("RAM.hex", mem);
+initial $readmemh("initialRAM.hex", mem);
 reg [11:0] mem [0:4095];
 reg [11:0] DO;
 
