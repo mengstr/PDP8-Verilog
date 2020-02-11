@@ -1,3 +1,10 @@
+//
+// FRONTPANEL.v - for the PDP-8 in Verilog project
+//
+// github.com/SmallRoomLabs/PDP8-Verilog
+// Mats Engstrom - mats.engstrom@gmail.com
+//
+
 `default_nettype none
 
 module FRONTPANEL(

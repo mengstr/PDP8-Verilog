@@ -25,41 +25,8 @@ module UART (
 //               +-------+     +     +     +     +     +     +     +     +------+
 //
 
-`ifdef CLK_50M
-parameter  XTAL = 100_000_000 / 2;
-`elsif CLK_25M
-parameter  XTAL = 100_000_000 / 4;
-`elsif CLK_12M
-parameter  XTAL = 100_000_000 / 8;
-`elsif CLK_6M
-parameter  XTAL = 100_000_000 / 16;
-`elsif CLK_3M
-parameter  XTAL = 100_000_000 / 32;
-`elsif CLK_1M
-parameter  XTAL = 100_000_000 / 64;
-`elsif CLK_800K
-parameter  XTAL = 100_000_000 / 128;
-`elsif CLK_400K
-parameter  XTAL = 100_000_000 / 256;
-`elsif CLK_200K
-parameter  XTAL = 100_000_000 / 512;
-`elsif CLK_100K
-parameter  XTAL = 100_000_000 / 1024;
-`elsif CLK_50K
-parameter  XTAL = 100_000_000 / 2048;
-`elsif CLK_24K
-parameter  XTAL = 100_000_000 / 4096;
-`elsif CLK_12K
-parameter  XTAL = 100_000_000 / 8192;
-`elsif CLK_6K
-parameter  XTAL = 100_000_000 / 16384;
-`elsif CLK_3K
-parameter  XTAL = 100_000_000 / 32768;
-`elsif CLK_1K
-parameter  XTAL = 100_000_000 / 65536;
-`endif
 
-parameter BAUDDIVIDER8X     = XTAL/(`BAUD*8);
+parameter BAUDDIVIDER8X     = `SYSCLK_FREQ / (`BAUD * 8);
 parameter BAUDDIVIDER_WIDTH = $clog2(BAUDDIVIDER8X);
 
 //

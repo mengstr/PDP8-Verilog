@@ -5,13 +5,11 @@ PORT:=/dev/cu.usbmodem48065801
 DEVICE 		:= hx1k
 PACKAGE 	:= vq100
 PCF    		:= olimex-pdp8.pcf
-XTAL		:= 100
 PNRCLKGOAL  := 25
 
-# CLK_50M, CLK_25M, CLK_12M, CLK_6M, CLK_3M, CLK_1M, 
-# CLK_800K, CLK_400K, CLK_200K, CLK_100K, CLK_50K, 
-# CLK_24K, CLK_12K, CLK_6, CLK_3, CLK_1K
-CLK			:= CLK_400K
+EXTCLK_FREQ	:= 100
+EXTCLK_DIV  := 2
+SYSCLK_FREQ := $(shell expr \( $(EXTCLK_FREQ) \* 1000000 \) / $(EXTCLK_DIV) )
 
 BAUD		:= 9600
 
@@ -30,12 +28,11 @@ ICEFLASH:=../verilog_old/upload/iceflash
 all: $(TARGET).bin time
 .PHONY: all upload lint clean
 
-
-$(TARGET).json: $(SOURCES) RAM.hex
+$(TARGET).json: $(SOURCES) RAM.hex Makefile $(PCF)
 	$(ICESTORM) yosys \
 		-DOSR=0000 \
-		-DAPA \
-		-D$(CLK) \
+		-DEXTCLK_DIV=$(EXTCLK_DIV) \
+		-DSYSCLK_FREQ=$(SYSCLK_FREQ) \
 		-DBAUD=$(BAUD) \
 		-q \
 		-p 'synth_ice40 -top top -json $@' \
@@ -43,7 +40,8 @@ $(TARGET).json: $(SOURCES) RAM.hex
 
 
 $(TARGET).asc: $(TARGET).json
-	@$(ICESTORM) nextpnr-ice40 \
+	$(ICESTORM) nextpnr-ice40 \
+		-q \
 		--$(DEVICE) \
 		--package $(PACKAGE) \
 		--pcf $(PCF) \
