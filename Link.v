@@ -7,7 +7,7 @@
 `default_nettype none
 
 module Link (
-input SYSCLK,
+input CLK,
 input RESET,
 input CLEAR,
 input LINK_CK,
@@ -19,6 +19,7 @@ output reg L,
 output TO_ROTATER
 );
 
+//FIXME should be clocked with CLK not LINK_CK
 always @(posedge LINK_CK or posedge CLEAR) begin 
 /* verilator lint_off SYNCASYNCNET */
   // FIXME

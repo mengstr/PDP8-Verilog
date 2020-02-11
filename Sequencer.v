@@ -7,7 +7,7 @@
 `default_nettype none
 
 module Sequencer (
-  input SYSCLK,           //
+  input CLK,           //
   input RESET,            //
   input DONE,             // Reset step counter before the natural end at step 31
   input RUN,              // Rising edge starts continous run
@@ -22,9 +22,9 @@ module Sequencer (
 
 reg [4:0] stepCnt; 
 wire run;
-Debounce_Switch debRun(SYSCLK, RUN, run);
+Debounce_Switch debRun(CLK, RUN, run);
  
-always @(posedge SYSCLK) begin 
+always @(posedge CLK) begin 
     if (RESET) begin
         running<=0;
         stepCnt<=31;

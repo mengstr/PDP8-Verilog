@@ -22,10 +22,10 @@ reg [15:0] xtalDivider;
 always @(posedge EXTCLK) xtalDivider<=xtalDivider+1;
 
 wire REFRESHCLK = xtalDivider[10]; // 100M/2048 = 48.82 KHz
-wire SYSCLK     = xtalDivider[$clog2(`EXTCLK_DIV)-1]; 
+wire CLK        = xtalDivider[$clog2(`EXTCLK_DIV)-1]; 
 
 CPU dut(
-  .SYSCLK(SYSCLK),
+  .CLK(CLK),
   .sw_RESET(~nBUT2),
   .sw_CLEAR(~nBUT2),
   .sw_RUN(~nBUT1), 

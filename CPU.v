@@ -4,48 +4,20 @@
 // Mats Engstrom - mats.engstrom@gmail.com
 //
 
-// Bus        Sends to                                  Receives from
-// -------------------------------------------------------------------------------------------------------
-// [REG]      [PCIN], INCREMENTER                       INDREG, DATAREG
-// [IR]       OC12A, OC12B                              IR
-// [DATA]     [PCIN], [RAMDATA],IR, INDREG, DATAREG     4000, [RAMDATA], INCREMENTER
-// [RAMDATA]  [DATA], MEMORY                            [DATA], MEMORY
-// [RAMADDR]  MEMORY                                    [PC], OC12B, INDREG
-// [PC]       [DATA], [RAMADDR]                         PC
-// [LATPC]    OC12A, OC12B                              PC
-// [PCIN]     PC, [REG],                                [DATA], OC12A ,'NEWPC'
-//
-//
-// CPU
-// ADDAND           comb  [A] [B]             -> [zOUT]
-// CLORIN           comb  [IN] CLR [OR] INV   -> [OUT]
-// ROTATER          comb  [IN] L              -> [zOUT] L
-// OPRDECODER       comb  [IR]                -> opr*
-// SKIP             comb  [AC] flags*         -> OUT
-// IRDECODER        comb  [PCL] [IR]          -> instType*
-// IOTBASEDECODER   comb  [IR]                -> iotRange*
-// INCREMENTER      comb  [IN]                -> [zOUT] C
-// PROGRAMCOUNTER   seq   [IN]                -> [PC] [PCLAT]
-// SEQUENCER
-// MultiLatch
-// LINK
-// INTERRUPT
-// RAM
-// TTY
-//
-
 `default_nettype none
 
 module CPU(
-  input SYSCLK,
+  input CLK,
   input sw_RESET,    // Reset CPU (power on reset)
   input sw_CLEAR,    // Clear CPU (button)
   input sw_RUN,      // Start CPU
   input sw_HALT,     // Halt CPU at next instruction
+  output LED1, LED2,
+  // UART
   input rx,
   output tx,
-  output LED1, LED2,
-  input REFRESHCLK,
+  // FrontPanel
+  input  REFRESHCLK,
   output GREEN1, GREEN2,
   output RED1, RED2,
   output YELLOW1, YELLOW2,
@@ -95,7 +67,7 @@ wire      done05, doneIOT0, doneIOT34, done7, doneIgnore;
 or(done_, done05, doneIOT0, doneIOT34, done7, doneIgnore);
  
 Sequencer theSEQUENCER(
-  .SYSCLK(SYSCLK),
+  .CLK(CLK),
   .RESET(sw_RESET),
   .RUN(sw_RUN),
   .HALT(sw_HALT | (oprHLT & ck2)),
@@ -121,7 +93,7 @@ wire       pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7;
 or(pc_ck_, pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7);
 
 ProgramCounter thePC(
-  .SYSCLK(SYSCLK),
+  .CLK(CLK),
   .RESET(sw_RESET),
   .IN(busPCin),
   .LD(pc_ld_),
@@ -145,7 +117,7 @@ wire        ram_weIFI, ram_we05;
 or(ram_we_, ram_weIFI, ram_we05);
 
 RAM theRAM(
-  .clk(SYSCLK),
+  .clk(CLK),
   .oe(ram_oe_),
   .we(ram_we_),
   .addr(busAddress), 
@@ -166,7 +138,7 @@ RAM theRAM(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ IR █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 IR theIR(
-  .SYSCLK(SYSCLK),
+  .CLK(CLK),
   .RESET(sw_RESET),
   .ckFetch(ckFetch),
   .busData(irqOverride ? 12'o4000 : busData),
@@ -253,7 +225,7 @@ wire [11:0] mqout1;
 /* verilator lint_off PINMISSING */
 MultiLatch theMQ(
   .RESET(sw_RESET),
-  .SYSCLK(SYSCLK),
+  .CLK(CLK),
   .in(accout1),
   .latch(mq_ck_), 
   .hold(mq_hold_),
@@ -277,7 +249,7 @@ wire link;
 wire rotaterLI;
 
 Link theLINK(
-  .SYSCLK(SYSCLK),
+  .CLK(CLK),
   .RESET(sw_RESET),
   .CLEAR(sw_RESET), //FIXME
   .LINK_CK(link_ck_),
@@ -361,7 +333,7 @@ or(accIn, accIn_andadd, accIn_rotater);
 wire [11:0] accout1;
 MultiLatch theACC(
   .RESET(sw_RESET),
-  .SYSCLK(SYSCLK),
+  .CLK(CLK),
   .in(accIn),
   .latch(ac_ck_),
   .hold(1'b0),
@@ -451,7 +423,7 @@ or(ind2rama_, ind2rama05);
 
 MultiLatch theIndReg(
   .RESET(sw_RESET),
-  .SYSCLK(SYSCLK),
+  .CLK(CLK),
   .in(busData),
   .latch(ind_ck_),
   .hold(1'b0),
@@ -476,7 +448,7 @@ or (ld2inc_ ,ld2inc05);
 /* verilator lint_off PINMISSING */
 MultiLatch theDataReg(
   .RESET(sw_RESET),
-  .SYSCLK(SYSCLK),
+  .CLK(CLK),
   .in(busData),
   .latch(data_ck_),
   .hold(1'b0),
@@ -636,7 +608,7 @@ wire irqOverride;
 wire GIE;
 
 InstructionIOT600x theInterrupt(
-  .SYSCLK(SYSCLK),
+  .CLK(CLK),
   .RESET(sw_RESET),
   .CLEAR(sw_CLEAR),
   .EN(instIOT & (busIR[8:3]==6'o00)),
@@ -667,7 +639,7 @@ InstructionIOT600x theInterrupt(
 wire [11:0] busACTTY;
 wire clrTTY;
 InstructionIOT603x theTTY(
-  .CLK(SYSCLK),
+  .CLK(CLK),
   .clear(sw_RESET | iotCLR0),
   .EN1(instIOT & (busIR[8:3]==6'o03)),
   .EN2(instIOT & (busIR[8:3]==6'o04)),

@@ -57,7 +57,7 @@
 //
 
 module InstructionIOT600x(
-  input SYSCLK,
+  input CLK,
   input RESET,
   input CLEAR,
   input EN,                             // High when this module is to be activated
@@ -121,7 +121,7 @@ wire instCAF= (EN & (IR==3'o7));
 wire AC8=~AC[8];
 wire preIrq;
 
-always @(posedge SYSCLK) begin
+always @(posedge CLK) begin
   if (CLEAR | RESET)       begin IE<=0; IEdly1<=0; IEdly2<=0; irqActive<=0; end
   if (ckFetch & ~stbFetch & preIrq)    begin irqActive<=1; end
   if (stb1 & instCAF)      begin IE<=0; IEdly1<=0; IEdly2<=0; end

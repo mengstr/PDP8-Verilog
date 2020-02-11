@@ -8,7 +8,7 @@
 
 
 module IR(
-  input SYSCLK,
+  input CLK,
   input RESET,
   input ckFetch,
   input [11:0] busData,
@@ -17,7 +17,7 @@ module IR(
 
 reg lastCkFetch=0;
 
-always @(posedge SYSCLK) begin
+always @(posedge CLK) begin
   if (RESET) begin 
     lastCkFetch<=0;
     busIR<=0;

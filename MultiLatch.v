@@ -13,7 +13,7 @@
 
 module MultiLatch (
   input RESET,
-  input SYSCLK, 
+  input CLK, 
   input [11:0] in,
   input hold,
   input latch,
@@ -27,7 +27,7 @@ reg [11:0] holdreg=0;
 assign out1=oe1 ? data : 12'bz;
 assign out2=oe2 ? data : 12'bz;
 
-always @(posedge SYSCLK) begin
+always @(posedge CLK) begin
   if (RESET) begin
     holdreg<=0;
     data<=0;
