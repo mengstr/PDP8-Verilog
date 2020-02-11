@@ -8,7 +8,7 @@ T2H=tools/tape2hexram.sh
     file="${filename%.*}"
     ext="${filename##*.}"
     echo Assembling $filename
-    $PAL -r hex/src/$filename
+    $PAL -a -r hex/src/$filename
     echo Convering $filename to hex
     $T2H < hex/src/$file.rim > hex/src/$file.hex
     mv -v -f hex/src/$file.hex hex/
