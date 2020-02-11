@@ -36,7 +36,7 @@ $(TARGET).json: $(SOURCES) RAM.hex Makefile $(PCF)
 		-DBAUD=$(BAUD) \
 		-q \
 		-p 'synth_ice40 -top top -json $@' \
-		$(SOURCES) 2>&1 | tee $(TARGET).yosys
+		$(SOURCES) 2>&1 | tee yosys.tmp
 
 
 $(TARGET).asc: $(TARGET).json
@@ -48,11 +48,11 @@ $(TARGET).asc: $(TARGET).json
 		--freq $(PNRCLKGOAL) \
 		--pcf-allow-unconstrained \
 		--json $< \
-		--asc $@ 2>&1 | tee $(TARGET).nextpnr 
+		--asc $@ 2>&1 | tee nextpnr.tmp
 		
 
 $(TARGET).bin: $(TARGET).asc
-	@$(ICESTORM) icepack $< $@ 2>&1 | tee $(TARGET).icepack
+	@$(ICESTORM) icepack $< $@ 2>&1 | tee icepack.tmp
 
 
 time:
@@ -61,9 +61,9 @@ time:
 		-c $(PNRCLKGOAL) \
 		-m \
 		-t \
-		-r $(TARGET).icetime \
-		$(TARGET).asc 2>&1 > $(TARGET).icetime_
-	@cat $(TARGET).icetime_ | grep -A1 'Timing' | sed 's/\/\/ /        /g'
+		-r icetime1.tmp \
+		$(TARGET).asc 2>&1 > icetime2.tmp
+	@cat icetime2.tmp | grep -A1 'Timing' | sed 's/\/\/ /        /g'
 
 
 upload:$(TARGET).bin
@@ -79,12 +79,11 @@ lint: $(SOURCES)
 		-DOSR=7777 \
 		--top-module top \
 		--lint-only \
-		$^ 2>&1 | tee $(TARGET).lint
+		$^ 2>&1 | tee lint.tmp
 
 
 clean:
-	@rm -f *.{tmp,tmp2,blif,asc,bin,rpt,dot,png,json,vvp,vcd,svg,out,log,hex}
-	@rm -f pdp8.*
+	@rm -f *.{tmp,blif,asc,bin,rpt,dot,png,json,vvp,vcd,svg,out,log}
 	@rm -f .*_history
 	@rm -f *~
 
