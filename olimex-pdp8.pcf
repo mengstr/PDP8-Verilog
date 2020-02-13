@@ -24,6 +24,10 @@ set_io PLED3   24          # 3_12A
 set_io PLED4   19          # 3_8B
 set_io PLED5   20          # 3_10A
 set_io PLED6   21          # 3_10B
+set_io SW1     13          # 3_6B
+set_io SW2     16          # 3_7B
+set_io SW3     18          # 3_8A
+
 
 #
 # Pins for SRAM on the olimex board
@@ -86,11 +90,8 @@ set_io -nowarn  P47 8               # 3_3B
 set_io -nowarn  P49 9               # 3_5A
 set_io -nowarn  P51 10              # 3_5B
 set_io -nowarn  P53 12              # 3_6A
-set_io -nowarn  P55 13              # 3_6B
-set_io -nowarn  P57 16              # 3_7B
-set_io -nowarn  P59 18              # 3_8A
 set_io -nowarn  SPISDO 45           # IOB_45_SDO SPI
-set_io -nowarn  SPISDI 46            # IOB_46_SDI SPI
+set_io -nowarn  SPISDI 46           # IOB_46_SDI SPI
 
 
 

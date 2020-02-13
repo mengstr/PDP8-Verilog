@@ -21,7 +21,8 @@ module PDP8(
   output GREEN1, GREEN2,
   output RED1, RED2,
   output YELLOW1, YELLOW2,
-  output PLED1, PLED2, PLED3, PLED4, PLED5, PLED6
+  output PLED1, PLED2, PLED3, PLED4, PLED5, PLED6,
+  input SW1, SW2, SW3
 );
 
 
@@ -38,16 +39,22 @@ wire [11:0] busORacc;
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ FRONT PANEL █ ▇ ▆ ▅ ▄ ▂ ▁
 //
+wire [11:0]switches;
+wire [5:0]buttons;
 
 FrontPanel thePanel(
   .REFRESHCLK(REFRESHCLK),
   .green(busLatPC),
-  .red(busIR),
-  .yellow(accout1),
+  .red(busIR|{6'b0,buttons}),
+  .yellow(switches),
+  // .yellow(accout1),
+  .switches(switches),
+  .buttons(buttons),
   .GREEN1(GREEN1), .GREEN2(GREEN2),
   .RED1(RED1), .RED2(RED2),
   .YELLOW1(YELLOW1), .YELLOW2(YELLOW2),
-  .PLED1(PLED1), .PLED2(PLED2), .PLED3(PLED3), .PLED4(PLED4), .PLED5(PLED5), .PLED6(PLED6)
+  .PLED1(PLED1), .PLED2(PLED2), .PLED3(PLED3), .PLED4(PLED4), .PLED5(PLED5), .PLED6(PLED6),
+  .SW1(SW1), .SW2(SW2), .SW3(SW3)
  );
 
 wire irqRq;           // Some device is asserting irq
