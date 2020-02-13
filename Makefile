@@ -31,50 +31,74 @@ VERILATOR:=$(DOCKER) --entrypoint /usr/local/bin/verilator verilator/verilator
 ICEFLASH:=../verilog_old/upload/iceflash 
 
 
-all: $(TARGET).bin time
-.PHONY: all upload lint clean test
+all: $(TARGET).bin time report
+.PHONY: all report upload lint clean test
 
-$(TARGET).json: $(SOURCES) RAM.hex Makefile $(PCF)
-	$(ICESTORM) yosys \
-		$(DEFS) \
-		-q \
-		-p 'synth_ice40 -top $(TARGET)_top -json $@' \
-		$(SOURCES) 2>&1 | tee yosys.tmp
+$(TARGET).json: $(SOURCES) initialRAM.hex Makefile $(PCF)
+	@echo "###"
+	@echo "### yosys $(DEFS)"
+	@echo "###"
+	@$(ICESTORM) yosys \
+	$(DEFS) \
+	-q \
+	-p 'synth_ice40 -top $(TARGET)_top -json $@' \
+	$(SOURCES) > yosys.tmp
 
 
 $(TARGET).asc: $(TARGET).json
-	$(ICESTORM) nextpnr-ice40 \
-		-q \
-		--$(DEVICE) \
-		--package $(PACKAGE) \
-		--pcf $(PCF) \
-		--freq $(PNRCLKGOAL) \
-		--pcf-allow-unconstrained \
-		--json $< \
-		--asc $@ 2>&1 | tee nextpnr.tmp
-		
+	@echo "###"
+	@echo "### nextpnr --freq $(PNRCLKGOAL)"
+	@echo "###"
+	@$(ICESTORM) nextpnr-ice40 \
+	--$(DEVICE) \
+	--package $(PACKAGE) \
+	--pcf $(PCF) \
+	--freq $(PNRCLKGOAL) \
+	--pcf-allow-unconstrained \
+	--json $< \
+	--asc $@  2>nextpnr2.tmp 1>nextpnr1.tmp
+
 
 $(TARGET).bin: $(TARGET).asc
-	@$(ICESTORM) icepack $< $@ 2>&1 | tee icepack.tmp
+	@echo "###"
+	@echo "### icepack"
+	@echo "###"
+	@$(ICESTORM) icepack \
+	$< \
+	$@ 2>&1 | tee icepack.tmp
 
 
 time:
+	@echo "###"
+	@echo "### icetime -c $(PNRCLKGOAL)"
+	@echo "###"
 	@$(ICESTORM) icetime \
-		-d $(DEVICE) \
-		-c $(PNRCLKGOAL) \
-		-m \
-		-t \
-		-r icetime1.tmp \
-		$(TARGET).asc 2>&1 > icetime2.tmp
-	@cat icetime2.tmp | grep -A1 'Timing' | sed 's/\/\/ /        /g'
+	-d $(DEVICE) \
+	-c $(PNRCLKGOAL) \
+	-m \
+	-t \
+	-r icetime0.tmp \
+	$(TARGET).asc 2>icetime2.tmp 1>icetime1.tmp
+
+report:
+	@echo ""
+	@grep "Device utilisation:" -A6 nextpnr2.tmp | tail -6 | sed "s/Info://g" | cut -c 9-
+	@cat icetime1.tmp | grep -A1 'Timing' | sed 's/\/\/ /  /g'
+	@echo ""
 
 
 upload:$(TARGET).bin
+	@echo "###"
+	@echo "### iceflash $(PORT) -h -e -w $(TARGET).bin -t -G"
+	@echo "###"
 	@$(ICEFLASH) $(PORT) -h -e -w $(TARGET).bin -t -G
 	tio $(PORT) 
 
 
 lint: $(SOURCES)
+	@echo "###"
+	@echo "### verilator --lint-only $(DEFS)"
+	@echo "###"
 	@$(VERILATOR) \
 		-Wall \
 		-Wno-UNUSED \
@@ -86,7 +110,10 @@ lint: $(SOURCES)
 
 
 test:
-	$(ICARUS) iverilog -g2012 \
+	@echo "###"
+	@echo "### iverilog -DOSR=7777 -DCLK_FREQ=4000000 -DBAUD=100000 -DDEBOUNCECNT=10"
+	@echo "###"
+	@$(ICARUS) iverilog -g2012 \
 		-DOSR=7777 -DCLK_FREQ=4000000 -DBAUD=100000 -DDEBOUNCECNT=10 \
 		-DTRACE  \
 		-o $(TARGET).vvp \
