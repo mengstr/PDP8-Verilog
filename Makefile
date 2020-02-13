@@ -31,7 +31,7 @@ VERILATOR:=$(DOCKER) --entrypoint /usr/local/bin/verilator verilator/verilator
 ICEFLASH:=../verilog_old/upload/iceflash 
 
 
-all: $(TARGET).bin time report
+all: $(TARGET).bin report
 .PHONY: all report upload lint clean test
 
 $(TARGET).json: $(SOURCES) initialRAM.hex Makefile $(PCF)
@@ -68,7 +68,7 @@ $(TARGET).bin: $(TARGET).asc
 	$@ 2>&1 | tee icepack.tmp
 
 
-time:
+icetime0.tmp: $(TARGET).asc
 	@echo "###"
 	@echo "### icetime -c $(PNRCLKGOAL)"
 	@echo "###"
@@ -80,7 +80,7 @@ time:
 	-r icetime0.tmp \
 	$(TARGET).asc 2>icetime2.tmp 1>icetime1.tmp
 
-report:
+report: icetime0.tmp
 	@echo ""
 	@grep "Device utilisation:" -A6 nextpnr2.tmp | tail -6 | sed "s/Info://g" | cut -c 9-
 	@cat icetime1.tmp | grep -A1 'Timing' | sed 's/\/\/ /  /g'
