@@ -1,0 +1,57 @@
+
+`default_nettype none
+
+module Skip_tb();
+
+reg [11:0]AC;
+reg LINK,SZASNA,SMASPA,SNLSZL,TSTINV;
+wire OUT,OUT2;
+
+Skip skip (
+  .AC(AC),
+  .LINK(LINK),
+  .SZASNA(SZASNA),
+  .SMASPA(SMASPA),
+  .SNLSZL(SNLSZL),
+  .TSTINV(TSTINV),
+  .OUT(OUT)
+);
+
+Skip2 skip2 (
+  .AC(AC),
+  .LINK(LINK),
+  .SZASNA(SZASNA),
+  .SMASPA(SMASPA),
+  .SNLSZL(SNLSZL),
+  .TSTINV(TSTINV),
+  .OUT(OUT2)
+);
+
+  integer ac;		
+  integer link;		
+  integer szasna,smaspa,snlszl;		
+  integer tstinv;		
+
+initial begin
+  $dumpfile("Skip.vcd");
+  $dumpvars(0,Skip_tb);
+  for (ac=0; ac<4096; ac=ac+1) begin		
+    for (link=0; link<2; link=link+1) begin		
+      for (szasna=0; szasna<2; szasna=szasna+1) begin		
+        for (smaspa=0; smaspa<2; smaspa=smaspa+1) begin		
+          for (snlszl=0; snlszl<2; snlszl=snlszl+1) begin		
+            for (tstinv=0; tstinv<2; tstinv=tstinv+1) begin		
+              AC=ac; LINK=link;	TSTINV=tstinv;
+              SZASNA=szasna; SMASPA=smaspa; SNLSZL=snlszl;
+              #1;		
+              if(OUT!=OUT2) $display("SKIP @ ","ac:",AC," link:",LINK," szasna,smaspa,snlszl:",SZASNA,SMASPA,SNLSZL," tstinv:",TSTINV);		
+            end
+          end
+        end		
+      end		
+    end		
+  end
+  $finish;
+end
+
+endmodule

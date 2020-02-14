@@ -17,7 +17,20 @@ module Skip (
   output OUT
 );
 
-// TODO: Redo Skip with regular logic
-assign OUT = ((((1'b1 ^ (AC!=0 | AC[11])) & SZASNA) | (AC[11] & SMASPA) | (LINK & SNLSZL)) ^ TSTINV);
+// assign OUT = ((((1'b1 ^ (AC!=0 | AC[11])) & SZASNA) | (AC[11] & SMASPA) | (LINK & SNLSZL)) ^ TSTINV);
+
+wire ACa      = AC[0] | AC[1] |  AC[2] | AC[3];
+wire ACb      = AC[4] | AC[5] |  AC[6] | AC[7];
+wire ACc      = AC[8] | AC[9] | AC[10] | AC[11];
+wire ACd      = ACa | ACb | ACc;
+wire ACisZero = ~ACd;
+
+wire zeroOK   = ACisZero & SZASNA;
+wire negOK    = AC[11] & SMASPA;
+wire linkOK   = LINK & SNLSZL;
+
+wire skip     = zeroOK | negOK | linkOK;
+
+assign OUT    = skip ^ TSTINV;
 
 endmodule
