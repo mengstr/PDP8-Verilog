@@ -120,6 +120,11 @@ test:
 		$(TARGET).vt $(filter-out $(TARGET)_top.v, $(SOURCES))
 	$(ICARUS) vvp $(TARGET).vvp | tools/showop.sh | tee test.tmp
 
+modules:
+	$(ICARUS) iverilog -g2012 -o Skip.vvp Skip.vt Skip.v
+	$(ICARUS) vvp Skip.vvp 
+
+
 
 clean:
 	@rm -f *.{tmp,blif,asc,bin,rpt,dot,png,json,vvp,vcd,svg,out,log}
