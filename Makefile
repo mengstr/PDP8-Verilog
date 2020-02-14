@@ -111,10 +111,10 @@ lint: $(SOURCES)
 
 test:
 	@echo "###"
-	@echo "### iverilog -DOSR=7777 -DCLK_FREQ=4000000 -DBAUD=100000 -DDEBOUNCECNT=10"
+	@echo "### iverilog -DOSR=7777 -DCLK_FREQ=4000000 -DBAUD=10000 -DDEBOUNCECNT=10"
 	@echo "###"
 	@$(ICARUS) iverilog -g2012 \
-		-DOSR=7777 -DCLK_FREQ=4000000 -DBAUD=100000 -DDEBOUNCECNT=10 \
+		-DOSR=7777 -DCLK_FREQ=4000000 -DBAUD=10000 -DDEBOUNCECNT=10 \
 		-DTRACE  \
 		-o $(TARGET).vvp \
 		$(TARGET).vt $(filter-out $(TARGET)_top.v, $(SOURCES))

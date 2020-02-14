@@ -15,7 +15,7 @@ module Incrementer (
   output C
 );
 
-assign OUT=(OE==1 ? IN+{11'b0,INC} : 12'bzzzzzzzzzzzz);
+assign OUT=(OE==1 ? IN+{11'b0,INC} : 12'b0);
 assign C=(INC==1 && IN==4095);
 
 endmodule

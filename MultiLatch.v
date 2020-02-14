@@ -24,9 +24,6 @@ module MultiLatch (
 reg [11:0] data=0;
 reg [11:0] holdreg=0;
 
-assign out1=oe1 ? data : 12'bz;
-assign out2=oe2 ? data : 12'bz;
-
 always @(posedge CLK) begin
   if (RESET) begin
     holdreg<=0;
@@ -36,5 +33,8 @@ always @(posedge CLK) begin
     if (latch) data<=holdreg;
   end
 end
+
+assign out1=oe1 ? data : 12'b0;
+assign out2=oe2 ? data : 12'b0;
 
 endmodule

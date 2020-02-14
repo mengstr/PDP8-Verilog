@@ -24,6 +24,6 @@ always @(negedge clk) begin
   if (oe) DO<=mem[addr];
 end
 
-assign dataO=oe ? DO : 12'bz;
+assign dataO=oe ? DO : 12'b0;
 
 endmodule

@@ -27,14 +27,27 @@ module PDP8(
 
 
 // The buses
-wire [11:0] busReg;
+wire [11:0] busReg_;
+wire [11:0] busReg_ind, busReg_data;
+assign busReg_=busReg_ind | busReg_data;
+
 reg [11:0] busIR;
-wire [11:0] busData;
-wire [11:0] busAddress;
+wire [11:0] busAddress_;
+wire [11:0] busAddress_ind, busAddress_pc, busAddress_ir;
+assign busAddress_=busAddress_ind | busAddress_pc | busAddress_ir;
+
 wire [11:0] busPC;
 wire [11:0] busLatPC;
-wire [11:0] busPCin;
+
+wire [11:0] busPCin_;
+assign busPCin_ = busPCin_ir | busPCin_reg; 
+wire [11:0] busPCin_ir,busPCin_reg;
+
 wire [11:0] busORacc;
+
+wire [11:0] busData_; 
+wire [11:0] busData_inc, busData_ram, busData_acc, busData_pc, busData_latpc;
+assign busData_ = busData_inc | busData_ram |busData_acc | busData_pc | busData_latpc;
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ FRONT PANEL █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -102,7 +115,7 @@ or(pc_ck_, pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7);
 ProgramCounter thePC(
   .CLK(CLK),
   .RESET(sw_RESET),
-  .IN(busPCin),
+  .IN(busPCin_),
   .LD(pc_ld_),
   .CK(pc_ck_ & ~(inIrq & ckFetch)),
   .LATCH(1'b0),
@@ -127,19 +140,11 @@ RAM theRAM(
   .clk(CLK),
   .oe(ram_oe_),
   .we(ram_we_),
-  .addr(busAddress), 
-  .dataI(busData),
-  .dataO(busData) 
+  .addr(busAddress_), 
+  .dataI(busData_), 
+  .dataO(busData_ram)  
 );
 
-// wire i=theInterrupt.flgGIE & (!theInterrupt.flgNoInt);
-// reg ckF=0;
-// always @(posedge CLK) begin
-// //  if (ckFetch) busIR<= busData;
-//   if (instJMS & ck2 & i & irqRq) theInterrupt.flgGIE<=0;
-//   if (ckFetch & !ckF) busIR<= (i & irqRq) ? 12'o4000 : busData;
-//   ckF<=ckFetch;
-// end
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ IR █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -148,7 +153,7 @@ IR theIR(
   .CLK(CLK),
   .RESET(sw_RESET),
   .ckFetch(ckFetch),
-  .busData(irqOverride ? 12'o4000 : busData),
+  .busData(irqOverride ? 12'o4000 : busData_), 
   .busIR(busIR)
 );
 
@@ -237,7 +242,7 @@ MultiLatch theMQ(
   .latch(mq_ck_), 
   .hold(mq_hold_),
   .oe1(mq2orbus_), 
-  .oe2(1'b1),
+  .oe2(1'b0),
   .out1(mqout1) 
 //  .out2(mqout2)
 );
@@ -284,7 +289,7 @@ wire andaddC;
 wire [11:0] accIn_andadd;
 AddAnd theADDAND(
   .A(accout1),
-  .B(busData),
+  .B(busData_),  
   .CI(1'b0),
   .OE_ADD(ramd2ac_add_),
   .OE_AND(ramd2ac_and_),
@@ -348,12 +353,12 @@ MultiLatch theACC(
   .oe1(1'b1),
   .oe2(ac2ramd_),
   .out1(accout1), 
-  .out2(busData)
+  .out2(busData_acc) 
 );
 
 assign busORacc=
   (oprOSR ? 12'o`OSR : 12'o0000) |
-  (mq2orbus_ ? mqout1   : 12'o0000) |
+  mqout1 |
   busACGTF |
   busACTTY;
 
@@ -381,7 +386,6 @@ ClrOrInv theCLORIN(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ACC INCREMENTER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-//wire [11:0] incOut;
 wire [11:0] incOut;
 wire incC;
 Incrementer theINCREMENTER(
@@ -412,7 +416,6 @@ Rotater theRotater(
 );
 
 
-
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT REGISTER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
@@ -432,13 +435,13 @@ or(ind2rama_, ind2rama05);
 MultiLatch theIndReg(
   .RESET(sw_RESET),
   .CLK(CLK),
-  .in(busData),
+  .in(busData_), 
   .latch(ind_ck_),
   .hold(1'b0),
   .oe1(ind2inc_),
   .oe2(ind2rama_),
-  .out1(busReg), 
-  .out2(busAddress)
+  .out1(busReg_ind), 
+  .out2(busAddress_ind)
 );
 
 
@@ -457,12 +460,12 @@ or (ld2inc_ ,ld2inc05);
 MultiLatch theDataReg(
   .RESET(sw_RESET),
   .CLK(CLK),
-  .in(busData),
+  .in(busData_), 
   .latch(data_ck_),
   .hold(1'b0),
   .oe1(ld2inc_),
   .oe2(1'b0),
-  .out1(busReg)
+  .out1(busReg_data)
 //  .out2(dummy1)
 );
 /* verilator lint_on PINMISSING */
@@ -477,10 +480,10 @@ or (inc2ramd_, inc2ramdIFI, inc2ramd05);
 
 wire incZero;
 Incrementer theBUSINCREMENTER(
-  .IN(busReg),
+  .IN(busReg_),
   .INC(1'b1),
   .OE(inc2ramd_),
-  .OUT(busData),
+  .OUT(busData_inc), 
   .C(incZero)
 );
 
@@ -509,15 +512,15 @@ wire pclat2ramd_;
 wire            pclat2ramd05;
 or(pclat2ramd_, pclat2ramd05);
 
-assign busPCin    = ir2pc_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // First OC12 module
-assign busPCin    = reg2pc_ ? busReg[11:0] : 12'bzzzzzzzz;
 
-// assign busAddress=ckFetch ? busLatPC : 12'bzzzzzzzzzzzz;
-assign busAddress = ir2rama_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'bzzzzzzzz; // Second OC12 module
-assign busAddress = ckFetch ? busPC : 12'bzzzzzzzzzzzz;
+assign busPCin_ir    = ir2pc_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0; // First OC12 module
+assign busPCin_reg    = reg2pc_ ? busReg_ : 12'b0; 
 
-assign busData    = pc2ramd_ ? busPC : 12'bzzzzzzzzzzzz;
-assign busData    = pclat2ramd_ ? busLatPC : 12'bzzzzzzzzzzzz;
+assign busAddress_ir = ir2rama_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0; // Second OC12 module
+assign busAddress_pc = ckFetch ? busPC : 12'b0;
+
+assign busData_pc    = pc2ramd_ ? busPC : 12'b0; 
+assign busData_latpc    = pclat2ramd_ ? busLatPC : 12'b0; 
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - FETCH & INDEXING █ ▇ ▆ ▅ ▄ ▂ ▁
