@@ -26,28 +26,158 @@ module PDP8(
 );
 
 
-// The buses
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ BUSSES & OR'ed BUSSES █ ▇ ▆ ▅ ▄ ▂ ▁
+// ▁ ▂ ▄ ▅ ▆ ▇ █   BUS INTERCONNECTS   █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+
+
 wire [11:0] busReg_;
 wire [11:0] busReg_ind, busReg_data;
-assign busReg_=busReg_ind | busReg_data;
+assign busReg_ = busReg_ind | busReg_data;
 
-reg [11:0] busIR;
 wire [11:0] busAddress_;
 wire [11:0] busAddress_ind, busAddress_pc, busAddress_ir;
-assign busAddress_=busAddress_ind | busAddress_pc | busAddress_ir;
-
-wire [11:0] busPC;
-wire [11:0] busLatPC;
+assign busAddress_ = busAddress_ind | busAddress_pc | busAddress_ir;
 
 wire [11:0] busPCin_;
+wire [11:0] busPCin_ir, busPCin_reg;
 assign busPCin_ = busPCin_ir | busPCin_reg; 
-wire [11:0] busPCin_ir,busPCin_reg;
-
-wire [11:0] busORacc;
 
 wire [11:0] busData_; 
 wire [11:0] busData_inc, busData_ram, busData_acc, busData_pc, busData_latpc;
 assign busData_ = busData_inc | busData_ram |busData_acc | busData_pc | busData_latpc;
+
+reg [11:0] busIR;
+wire [11:0] busPC;
+wire [11:0] busLatPC;
+
+wire [11:0] busORacc;
+assign busORacc = mqout1 | busACGTF | busACTTY | (oprOSR ? 12'o`OSR : 12'o0000);
+
+assign busPCin_ir    = ir2pc_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0; // First OC12 module
+assign busPCin_reg    = reg2pc_ ? busReg_ : 12'b0; 
+
+assign busAddress_ir = ir2rama_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0; // Second OC12 module
+assign busAddress_pc = ckFetch ? busPC : 12'b0;
+
+assign busData_pc    = pc2ramd_ ? busPC : 12'b0; 
+assign busData_latpc  = pclat2ramd_ ? busLatPC : 12'b0; 
+
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ OR'ed CONTROL SIGNALS █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+wire irqRq;             // Some device is asserting irq
+wire irqRqIOT34;
+assign irqRq = irqRqIOT34;
+
+wire done_;
+wire done05, doneIOT0, doneIOT34, done7, doneIgnore;
+assign done_ = done05 | doneIOT0 | doneIOT34 | done7 | doneIgnore;
+
+wire pc_ld_;
+wire pc_ld05;
+assign pc_ld_ = pc_ld05;
+
+wire pc_ck_;
+wire pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7;
+assign pc_ck_ =  pc_ckIFI | pc_ck05 | pc_ckIOT0 | pc_ckIOT34 | pc_ck7;
+
+wire ram_oe_;
+wire ram_oeIFI, ram_oe05;
+assign ram_oe_ = ram_oeIFI | ram_oe05;
+
+wire ram_we_;
+wire ram_weIFI, ram_we05;
+assign ram_we_ = ram_weIFI | ram_we05;
+
+wire mq_ck_;
+wire mq_ck7;
+assign mq_ck_ = mq_ck7;
+
+wire mq_hold_;
+wire mq_hold7;
+assign mq_hold_ = mq_hold7;
+
+wire mq2orbus_;
+wire mq2orbus7;
+assign mq2orbus_ = mq2orbus7;
+
+wire link_ck_;
+wire link_ck05, link_ckIOT0, link_ck7;
+assign link_ck_ = link_ck05 | link_ckIOT0 | link_ck7;
+
+wire ramd2ac_add_;
+wire ramd2ac_add05;
+assign ramd2ac_add_ = ramd2ac_add05;
+
+wire ramd2ac_and_;
+wire ramd2ac_and05;
+assign ramd2ac_and_ = ramd2ac_and05;
+
+wire ac_ck_;
+wire ac_ck05, ac_ckIOT0, ac_ck7, ac_ckTTY;
+assign ac_ck_ = ac_ck05 | ac_ckIOT0 | ac_ck7 | ac_ckTTY;
+
+wire ac2ramd_;
+wire ac2ramd05;
+assign ac2ramd_ = ac2ramd05;
+
+wire claDCA_;
+wire cla05, cla7;
+assign claDCA_ = cla05 | cla7;
+
+wire clorinCLR;
+assign clorinCLR = claDCA_ | oprCLA | iotCLR0 |clrTTY;
+
+wire rot2ac_;
+wire rot2ac05, rot2acIOT0, rot2ac7, rot2acTTY;
+assign rot2ac_ = rot2ac05 | rot2acIOT0 | rot2ac7 | rot2acTTY;
+
+wire ind_ck_;
+wire ind_ckIFI;
+assign ind_ck_ = ind_ckIFI;
+
+wire ind2inc_;
+wire ind2incIFI, ind2reg05;
+assign ind2inc_ = ind2incIFI | ind2reg05;
+
+wire ind2rama_;
+wire ind2rama05;
+assign ind2rama_ = ind2rama05;
+
+wire data_ck_;
+wire data_ck05;
+assign data_ck_  = data_ck05;
+
+wire ld2inc_;
+wire ld2inc05;
+assign ld2inc_ = ld2inc05;
+
+wire inc2ramd_;
+wire inc2ramdIFI, inc2ramd05;
+assign inc2ramd_ = inc2ramdIFI | inc2ramd05;
+
+wire ir2pc_;
+wire       ir2pc05;
+or(ir2pc_, ir2pc05);
+
+wire reg2pc_;
+wire reg2pc05;
+or (reg2pc_, reg2pc05);
+
+wire ir2rama_;
+wire ir2ramaIFI, ir2rama05;
+assign ir2rama_ = ir2ramaIFI | ir2rama05;
+
+wire pc2ramd_;
+wire pc2ramd05;
+assign pc2ramd_ = pc2ramd05;
+
+wire pclat2ramd_;
+wire pclat2ramd05;
+assign pclat2ramd_ = pclat2ramd05;
+
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ FRONT PANEL █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -56,11 +186,12 @@ wire [11:0]switches;
 wire [5:0]buttons;
 
 FrontPanel thePanel(
+  // Inputs
   .REFRESHCLK(REFRESHCLK),
   .green(busLatPC),
   .red(busIR|{6'b0,buttons}),
   .yellow(switches),
-  // .yellow(accout1),
+  // Outputs
   .switches(switches),
   .buttons(buttons),
   .GREEN1(GREEN1), .GREEN2(GREEN2),
@@ -70,9 +201,6 @@ FrontPanel thePanel(
   .SW1(SW1), .SW2(SW2), .SW3(SW3)
  );
 
-wire irqRq;           // Some device is asserting irq
-wire      irqRqIOT34;
-or(irqRq, irqRqIOT34);
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ SEQUENCER & START/STOP █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -81,18 +209,16 @@ wire ckFetch, ckAuto1, ckAuto2, ckInd;
 wire ck1, ck2, ck3, ck4, ck5, ck6;
 wire stbFetch, stbAuto1, stbAuto2, stbInd;
 wire stb1, stb2, stb3, stb4, stb5, stb6;
-
-wire done_;
-wire      done05, doneIOT0, doneIOT34, done7, doneIgnore;
-or(done_, done05, doneIOT0, doneIOT34, done7, doneIgnore);
  
 Sequencer theSEQUENCER(
   .CLK(CLK),
   .RESET(sw_RESET),
+  // Inputs
   .RUN(sw_RUN),
   .HALT(sw_HALT | (oprHLT & ck2)),
   .DONE(done_), 
   .SEQTYPE({instIsPPIND,instIsIND}),
+  // Outputs
   .CK_FETCH(ckFetch), .CK_AUTO1(ckAuto1), .CK_AUTO2(ckAuto2), .CK_IND(ckInd),
   .CK_1(ck1), .CK_2(ck2), .CK_3(ck3), .CK_4(ck4), .CK_5(ck5), .CK_6(ck6),
   .STB_FETCH(stbFetch), .STB_AUTO1(stbAuto1), .STB_AUTO2(stbAuto2), .STB_IND(stbInd), 
@@ -103,23 +229,16 @@ Sequencer theSEQUENCER(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ PROGRAM COUNTER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-
-wire pc_ld_;
-wire       pc_ld05;
-or(pc_ld_, pc_ld05);
-
-wire pc_ck_;
-wire       pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7;
-or(pc_ck_, pc_ckIFI, pc_ck05, pc_ckIOT0, pc_ckIOT34, pc_ck7);
-
 ProgramCounter thePC(
   .CLK(CLK),
   .RESET(sw_RESET),
+  // Inputs
   .IN(busPCin_),
   .LD(pc_ld_),
   .CK(pc_ck_ & ~(inIrq & ckFetch)),
   .LATCH(1'b0),
   .FETCH(ckFetch & ~inIrq),
+  //Outputs
   .PC(busPC),
   .PCLAT(busLatPC)
 ); 
@@ -128,20 +247,14 @@ ProgramCounter thePC(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ RAM MEMORY █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-wire ram_oe_;
-wire        ram_oeIFI, ram_oe05;
-or(ram_oe_, ram_oeIFI, ram_oe05);
-
-wire ram_we_;
-wire        ram_weIFI, ram_we05;
-or(ram_we_, ram_weIFI, ram_we05);
-
 RAM theRAM(
   .clk(CLK),
+  // Inputs
   .oe(ram_oe_),
   .we(ram_we_),
   .addr(busAddress_), 
   .dataI(busData_), 
+  // Outputs
   .dataO(busData_ram)  
 );
 
@@ -152,8 +265,10 @@ RAM theRAM(
 IR theIR(
   .CLK(CLK),
   .RESET(sw_RESET),
+  // Inputs
   .ckFetch(ckFetch),
   .busData(irqOverride ? 12'o4000 : busData_), 
+  // Outputs
   .busIR(busIR)
 );
 
@@ -170,10 +285,22 @@ wire instAND, instTAD, instISZ, instDCA, instJMS, instJMP, instIOT, instOPR;
 
 IRdecode theIRDECODER(
   .RESET(sw_RESET),
+  // Inputs
   .PCLATCHED(busLatPC),
   .IR(busIR),
-  .PPIND(instIsPPIND), .IND(instIsIND), .DIR(instIsDIR), .MP(instIsMP),
-  .AAND(instAND), .TAD(instTAD), .ISZ(instISZ), .DCA(instDCA), .JMS(instJMS), .JMP(instJMP), .IOT(instIOT), .OPR(instOPR)
+  // Outputs
+  .PPIND(instIsPPIND), 
+  .IND(instIsIND), 
+  .DIR(instIsDIR), 
+  .MP(instIsMP),
+  .AAND(instAND), 
+  .TAD(instTAD), 
+  .ISZ(instISZ), 
+  .DCA(instDCA), 
+  .JMS(instJMS), 
+  .JMP(instJMP), 
+  .IOT(instIOT), 
+  .OPR(instOPR)
 );
 
 
@@ -190,8 +317,10 @@ wire oprSCL, oprMUY, oprDVI, oprNMI, oprSHL, oprASL, oprLSR; // OPR 3
 wire oprCLA;
 
 OPRdecoder  theOPRDECODER(
+  // Inputs
   .IR(busIR[8:0]),
   .OPR(instOPR),
+  // Outputs
   .opr1(opr1), .opr2(opr2), .opr3(opr3),
   .oprIAC(oprIAC), .oprX2(oprX2), .oprLEFT(oprLEFT), .oprRIGHT(oprRIGHT), .oprCML(oprCML), .oprCMA(oprCMA), .oprCLL(oprCLL), // OPR 1
   .oprHLT(oprHLT), .oprOSR(oprOSR), .oprTSTINV(oprTSTINV), .oprSNLSZL(oprSNLSZL), .oprSZASNA(oprSZASNA), .oprSMASPA(oprSMASPA),  // OPR 2
@@ -207,12 +336,14 @@ OPRdecoder  theOPRDECODER(
 wire doSkip;
 
 Skip theSKIP(
+  // Inputs
   .AC(accout1),
   .LINK(link),
   .SZASNA(oprSZASNA),
   .SMASPA(oprSMASPA),
   .SNLSZL(oprSNLSZL),
   .TSTINV(oprTSTINV),
+  // Outputs
   .OUT(doSkip)
 );
 
@@ -220,31 +351,19 @@ Skip theSKIP(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ MQ █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-
-wire mq_ck_;
-wire        mq_ck7;
-or (mq_ck_, mq_ck7);
-
-wire mq_hold_;
-wire          mq_hold7;
-or (mq_hold_, mq_hold7);
-
-wire mq2orbus_;
-wire mq2orbus7;
-or (mq2orbus_, mq2orbus7);
-
 wire [11:0] mqout1;
 /* verilator lint_off PINMISSING */
 MultiLatch theMQ(
   .RESET(sw_RESET),
   .CLK(CLK),
+  // Inputs
   .in(accout1),
   .latch(mq_ck_), 
   .hold(mq_hold_),
   .oe1(mq2orbus_), 
   .oe2(1'b0),
+  // Outputs
   .out1(mqout1) 
-//  .out2(mqout2)
 );
 /* verilator lint_on PINMISSING */
 
@@ -252,11 +371,6 @@ MultiLatch theMQ(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ LINK █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-
-wire link_ck_;
-wire         link_ck05, link_ckIOT0, link_ck7;
-or(link_ck_, link_ck05, link_ckIOT0, link_ck7);
-
 wire link;
 wire rotaterLI;
 
@@ -264,11 +378,13 @@ Link theLINK(
   .CLK(CLK),
   .RESET(sw_RESET),
   .CLEAR(sw_RESET), //FIXME
+  // Inputs
   .LINK_CK(link_ck_),
   .CLL(oprCLL | linkclrIOT0),
   .CML(((oprCML ^ (incC & oprIAC)) | (andaddC & instTAD)) | linkcmlIOT0),
   .SET(oprLEFT|oprRIGHT),
   .FROM_ROTATER(rotaterLO),
+  // Outputs
   .L(link),
   .TO_ROTATER(rotaterLI)
 );
@@ -278,21 +394,17 @@ Link theLINK(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ADD/AND █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-wire ramd2ac_add_, ramd2ac_and_;
-wire ramd2ac_and05;
-wire ramd2ac_add05;
-
-or(ramd2ac_and_, ramd2ac_and05);
-or(ramd2ac_add_, ramd2ac_add05);
-
 wire andaddC;
 wire [11:0] accIn_andadd;
+
 AddAnd theADDAND(
+  // Inputs
   .A(accout1),
   .B(busData_),  
   .CI(1'b0),
   .OE_ADD(ramd2ac_add_),
   .OE_AND(ramd2ac_and_),
+  // Outputs
   .S(accIn_andadd),
   .CO(andaddC)
 );
@@ -300,20 +412,6 @@ AddAnd theADDAND(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ACCUMULATOR █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-
-// CLA      7200  clear AC                                      1
-// CLL      7100  clear link                            1
-
-// CMA      7040  complement AC                                   2
-// CML      7020  complement link                                 2
-
-// IAC      7001  increment AC                                      3
-
-// RAR      7010  rotate AC and link right one          4
-// RAL      7004  rotate AC and link left one           4
-// RTR      7012  rotate AC and link right two          4
-// RTL      7006  rotate AC and link left two           4
-// BSW      7002  swap bytes in AC                      4
 
 //
 //             +--------------------> theADDAND -->--------------->+
@@ -327,58 +425,38 @@ AddAnd theADDAND(
 // +-<---------------------------<------------------------------<--+
 //
 //
-//      ac2ramd     (perm)        (perm)            rot2ac
-//
-//
-
-wire ac_ck_;
-wire        ac_ck05, ac_ckIOT0, ac_ck7, ac_ckTTY;
-or (ac_ck_, ac_ck05, ac_ckIOT0, ac_ck7, ac_ckTTY);
-
-wire ac2ramd_;
-wire ac2ramd05;
-or (ac2ramd_, ac2ramd05);
-
 wire [11:0] accIn;
-assign accIn = accIn_andadd | accIn_rotater;
-//or(accIn, accIn_andadd, accIn_rotater);
+assign accIn = accIn_andadd | accIn_rotater; //FIX
 
 wire [11:0] accout1;
 MultiLatch theACC(
   .RESET(sw_RESET),
   .CLK(CLK),
+  // Inputs
   .in(accIn),
   .latch(ac_ck_),
   .hold(1'b0),
   .oe1(1'b1),
   .oe2(ac2ramd_),
+  // Outputs
   .out1(accout1), 
   .out2(busData_acc) 
 );
 
-assign busORacc=
-  (oprOSR ? 12'o`OSR : 12'o0000) |
-  mqout1 |
-  busACGTF |
-  busACTTY;
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ACC CLORIN █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-wire claDCA_;
-wire         cla05, cla7;
-or (claDCA_, cla05, cla7);
-
-wire clorinCLR;
-or (clorinCLR, claDCA_, oprCLA, iotCLR0, clrTTY);
-
 wire [11:0] clorinOut;
+
 ClrOrInv theCLORIN(
+  // Inputs
   .IN(accout1),
   .CLR(clorinCLR),
   .DOR(busORacc),
   .INV(oprCMA),
+  // Outputs
   .OUT(clorinOut)
 );
 
@@ -388,10 +466,13 @@ ClrOrInv theCLORIN(
 
 wire [11:0] incOut;
 wire incC;
+
 Incrementer theINCREMENTER(
+  // Inputs
   .IN(clorinOut),
   .INC(oprIAC),
   .OE(1'b1),
+  // Outputs
   .OUT(incOut),
   .C(incC)
 );
@@ -400,17 +481,16 @@ Incrementer theINCREMENTER(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ACC ROTATER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-wire rot2ac_;
-wire        rot2ac05, rot2acIOT0, rot2ac7, rot2acTTY;
-or(rot2ac_, rot2ac05, rot2acIOT0, rot2ac7, rot2acTTY);
-
 wire rotaterLO;
 wire [11:0] accIn_rotater;
+
 Rotater theRotater(
+  // Inputs
   .OP({oprRIGHT,oprLEFT,oprX2}),
   .AI(incOut),
   .LI(rotaterLI),
   .OE(rot2ac_),
+  // Outputs
   .AO(accIn_rotater),
   .LO(rotaterLO)
 );
@@ -419,27 +499,16 @@ Rotater theRotater(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT REGISTER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-
-wire ind_ck_;
-wire        ind_ckIFI;
-or(ind_ck_, ind_ckIFI);
-
-wire ind2inc_;
-wire          ind2incIFI, ind2reg05;
-or (ind2inc_, ind2incIFI, ind2reg05);
-
-wire ind2rama_;
-wire          ind2rama05;
-or(ind2rama_, ind2rama05);
-
 MultiLatch theIndReg(
   .RESET(sw_RESET),
   .CLK(CLK),
+  // Inputs
   .in(busData_), 
   .latch(ind_ck_),
   .hold(1'b0),
   .oe1(ind2inc_),
   .oe2(ind2rama_),
+  // Outputs
   .out1(busReg_ind), 
   .out2(busAddress_ind)
 );
@@ -448,25 +517,18 @@ MultiLatch theIndReg(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ DATA REGISTER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-wire data_ck_;
-wire data_ck05;
-or (data_ck_ ,data_ck05);
-
-wire ld2inc_;
-wire ld2inc05;
-or (ld2inc_ ,ld2inc05);
-
 /* verilator lint_off PINMISSING */
 MultiLatch theDataReg(
   .RESET(sw_RESET),
   .CLK(CLK),
+  // Inputs
   .in(busData_), 
   .latch(data_ck_),
   .hold(1'b0),
   .oe1(ld2inc_),
   .oe2(1'b0),
+  // Outputs
   .out1(busReg_data)
-//  .out2(dummy1)
 );
 /* verilator lint_on PINMISSING */
 
@@ -474,64 +536,31 @@ MultiLatch theDataReg(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ BUS INCREMENTER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-wire inc2ramd_;
-wire inc2ramdIFI, inc2ramd05;
-or (inc2ramd_, inc2ramdIFI, inc2ramd05);
-
 wire incZero;
+
 Incrementer theBUSINCREMENTER(
+  // Inputs
   .IN(busReg_),
   .INC(1'b1),
   .OE(inc2ramd_),
+  // Outputs
   .OUT(busData_inc), 
   .C(incZero)
 );
 
 
-//
-// ▁ ▂ ▄ ▅ ▆ ▇ █ BUS INTERCONNECTS █ ▇ ▆ ▅ ▄ ▂ ▁
-//
-
-wire ir2pc_;
-wire       ir2pc05;
-or(ir2pc_, ir2pc05);
-
-wire reg2pc_;
-wire reg2pc05;
-or (reg2pc_, reg2pc05);
-
-wire ir2rama_;
-wire         ir2ramaIFI, ir2rama05;
-or(ir2rama_, ir2ramaIFI, ir2rama05);
-
-wire pc2ramd_;
-wire          pc2ramd05;
-or (pc2ramd_, pc2ramd05);
-
-wire pclat2ramd_;
-wire            pclat2ramd05;
-or(pclat2ramd_, pclat2ramd05);
-
-
-assign busPCin_ir    = ir2pc_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0; // First OC12 module
-assign busPCin_reg    = reg2pc_ ? busReg_ : 12'b0; 
-
-assign busAddress_ir = ir2rama_ ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0; // Second OC12 module
-assign busAddress_pc = ckFetch ? busPC : 12'b0;
-
-assign busData_pc    = pc2ramd_ ? busPC : 12'b0; 
-assign busData_latpc    = pclat2ramd_ ? busLatPC : 12'b0; 
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - FETCH & INDEXING █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-
 InstructionFetch theinstFI (
-   .instIsIND(instIsIND),
-   .instIsPPIND(instIsPPIND),
-   .ckFetch(ckFetch), .ckAuto1(ckAuto1), .ckAuto2(ckAuto2), .ckInd(ckInd),
-   .stbFetch(stbFetch), .stbAuto2(stbAuto2), .stbAuto1(stbAuto1), .stbInd(stbInd),
+  // Inputs
+  .instIsIND(instIsIND),
+  .instIsPPIND(instIsPPIND),
+  .ckFetch(ckFetch), .ckAuto1(ckAuto1), .ckAuto2(ckAuto2), .ckInd(ckInd),
+  .stbFetch(stbFetch), .stbAuto2(stbAuto2), .stbAuto1(stbAuto1), .stbInd(stbInd),
   .irqOverride(irqOverride),
+  // Outputs
   .inc2ramd(inc2ramdIFI),
   .ind_ck(ind_ckIFI),
   .ind2inc(ind2incIFI),
@@ -545,8 +574,8 @@ InstructionFetch theinstFI (
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 7xxx OPR █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-
 InstructionOPR theinst7 (
+  // Inputs
   .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   .doSkip(doSkip),
@@ -558,7 +587,7 @@ InstructionOPR theinst7 (
   .oprMQA(oprMQA),
   .oprMQL(oprMQL),
   .oprSCA(oprSCA),
-
+  // Outputs
   .ac_ck(ac_ck7),
   .cla(cla7),
   .done(done7),
@@ -575,12 +604,14 @@ InstructionOPR theinst7 (
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 0,1,2,3,4,5xxx  █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 Instructions theinst0_5 (
- .instIsDIR(instIsDIR), .instIsIND(instIsIND), .instIsPPIND(instIsPPIND),
- .instAND(instAND), .instDCA(instDCA), .instISZ(instISZ), .instJMP(instJMP), .instJMS(instJMS), .instTAD(instTAD),
+  // Inputs
+  .instIsDIR(instIsDIR), .instIsIND(instIsIND), .instIsPPIND(instIsPPIND),
+  .instAND(instAND), .instDCA(instDCA), .instISZ(instISZ), .instJMP(instJMP), .instJMS(instJMS), .instTAD(instTAD),
   .incZero(incZero),
   .irqOverride(irqOverride),
   .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
+  // Outputs
   .pclat2ramd(pclat2ramd05),
   .ac2ramd(ac2ramd05),
   .cla(cla05),
@@ -619,6 +650,7 @@ wire irqOverride;
 wire GIE;
 
 InstructionIOT600x theInterrupt(
+  //Inputs
   .CLK(CLK),
   .RESET(sw_RESET),
   .CLEAR(sw_CLEAR),
@@ -630,6 +662,7 @@ InstructionIOT600x theInterrupt(
   .stbFetch(stbFetch), .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   .irqRq(irqRq),
   .anyDone(done_),
+  // Outputs
   .done(doneIOT0),
   .rot2ac(rot2acIOT0),
   .ac_ck(ac_ckIOT0),
@@ -649,19 +682,22 @@ InstructionIOT600x theInterrupt(
 
 wire [11:0] busACTTY;
 wire clrTTY;
+
 InstructionIOT603x theTTY(
   .CLK(CLK),
   .clear(sw_RESET | iotCLR0),
+  //Inputs
   .EN1(instIOT & (busIR[8:3]==6'o03)),
   .EN2(instIOT & (busIR[8:3]==6'o04)),
   .IR(busIR[2:0]),
-  .AC(accout1), //.ACbit11(accout1[0:0]), // PDP has the bit order reversed
+  .AC(accout1),
   .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   .done(doneIOT34),
   .pc_ck(pc_ckIOT34),
   .irq(irqRqIOT34),
   .rx(rx),
+  // Outputs
   .tx(tx),
   .LED2(LED2),
   .ACTTY(busACTTY),
