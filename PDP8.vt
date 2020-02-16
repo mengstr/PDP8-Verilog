@@ -1,4 +1,4 @@
-`timescale 100ns/10ns
+`timescale 10ns/1ns
 `default_nettype none
 
 module PDP8_tb();
@@ -12,14 +12,13 @@ module PDP8_tb();
     wire PLED1, PLED2, PLED3, PLED4, PLED5, PLED6;
     
 PDP8 dut(
-  .CLK(CLK),
+  .clk(CLK),
   .sw_RESET(reset),
   .sw_CLEAR(clear),
   .sw_RUN(run), 
   .sw_HALT(halt),
   .rx(RxD), .tx(TxD),
   .LED1(LED1), .LED2(LED2),
-  .REFRESHCLK(REFRESHCLK),
   .GREEN1(GREEN1), .GREEN2(GREEN2),
   .RED1(RED1), .RED2(RED2),
   .YELLOW1(YELLOW1), .YELLOW2(YELLOW2),
@@ -29,7 +28,7 @@ PDP8 dut(
   reg [20:0] cnt=0;
 
     always begin
-        #1 CLK<=~CLK;
+        #2 CLK<=~CLK;
     end
 
     // Clear/reset the entire system
@@ -48,12 +47,12 @@ PDP8 dut(
     initial begin
         $dumpfile("PDP8.vcd");
         $dumpvars(0,PDP8_tb);
-        #30000 begin $display("DONE after %d instructions",cnt); $finish; end
+        #300000 begin $display("DONE after %d instructions",cnt); $finish; end
     end
 
     always @(CLK) begin
         if (dut.theSEQUENCER.stepCnt==5'd30) begin $display("Unhandled OP"); $finish; end
-        if (dut.theSEQUENCER.stepCnt==5'd1 && dut.CLK==0) begin:PRN    
+        if (dut.theSEQUENCER.stepCnt==5'd1 && dut.clk==0) begin:PRN    
         cnt<=cnt+1;
 //      if ((cnt%1000)==0) $display("%d",cnt);
  `ifdef TRACE

@@ -9,6 +9,7 @@
 
 module FrontPanel(
   input REFRESHCLK,
+  input BUTTONDELAY,
   input [11:0]green,
   input [11:0]red,
   input [11:0]yellow,

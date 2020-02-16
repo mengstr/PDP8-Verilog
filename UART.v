@@ -9,6 +9,7 @@
 module UART (
   input CLK,
   input RESET,
+  input baudX7,
   input [7:0] txData, // data to be transmitted serially onto tx
   input txStb,        // positive going strobe for the txData - 1 CLK
   output tx,          // serial output stream in 8N1 format with high idle
@@ -25,20 +26,16 @@ module UART (
 //               +-------+     +     +     +     +     +     +     +     +------+
 //
 
+parameter CLK_FREQ=2500000;
+parameter BAUD=76800;
 
-parameter BAUDDIVIDER8X     = `CLK_FREQ / (`BAUD * 8);
+parameter BAUDDIVIDER8X     = CLK_FREQ / (BAUD * 8);
 parameter BAUDDIVIDER_WIDTH = $clog2(BAUDDIVIDER8X);
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ BAUDRATE DIVIDER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-// Divide the CLK down to the 8x baud rate as well as the real baudrate.
-// The 8x baud is used to time the midpoint of the samples in the RX handling.
-
-reg [BAUDDIVIDER_WIDTH-1:0] baud8x=0; 
-reg baudTick8x=0;
-reg [2:0] baudCnt=0;  // Counter to divide the 8xbaud clock to the real baudrate
 reg baudTick=0;       // Strobes at baudrate speed - 1 CLK
 
 always @(posedge CLK) begin
@@ -46,54 +43,49 @@ always @(posedge CLK) begin
   end
 end
 
+reg [2:0] baud7Xcnt=0;
+
 always @(posedge CLK) begin
-  baud8x <= baud8x + 1;
-  if ({32'b0,baud8x}==BAUDDIVIDER8X-1) begin 
-    baud8x <= 0;
-    baudTick8x <= 1;
-  end 
-  if (baudTick8x) begin 
-    baudTick8x <= 0;
-    baudCnt<=baudCnt+1;
-    if (baudCnt==0) baudTick<=1;
+  if (baudX7) baud7Xcnt <= baud7Xcnt + 1;
+  if (baud7Xcnt > 6) begin
+    baud7Xcnt <= 0;
+    baudTick <= 1;
+  end else begin
+    baudTick <= 0;
   end
-  if (baudTick) baudTick <= 0;
 end
+
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ UART RECEIVE █ ▇ ▆ ▅ ▄ ▂ ▁
-//
-
-//
-//
 //
 
 reg [3:0] rxCnt=0;
 reg [8:0] rxBuf=0;
 reg [3:0] nextMiddle=0;
 reg rxReady=0;
-reg ping=0;
+reg samplePoint=0;
 
 always @(posedge CLK) begin
   if (rxAck) rxReady<=0;
-  if (baudTick8x) begin
+  if (baudX7) begin
     if (rxCnt==0) begin
       if (~rx) begin
         // Detected the startbit
-        nextMiddle <= 10;
+        nextMiddle <= 8;
         rxCnt <= rxCnt + 1;
         rxBuf <= 0;
-        ping<=1;
+        samplePoint<=1;
         rxReady <= 0;
       end
     end else if (nextMiddle!=0) begin
       nextMiddle <= nextMiddle-1;
     end else begin
-      ping<=1;
+      samplePoint<=1;
       rxBuf <= rxBuf >> 1;
       rxBuf[8] <= rx;
       rxCnt <= rxCnt+1;
-      nextMiddle <= 7;
+      nextMiddle <= 6;
       if (rxCnt>8) begin
         rxCnt <= 0;
         rxReady <= 1;
@@ -101,7 +93,7 @@ always @(posedge CLK) begin
 
     end
   end
-  if (ping) ping<=0;
+ samplePoint <= 0;
 end
 
 assign rxData = rxBuf[7:0];

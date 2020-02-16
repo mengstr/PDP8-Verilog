@@ -115,14 +115,16 @@ test:
 	@echo "###"
 	@$(ICARUS) iverilog -g2012 \
 		-DOSR=7777 -DCLK_FREQ=4000000 -DBAUD=10000 -DDEBOUNCECNT=10 \
-		-DTRACE  \
+		-DxTRACE  \
 		-o $(TARGET).vvp \
 		$(TARGET).vt $(filter-out $(TARGET)_top.v, $(SOURCES))
 	$(ICARUS) vvp $(TARGET).vvp | tools/showop.sh | tee test.tmp
 
 modules:
-	$(ICARUS) iverilog -g2012 -o Skip.vvp Skip.vt Skip.v
-	$(ICARUS) vvp Skip.vvp 
+	# $(ICARUS) iverilog -g2012 -o Skip.vvp Skip.vt Skip.v
+	# $(ICARUS) vvp Skip.vvp 
+	$(ICARUS) iverilog -g2012 -o UART.vvp UART.vt UART.v ClockGen.v
+	$(ICARUS) vvp UART.vvp 
 
 
 

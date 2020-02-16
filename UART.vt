@@ -1,0 +1,67 @@
+`timescale 10ns/1ns
+`default_nettype none
+
+module UART_tb();
+
+reg clk=0;
+reg reset=0;
+reg [7:0] txData=0;
+reg txStb=0;
+wire tx;
+wire txRdy;
+reg rx=1;
+wire [7:0] rxData;
+reg rxAck=0;
+wire rxRdy;
+
+UART UART(
+  .CLK(clk),
+  .RESET(reset),
+  .baudX7(baudX7),
+  .txData(txData), // data to be transmitted serially onto tx
+  .txStb(txStb),        // positive going strobe for the txData - 1 CLK
+  .tx(tx),          // serial output stream in 8N1 format with high idle
+  .txRdy(txRdy),       // high when the uart is ready to accept new data
+  .rx(rx),
+  .rxData(rxData),
+  .rxAck(rxAck),
+  .rxRdy(rxRdy)
+);
+
+wire baudX7;
+wire frontRefresh;
+wire buttonDelay;
+
+ClockGen ClockGen(
+  .clk(clk),
+  .baudX7(baudX7),
+  .frontRefresh(frontRefresh),
+  .buttonDelay(buttonDelay)
+);
+
+
+initial begin
+  $dumpfile("UART.vcd");
+  $dumpvars(0,UART_tb);
+end
+
+always begin
+  #2 clk<=~clk;
+end
+
+always begin
+  #2
+  rx<=tx;
+end
+
+always begin
+  txData<=8'h01;
+  #10000;
+  txStb<=1;
+  #4;
+  txStb<=0;
+  #150000 $finish;
+end
+
+
+endmodule
