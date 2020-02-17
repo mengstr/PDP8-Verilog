@@ -159,12 +159,12 @@ always @(posedge CLK) begin
       if (instTFL) flgPRN<=1; //Teleprinter Flag set
       if (instTFC) flgPRN<=0; //Teleprinter Flag clear
       if (instTPC) begin
-      if (ck1) $display("(%c)", AC & 12'd127);
+      if (ck1) $display("(%c)", {1'b0,AC[6:0]} );
       if (ck1) begin txData<={1'b0,AC[6:0]}; txStb<=1; end;
     end
     if (instTLS) begin      //Teleprinter Load and start
       flgPRN<=0;
-      if (ck1) $display("[%c]", AC & 12'd127);
+      if (ck1) $display("[%c]", {1'b0,AC[6:0]} );
       if (ck1) begin txData<={1'b0,AC[6:0]}; txStb<=1; end;
     end
     if (txStb==1) txStb<=0; 
