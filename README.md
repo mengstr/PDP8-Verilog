@@ -1,5 +1,60 @@
 # PDP8/X-Verilog
 
+## Usage of Sequencer signals
+
+FILE | ckFetch | stbFetch | ckAuto1 | stbAuto1 | ckAuto2 | stbAuto2 | ckInd | stbInd
+---|----|----|----|----|----|----|----|----
+AddAnd.v                 |  |  |  |  |  |  |  |
+ClockGen.v               |  |  |  |  |  |  |  |
+ClrOrInv.v               |  |  |  |  |  |  |  |
+FrontPanel.v             |  |  |  |  |  |  |  |
+IR.v                     | 2 |  |  |  |  |  |  |
+IRdecode.v               |  |  |  |  |  |  |  |
+Incrementer.v            |  |  |  |  |  |  |  |
+InstructionFetch.v       | 1 | 1 | 3 | 1 | 3 | 1 | 4 | 2
+InstructionIOT600x.v     | 2 | 1 |  |  |  |  |  |
+InstructionIOT603x.v     |  |  |  |  |  |  |  |
+InstructionIOTdecode.v   | 1 |  |  |  |  |  |  |
+InstructionOPR.v         |  |  |  |  |  |  |  |
+Instructions.v           |  |  |  |  |  |  |  |
+Link.v                   |  |  |  |  |  |  |  |
+MultiLatch.v             |  |  |  |  |  |  |  |
+OPRdecoder.v             |  |  |  |  |  |  |  |
+ProgramCounter.v         |  |  |  |  |  |  |  |
+RAM.v                    |  |  |  |  |  |  |  |
+RIMloader.v              |  |  |  |  |  |  |  |
+Rotater.v                |  |  |  |  |  |  |  |
+Sequencer.v              | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1
+Skip.v                   |  |  |  |  |  |  |  |
+UART.v                   |  |  |  |  |  |  |  |
+
+
+FILE | ck1 | stb1 | ck2 | stb2 | ck3 | stb3 | ck4 | stb4 | ck5 | stb5 | ch6 | stb6
+---|----|----|----|----|----|----|----|----|----|----|----|----
+AddAnd.v                 |  |  |  |  |  |  |  |  |  |  |  |
+ClockGen.v               |  |  |  |  |  |  |  |  |  |  |  |
+ClrOrInv.v               |  |  |  |  |  |  |  |  |  |  |  |
+FrontPanel.v             |  |  |  |  |  |  |  |  |  |  |  |
+IR.v                     |  |  |  |  |  |  |  |  |  |  |  |
+IRdecode.v               |  |  |  |  |  |  |  |  |  |  |  |
+Incrementer.v            |  |  |  |  |  |  |  |  |  |  |  |
+InstructionFetch.v       |  |  |  |  |  |  |  |  |  |  |  |
+InstructionIOT600x.v     | 8 | 11 | 7 |  | 3 |  | 3 |  | 3 |  |  |
+InstructionIOT603x.v     | 13 | 4 | 4 |  | 6 |  | 4 |  |  |  |  |
+InstructionIOTdecode.v   |  |  |  |  | 1 |  |  |  |  |  |  |
+InstructionOPR.v         | 17 | 9 | 14 | 6 | 8 |  | 1 |  |  |  |  |
+Instructions.v           | 32 | 18 | 27 | 4 | 9 | 4 | 6 | 2 | 3 |  |  |
+Link.v                   |  |  |  |  |  |  |  |  |  |  |  |
+MultiLatch.v             |  |  |  |  |  |  |  |  |  |  |  |
+OPRdecoder.v             |  |  |  |  |  |  |  |  |  |  |  |
+ProgramCounter.v         |  |  |  |  |  |  |  |  |  |  |  |
+RAM.v                    |  |  |  |  |  |  |  |  |  |  |  |
+RIMloader.v              |  |  |  |  |  |  |  |  |  |  |  |
+Rotater.v                |  |  |  |  |  |  |  |  |  |  |  |
+Sequencer.v              | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |  | 1
+Skip.v                   |  |  |  |  |  |  |  |  |  |  |  |
+UART.v                   |  |  |  |  |  |  |  |  |  |  |  |
+
 ## Interrupts
 
 ### GIE - Global Interrupt Enable

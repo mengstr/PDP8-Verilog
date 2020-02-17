@@ -145,10 +145,10 @@ Sequencer theSEQUENCER(
   .DONE(done), 
   .SEQTYPE({instIsPPIND,instIsIND}),
   // Outputs
-  .CK_FETCH(ckFetch), .CK_AUTO1(ckAuto1), .CK_AUTO2(ckAuto2), .CK_IND(ckInd),
-  .CK_1(ck1), .CK_2(ck2), .CK_3(ck3), .CK_4(ck4), .CK_5(ck5), .CK_6(ck6),
-  .STB_FETCH(stbFetch), .STB_AUTO1(stbAuto1), .STB_AUTO2(stbAuto2), .STB_IND(stbInd), 
-  .STB_1(stb1), .STB_2(stb2), .STB_3(stb3), .STB_4(stb4), .STB_5(stb5), .STB_6(stb6),
+  .ckFetch(ckFetch), .ckAuto1(ckAuto1), .ckAuto2(ckAuto2), .ckInd(ckInd),
+  .ck1(ck1), .ck2(ck2), .ck3(ck3), .ck4(ck4), .ck5(ck5), .ck6(ck6),
+  .stbFetch(stbFetch), .stbAuto1(stbAuto1), .stbAuto2(stbAuto2), .stbInd(stbInd), 
+  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   .running(LED1)
 );
 

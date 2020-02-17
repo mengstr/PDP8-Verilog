@@ -15,8 +15,18 @@ module ClrOrInv (
   output [11:0] OUT
 );
 
-assign OUT=(CLR==1'b0) ?
-  INV ? (IN|DOR)^12'b111111111111 : (IN|DOR) :
-  INV ? (   DOR)^12'b111111111111 : (   DOR) ;
+`ifdef HW
+  // 898 44.92 MHz
+  wire [11:0] stage1,stage2,stage3;
+  assign stage1 = IN & {12{CLR}};
+  assign stage2 = stage1 | DOR;
+  assign stage3 = stage2 ^ {12{INV}};
+  assign OUT    = stage3;
+`else
+  // 871 46.90 MHz
+  assign OUT=(CLR==1'b0) ?
+    INV ? (IN|DOR)^12'b111111111111 : (IN|DOR) :
+    INV ? (   DOR)^12'b111111111111 : (   DOR) ;
+`endif
 
 endmodule

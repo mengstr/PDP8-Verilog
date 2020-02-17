@@ -10,8 +10,8 @@
 module InstructionIOTdecode (
   input [11:0] IR,
   input IOT,
-  input CK_FETCH,
-  input CK_3,
+  input ckFetch,
+  input ck3,
   output IOT600x ,
   output IOT601x ,
   output IOT602x ,
@@ -41,7 +41,7 @@ wire s6;
 wire s7;
 wire s8;
 wire s9;
-assign DONE = (CK_3 & IOT);
+assign DONE = (ck3 & IOT);
 assign s6 = ~ IR[8];
 assign s5 = ~ IR[7];
 assign s4 = ~ IR[6];
@@ -51,7 +51,7 @@ assign s1 = ~ IR[3];
 assign s9 = ~ IR[2];
 assign s8 = ~ IR[1];
 assign s7 = ~ IR[0];
-assign s0 = ~ CK_FETCH;
+assign s0 = ~ ckFetch;
 assign IOT600x  = (s0 & IOT & s1 & s2 & s3 & s4 & s5 & s6);
 assign IOT601x  = (s0 & IOT & IR[3] & s2 & s3 & s4 & s5 & s6);
 assign IOT602x  = (s0 & IOT & s1 & IR[4] & s3 & s4 & s5 & s6);
