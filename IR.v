@@ -11,6 +11,7 @@ module IR(
   input CLK,
   input RESET,
   input ckFetch,
+  input irqOverride,
   input [11:0] busData,
   output reg [11:0] busIR
 );
@@ -22,7 +23,7 @@ always @(posedge CLK) begin
     lastCkFetch<=0;
     busIR<=0;
   end else begin
-    if (ckFetch & !lastCkFetch) busIR<=busData;
+    if (ckFetch & !lastCkFetch) busIR <= irqOverride ? 12'o4000 : busData;
   end
   lastCkFetch<=ckFetch;
 end

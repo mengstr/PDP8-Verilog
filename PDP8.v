@@ -194,12 +194,13 @@ RAM theRAM(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ IR █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-IR theIR(
+IR theIR(   // TODO Should IR be a Multilatch?
   .CLK(clk),
   .RESET(sw_RESET),
   // Inputs
   .ckFetch(ckFetch),
-  .busData(irqOverride ? 12'o4000 : busData),  //FIX
+  .irqOverride(irqOverride),
+  .busData(busData),
   // Outputs
   .busIR(busIR)
 );
