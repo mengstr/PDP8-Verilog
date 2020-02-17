@@ -40,6 +40,7 @@ parameter PREDIVTOP=23;
 reg [16:0] counter=0;
 parameter BAUDTAP=3;
 reg lastX7=0;
+reg lastFrontRefresh=0;
 
 always @(posedge clk) begin
   preDiv <= preDiv - 1;
@@ -48,10 +49,11 @@ always @(posedge clk) begin
     counter <= counter + 1;
   end
   lastX7<=counter[BAUDTAP];
+  lastFrontRefresh<=counter[6];
 end
 
-assign baudX7=counter[BAUDTAP] & ~lastX7;      // 9600 baud
-assign frontRefresh=counter[6];   // 8.49 KHz
-assign buttonDelay=counter[16];   // 120.58 ms
+assign baudX7=counter[BAUDTAP] & ~lastX7;             // 9600 baud
+assign frontRefresh=counter[6] & ~lastFrontRefresh;   // 8.49 KHz
+assign buttonDelay=counter[12];   // 7.53 ms
 
 endmodule

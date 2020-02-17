@@ -8,12 +8,13 @@
 `default_nettype none
 
 module FrontPanel(
+  input clk,
   input REFRESHCLK,
   input BUTTONDELAY,
   input [11:0]green,
   input [11:0]red,
   input [11:0]yellow,
-  output reg [11:0] switches,
+  output reg [11:0] toggles,
   output reg [5:0] buttons,
   output reg GREEN1, GREEN2,
   output reg RED1, RED2,
@@ -22,74 +23,76 @@ module FrontPanel(
   input SW1, SW2, SW3
 );
 
-reg  [2:0] group = 0;
-reg [11:0] tmpSwitches=0;
-reg  [7:0] dly=0;
-reg  [2:0] dlycnt=0;
-reg lastdly=0;
+reg  [2:0] group=0;
+reg [11:0] tmpToggles=0;
+reg [5:0] tmpButtons=0;
 reg anyon=0;
+reg [2:0]cnt=0;
+reg LASTBUTTONDLY=0;
 
+always @(posedge clk) begin
+  if (REFRESHCLK) begin
+      group <= group + 1;
+      GREEN1  <= (group==0);
+      GREEN2  <= (group==1);
+      RED1    <= (group==2);
+      RED2    <= (group==3);
+      YELLOW1 <= (group==4);
+      YELLOW2 <= (group==5);
 
-always @(posedge REFRESHCLK) begin
-  group <= group + 1;
+      PLED1 <=  (group==0 &  green[0]) | (group==1 &  green[6]) |
+                (group==2 &    red[0]) | (group==3 &    red[6]) |
+                (group==4 & yellow[0]) | (group==5 & yellow[6]);
 
-  GREEN1  <= (group==0);
-  GREEN2  <= (group==1);
-  RED1    <= (group==2);
-  RED2    <= (group==3);
-  YELLOW1 <= (group==4);
-  YELLOW2 <= (group==5);
+      PLED2 <=  (group==0 &  green[1]) | (group==1 &  green[7]) |
+                (group==2 &    red[1]) | (group==3 &    red[7]) |
+                (group==4 & yellow[1]) | (group==5 & yellow[7]);
 
-  PLED1 <=   (group==0 &  green[0]) | (group==1 &  green[6]) |
-             (group==2 &    red[0]) | (group==3 &    red[6]) |
-             (group==4 & yellow[0]) | (group==5 & yellow[6]);
+      PLED3 <=  (group==0 &  green[2]) | (group==1 &  green[8]) |
+                (group==2 &    red[2]) | (group==3 &    red[8]) |
+                (group==4 & yellow[2]) | (group==5 & yellow[8]);
 
-  PLED2 <=   (group==0 &  green[1]) | (group==1 &  green[7]) |
-             (group==2 &    red[1]) | (group==3 &    red[7]) |
-             (group==4 & yellow[1]) | (group==5 & yellow[7]);
+      PLED4 <=  (group==0 &  green[3]) | (group==1 &  green[9]) |
+                (group==2 &    red[3]) | (group==3 &    red[9]) |
+                (group==4 & yellow[3]) | (group==5 & yellow[9]);
 
-  PLED3 <=   (group==0 &  green[2]) | (group==1 &  green[8]) |
-             (group==2 &    red[2]) | (group==3 &    red[8]) |
-             (group==4 & yellow[2]) | (group==5 & yellow[8]);
+      PLED5 <=  (group==0 &  green[4]) | (group==1 &  green[10]) |
+                (group==2 &    red[4]) | (group==3 &    red[10]) |
+                (group==4 & yellow[4]) | (group==5 & yellow[10]);
 
-  PLED4 <=   (group==0 &  green[3]) | (group==1 &  green[9]) |
-             (group==2 &    red[3]) | (group==3 &    red[9]) |
-             (group==4 & yellow[3]) | (group==5 & yellow[9]);
+      PLED6 <=  (group==0 &  green[5]) | (group==1 &  green[11]) |
+                (group==2 &    red[5]) | (group==3 &    red[11]) |
+                (group==4 & yellow[5]) | (group==5 & yellow[11]);
 
-  PLED5 <=   (group==0 &  green[4]) | (group==1 &  green[10]) |
-             (group==2 &    red[4]) | (group==3 &    red[10]) |
-             (group==4 & yellow[4]) | (group==5 & yellow[10]);
+      if (group==1) begin tmpToggles[5]<=SW1; tmpToggles[11]<=SW2; tmpButtons[5]<=SW3; end
+      if (group==2) begin tmpToggles[4]<=SW1; tmpToggles[10]<=SW2; tmpButtons[4]<=SW3; end
+      if (group==3) begin tmpToggles[3]<=SW1; tmpToggles[ 9]<=SW2; tmpButtons[3]<=SW3; end
+      if (group==4) begin tmpToggles[2]<=SW1; tmpToggles[ 8]<=SW2; tmpButtons[2]<=SW3; end
+      if (group==5) begin tmpToggles[1]<=SW1; tmpToggles[ 7]<=SW2; tmpButtons[1]<=SW3; end
+      if (group==6) begin tmpToggles[0]<=SW1; tmpToggles[ 6]<=SW2; tmpButtons[0]<=SW3; end
 
-  PLED6 <=   (group==0 &  green[5]) | (group==1 &  green[11]) |
-             (group==2 &    red[5]) | (group==3 &    red[11]) |
-             (group==4 & yellow[5]) | (group==5 & yellow[11]);
+      anyon <= anyon | SW1 | SW2 | SW3;
 
-    if (group==1) begin tmpSwitches[5]<=SW1;  tmpSwitches[11]<=SW2; buttons[5]<=SW3; end
-    if (group==2) begin tmpSwitches[4]<=SW1;  tmpSwitches[10]<=SW2; buttons[4]<=SW3; end
-    if (group==3) begin tmpSwitches[3]<=SW1;  tmpSwitches[ 9]<=SW2; buttons[3]<=SW3; end
-    if (group==4) begin tmpSwitches[2]<=SW1;  tmpSwitches[ 8]<=SW2; buttons[2]<=SW3; end
-    if (group==5) begin tmpSwitches[1]<=SW1;  tmpSwitches[ 7]<=SW2; buttons[1]<=SW3; end
-    if (group==6) begin tmpSwitches[0]<=SW1;  tmpSwitches[ 6]<=SW2; buttons[0]<=SW3; end
+      if (group==7) begin
+        if (~anyon) begin
+          cnt <= 0;
+          buttons <= 0;
+        end else begin 
+          if (BUTTONDELAY & ~LASTBUTTONDLY) begin
+            if (cnt<3) cnt <= cnt + 1;
+            if (cnt==2) begin
+              toggles <= toggles ^ tmpToggles;
+              buttons  <=  tmpButtons;
+            end
+          end
+          LASTBUTTONDLY <= BUTTONDELAY;
+        end
 
-    anyon<=anyon|SW1|SW2|SW3;
-
-    if (group==7) begin
-      dly <= dly + 1;
-
-      if (dlycnt==0 & anyon) begin
-        tmpSwitches<=tmpSwitches^switches;
-        switches<=tmpSwitches;
-        dlycnt<=3;
+        anyon <= 0;
+        tmpToggles <= 0;
+        tmpButtons <= 0;
       end
-
-      if (dlycnt>0 & dly[7]==1 & ~lastdly) begin
-        dlycnt<=dlycnt-1;
-      end
-
-      lastdly<=dly[7];
-      anyon<=0;
     end
-
 end
 
 endmodule

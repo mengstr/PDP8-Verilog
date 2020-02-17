@@ -13,7 +13,7 @@ module PDP8_tb();
     
 PDP8 dut(
   .clk(CLK),
-  .sw_RESET(reset),
+  .reset(reset),
   .sw_CLEAR(clear),
   .sw_RUN(run), 
   .sw_HALT(halt),

@@ -8,7 +8,7 @@
 
 module PDP8(
   input clk,
-  input sw_RESET,    // Reset CPU (power on reset)
+  input reset,       // Power On Reset
   input sw_CLEAR,    // Clear CPU (button)
   input sw_RUN,      // Start CPU
   input sw_HALT,     // Halt CPU at next instruction
@@ -106,18 +106,19 @@ wire pc2ramd      = pc2ramd05;
 // ▁ ▂ ▄ ▅ ▆ ▇ █ FRONT PANEL █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 wire [11:0]switches;
-wire [5:0]buttons;
+wire startstop, sst, button2, button3, button4, button5;
 
 FrontPanel thePanel(
   // Inputs
+  .clk(clk),
   .REFRESHCLK(frontRefresh),
   .BUTTONDELAY(buttonDelay),
   .green(busLatPC),
-  .red(busIR|{6'b0,buttons}),
+  .red(busIR),
   .yellow(switches),
   // Outputs
-  .switches(switches),
-  .buttons(buttons),
+  .toggles(switches),
+  .buttons({startstop, sst, button2, button3, button4, button5}),
   .GREEN1(GREEN1), .GREEN2(GREEN2),
   .RED1(RED1), .RED2(RED2),
   .YELLOW1(YELLOW1), .YELLOW2(YELLOW2),
@@ -133,22 +134,25 @@ wire ckFetch, ckAuto1, ckAuto2, ckInd;
 wire ck1, ck2, ck3, ck4, ck5, ck6;
 wire stbFetch, stbAuto1, stbAuto2, stbInd;
 wire stb1, stb2, stb3, stb4, stb5, stb6;
- 
+wire running;
+
 Sequencer theSEQUENCER(
   .CLK(clk),
-  .RESET(sw_RESET),
+  .RESET(reset),
   // Inputs
-  .RUN(sw_RUN),
-  .HALT(sw_HALT | (oprHLT & ck2)), //FIX
+  .HALT((oprHLT & ck2)), //FIX
   .DONE(done), 
+  .startstop(startstop),
+  .sst(sst),
   .SEQTYPE({instIsPPIND,instIsIND}),
   // Outputs
   .ckFetch(ckFetch), .ckAuto1(ckAuto1), .ckAuto2(ckAuto2), .ckInd(ckInd),
   .ck1(ck1), .ck2(ck2), .ck3(ck3), .ck4(ck4), .ck5(ck5), .ck6(ck6),
   .stbFetch(stbFetch), .stbAuto1(stbAuto1), .stbAuto2(stbAuto2), .stbInd(stbInd), 
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
-  .running(LED1)
+  .running(running)
 );
+assign LED1=running;
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ PROGRAM COUNTER █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -158,7 +162,7 @@ wire inIrq=(busIR==12'o4000) | irqOverride; //FIX
 
 ProgramCounter thePC(
   .CLK(clk),
-  .RESET(sw_RESET),
+  .RESET(reset),
   // Inputs
   .IN(busPCin),
   .LD(pc_ld),
@@ -194,7 +198,7 @@ RAM theRAM(
 //
 IR theIR(   // TODO Should IR be a Multilatch?
   .CLK(clk),
-  .RESET(sw_RESET),
+  .RESET(reset),
   // Inputs
   .ckFetch(ckFetch),
   .irqOverride(irqOverride),
@@ -214,7 +218,7 @@ wire instIsPPIND, instIsIND, instIsDIR, instIsMP;
 wire instAND, instTAD, instISZ, instDCA, instJMS, instJMP, instIOT, instOPR;
 
 IRdecode theIRDECODER(
-  .RESET(sw_RESET),
+  .RESET(reset),
   // Inputs
   .PCLATCHED(busLatPC),
   .IR(busIR),
@@ -287,7 +291,7 @@ wire [11:0] mqout1;
 
 /* verilator lint_off PINMISSING */
 MultiLatch theMQ(
-  .RESET(sw_RESET),
+  .RESET(reset),
   .CLK(clk),
   // Inputs
   .in(accout1),
@@ -310,8 +314,8 @@ wire rotaterLI;
 
 Link theLINK(
   .CLK(clk),
-  .RESET(sw_RESET),
-  .CLEAR(sw_RESET), // FIX
+  .RESET(reset),
+  .CLEAR(reset), // FIX
   // Inputs
   .LINK_CK(link_ck),
   .CLL(oprCLL | linkclrIOT0), // FIX
@@ -363,7 +367,7 @@ wire [11:0] busData_acc;
 
 wire [11:0] accout1;
 MultiLatch theACC(
-  .RESET(sw_RESET),
+  .RESET(reset),
   .CLK(clk),
   // Inputs
   .in(accIn),
@@ -437,7 +441,7 @@ wire [11:0] busAddress_ind;
 wire [11:0] busReg_ind;
 
 MultiLatch theIndReg(
-  .RESET(sw_RESET),
+  .RESET(reset),
   .CLK(clk),
   // Inputs
   .in(busData), 
@@ -459,7 +463,7 @@ wire [11:0] busReg_data;
 
 /* verilator lint_off PINMISSING */
 MultiLatch theDataReg(
-  .RESET(sw_RESET),
+  .RESET(reset),
   .CLK(clk),
   // Inputs
   .in(busData), 
@@ -640,7 +644,7 @@ wire GIE; //FIX
 InstructionIOT600x theInterrupt(
   //Inputs
   .CLK(clk),
-  .RESET(sw_RESET),
+  .RESET(reset),
   .CLEAR(sw_CLEAR),
   .EN(instIOT & (busIR[8:3]==6'o00)), //FIX
   .IR(busIR[2:0]),
@@ -678,7 +682,7 @@ wire rot2acTTY;
 
 InstructionIOT603x theTTY(
   .CLK(clk),
-  .clear(sw_RESET | iotCLR0), //FIX
+  .clear(reset | iotCLR0), //FIX
   //Inputs
   .baudX7(baudX7),
   .EN1(instIOT & (busIR[8:3]==6'o03)), //FIX

@@ -19,19 +19,24 @@ module PDP8_top(
   input SW1, SW2, SW3
 );
 
+reg reset=1;
+reg [3:0] cnt=0;
 // The VQ100 package of the ICE40 lacks a PLL, so we have to
 // manually divide down the 100MHz clock input on the Olimex
 // board down to 25 MHz and and distribute it as the usual
 // clock to all non-top modules
-reg [1:0] extClkDivider;
-always @(posedge EXTCLK) extClkDivider <= extClkDivider + 1;
+
+reg [1:0] extClkDivider=0;
+always @(posedge EXTCLK) begin
+  extClkDivider <= extClkDivider + 1;
+  if (cnt==15) reset <= 0; else cnt<=cnt+1;
+end
 wire clk = extClkDivider[1];
 
-// wire REFRESHCLK = xtalDivider[10]; // 100M/2048 = 48.82 KHz
 
 PDP8 cpu(
   .clk(clk),
-  .sw_RESET(~nBUT2),
+  .reset(reset),
   .sw_CLEAR(~nBUT2),
   .sw_RUN(~nBUT1), 
   .sw_HALT(0),
