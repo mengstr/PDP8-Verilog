@@ -50,20 +50,25 @@ assign ram_oeFETCH=   ckFetch;
 assign pc_ckFETCH=    stbFetch;
 
 // 
-// ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
-// 
-assign ir2ramaIND=   instIsIND & (ckInd);
-assign ram_oeIND=    instIsIND & (ckInd);
-assign ind_ckIND=    instIsIND & (stbInd);
-
-// 
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT W. AUTOINC CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
 // 
-assign ir2ramaPPIND= instIsPPIND & (ckAuto1 | ckAuto2 | ckInd);
-assign ram_oePPIND=  instIsPPIND & (ckAuto1 | ckInd);
-assign ind2incPPIND= instIsPPIND & (ckAuto1 | ckAuto2);
-assign ind_ckPPIND=  instIsPPIND & (stbAuto1 | stbInd);
-assign inc2ramdPPIND=instIsPPIND & (ckAuto2);
-assign ram_wePPIND=  instIsPPIND & (stbAuto2);
+//
+//                                  ckAuto1 . stbAuto1 . ckAuto2 . stbAuto2 . ckInd . stbInd
+//                                  --------------------------------------------------------
+assign ir2ramaPPIND= instIsPPIND & (ckAuto1 |            ckAuto2 |            ckInd          );
+assign ram_oePPIND=  instIsPPIND & (ckAuto1 |                                 ckInd          );
+assign ind2incPPIND= instIsPPIND & (ckAuto1 |            ckAuto2                             );
+assign ind_ckPPIND=  instIsPPIND & (stbAuto1|                                         stbInd );
+assign inc2ramdPPIND=instIsPPIND & (                     ckAuto2                             );
+assign ram_wePPIND=  instIsPPIND & (                               stbAuto2                  );
+
+// 
+// ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
+// 
+//                                  ckAuto1 . stbAuto1 . ckAuto2 . stbAuto2 . ckInd . stbInd
+//                                  --------------------------------------------------------
+assign ir2ramaIND=   instIsIND & (                                            ckInd          );
+assign ram_oeIND=    instIsIND & (                                            ckInd          );
+assign ind_ckIND=    instIsIND & (                                                   stbInd  );
 
 endmodule
