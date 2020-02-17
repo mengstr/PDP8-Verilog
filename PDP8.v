@@ -56,12 +56,11 @@ wire [11:0] busPCin_reg   = reg2pc ? busReg : 12'b0;
 wire [11:0] busAddress_ir = ir2rama ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0; // Second OC12 module
 wire [11:0] busAddress_pc = ckFetch ? busPC : 12'b0;
 wire [11:0] busData_pc    = pc2ramd ? busPC : 12'b0; 
-wire [11:0] busData_latpc = pclat2ramd ? busLatPC : 12'b0; 
 
 wire [11:0] busReg        = busReg_ind | busReg_data;
 wire [11:0] busAddress    = busAddress_ind | busAddress_pc | busAddress_ir;
 wire [11:0] busPCin       = busPCin_ir | busPCin_reg; 
-wire [11:0] busData       = busData_inc | busData_ram |busData_acc | busData_pc | busData_latpc;
+wire [11:0] busData       = busData_inc | busData_ram |busData_acc | busData_pc;
 wire [11:0] busORacc      = mqout1 | busACGTF | busACTTY | (oprOSR ? 12'o`OSR : 12'o0000);
 wire [11:0] accIn         = accIn_andadd | accIn_rotater; 
 
@@ -102,7 +101,6 @@ wire ld2inc       = ld2inc05;
 wire ir2pc        = ir2pc05;
 wire reg2pc       = reg2pc05;
 wire pc2ramd      = pc2ramd05;
-wire pclat2ramd   = pclat2ramd05;
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ FRONT PANEL █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -587,7 +585,6 @@ wire reg2pc05;
 wire ir2rama05;
 wire pc2ramd05;
 wire ir2pc05;
-wire pclat2ramd05;
 wire done05;
 
 Instructions theinst0_5 (
@@ -599,7 +596,6 @@ Instructions theinst0_5 (
   .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   // Outputs
-  .pclat2ramd(pclat2ramd05),
   .ac2ramd(ac2ramd05),
   .cla(cla05),
   .inc2ramd(inc2ramd05),

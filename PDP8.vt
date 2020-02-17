@@ -47,7 +47,7 @@ PDP8 dut(
     initial begin
         $dumpfile("PDP8.vcd");
         $dumpvars(0,PDP8_tb);
-        #300000 begin $display("DONE after %d instructions",cnt); $finish; end
+        #3000000 begin $display("DONE after %d instructions",cnt); $finish; end
     end
 
     always @(CLK) begin
