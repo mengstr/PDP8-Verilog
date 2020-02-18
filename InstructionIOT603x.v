@@ -160,14 +160,14 @@ always @(posedge CLK) begin
       if (instTFC) flgPRN<=0; //Teleprinter Flag clear
       if (instTPC) begin
 `ifdef IVERILOG
-      if (ck1) $display("(%c)", {1'b0,AC[6:0]} );
+      if (ck1) $display("TX %d (%c)", {1'b0,AC[6:0]},{1'b0,AC[6:0]} );
 `endif
       if (ck1) begin txData<={1'b0,AC[6:0]}; txStb<=1; end;
     end
     if (instTLS) begin      //Teleprinter Load and start
       flgPRN<=0;
 `ifdef IVERILOG
-      if (ck1) $display("[%c]", {1'b0,AC[6:0]} );
+      if (ck1) $display("TX %d [%c]", {1'b0,AC[6:0]},{1'b0,AC[6:0]} );
 `endif
       if (ck1) begin txData<={1'b0,AC[6:0]}; txStb<=1; end;
     end
