@@ -26,11 +26,6 @@ module UART (
 //               +-------+     +     +     +     +     +     +     +     +------+
 //
 
-parameter CLK_FREQ=2500000;
-parameter BAUD=76800;
-
-parameter BAUDDIVIDER8X     = CLK_FREQ / (BAUD * 8);
-parameter BAUDDIVIDER_WIDTH = $clog2(BAUDDIVIDER8X);
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ BAUDRATE DIVIDER █ ▇ ▆ ▅ ▄ ▂ ▁
