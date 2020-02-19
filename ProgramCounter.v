@@ -30,6 +30,7 @@ assign PCLAT=thisPCLAT;
 always @(posedge CLK) begin 
   if (RESET) begin
     thisPC<=12'o0200;
+    thisPCLAT<=12'o0200;
     prevLD<=0;
     prevFetch<=0;
   end else if (LD && !prevLD) begin
