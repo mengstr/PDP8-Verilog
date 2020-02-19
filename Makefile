@@ -13,11 +13,7 @@ CLK_FREQ := $(shell expr \( $(EXTCLK_FREQ) \* 1000000 \) / $(EXTCLK_DIV) )
 BAUD		:= 9600
 OSR			:= 0000
 DEBOUNCECNT	:= 250000 
-DEFS		:= 	-DOSR=$(OSR) \
-				-DEXTCLK_DIV=$(EXTCLK_DIV) \
-				-DCLK_FREQ=$(CLK_FREQ) \
-				-DDEBOUNCECNT=$(DEBOUNCECNT) \
-				-DBAUD=$(BAUD) 
+DEFS		:= 	-DOSR=$(OSR) 
 
 TARGET 		:= PDP8
 SOURCES		:= $(wildcard *.v)
@@ -108,17 +104,24 @@ lint: $(SOURCES)
 		--lint-only \
 		$^ 2>&1 | tee lint.tmp
 
+CNT:=100000
+OSR:=0000
+BP:=7777
+TRACE:=
 
 test:
 	@echo "###"
-	@echo "### iverilog -DOSR=7777 -DCLK_FREQ=4000000 -DBAUD=10000 -DDEBOUNCECNT=10"
+	@echo "### iverilog -DOSR=$(OSR) -DCNT=$(CNT) -DBP=$(BP) -D$(TRACE)TRACE "
 	@echo "###"
 	@$(ICARUS) iverilog -g2012 \
-		-DOSR=7777 -DCLK_FREQ=4000000 -DBAUD=10000 -DDEBOUNCECNT=10 \
-		-DxTRACE  \
+		-DIVERILOG \
+		-DOSR=$(OSR) \
+		-DBP=$(BP) \
+		-D$(TRACE)TRACE \
+		-DCNT=$(CNT) \
 		-o $(TARGET).vvp \
 		$(TARGET).vt $(filter-out $(TARGET)_top.v, $(SOURCES))
-	$(ICARUS) vvp $(TARGET).vvp | tools/showop.sh | tee test.tmp
+	@$(ICARUS) vvp $(TARGET).vvp | tools/showop.sh | tee test.tmp
 
 modules:
 	# $(ICARUS) iverilog -g2012 -o Skip.vvp Skip.vt Skip.v

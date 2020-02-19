@@ -11,7 +11,6 @@ module PDP8(
   input reset,       // Power On Reset
   input sw_CLEAR,    // Clear CPU (button)
   input sw_RUN,      // Start CPU
-  input sw_HALT,     // Halt CPU at next instruction
   output LED1, LED2,
   // UART
   input rx,
@@ -59,7 +58,7 @@ wire [11:0] busData_pc    = pc2ramd ? busPC : 12'b0;
 
 wire [11:0] busReg        = busReg_ind | busReg_data;
 wire [11:0] busAddress    = busAddress_ind | busAddress_pc | busAddress_ir;
-wire [11:0] busPCin       = busPCin_ir | busPCin_reg; 
+wire [11:0] busPCin       = busPCin_ir | busPCin_reg | (setpc ? switches : 12'o0000); 
 wire [11:0] busData       = busData_inc | busData_ram |busData_acc | busData_pc;
 wire [11:0] busORacc      = mqout1 | busACGTF | busACTTY | (oprOSR ? 12'o`OSR : 12'o0000);
 wire [11:0] accIn         = accIn_andadd | accIn_rotater; 
@@ -71,7 +70,7 @@ wire [11:0] accIn         = accIn_andadd | accIn_rotater;
 
 // 5 input or
 wire done         = done05 | doneIOT0 | doneIOT34 | done7 | doneIgnore;
-wire pc_ck        = pc_ckIFI | pc_ck05 | pc_ckIOT0 | pc_ckIOT34 | pc_ck7;
+wire pc_ck        = pc_ckIFI | pc_ck05 | pc_ckIOT0 | pc_ckIOT34 | pc_ck7 | setpc;
 // 4 input or
 wire ac_ck        = ac_ck05 | ac_ckIOT0 | ac_ck7 | ac_ckTTY;
 wire rot2ac       = rot2ac05 | rot2acIOT0 | rot2ac7 | rot2acTTY;
@@ -84,9 +83,9 @@ wire ram_we       = ram_weIFI | ram_we05;
 wire claDCA       = cla05 | cla7;
 wire ind2inc      = ind2incIFI | ind2reg05;
 wire inc2ramd     = inc2ramdIFI | inc2ramd05;
-wire  ir2rama     = ir2ramaIFI | ir2rama05;
+wire ir2rama      = ir2ramaIFI | ir2rama05;
 // Direct connected
-wire pc_ld        = pc_ld05;
+wire pc_ld        = pc_ld05  | setpc;
 wire irqRq        = irqRqIOT34;  // Some device is asserting irq
 wire mq_ck        = mq_ck7;
 wire mq_hold      = mq_hold7;
@@ -106,7 +105,7 @@ wire pc2ramd      = pc2ramd05;
 // ▁ ▂ ▄ ▅ ▆ ▇ █ FRONT PANEL █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 wire [11:0]switches;
-wire startstop, sst, button2, button3, button4, button5;
+wire startstop, sst, setpc, button3, button4, button5;
 
 FrontPanel thePanel(
   // Inputs
@@ -118,7 +117,7 @@ FrontPanel thePanel(
   .yellow(switches),
   // Outputs
   .toggles(switches),
-  .buttons({startstop, sst, button2, button3, button4, button5}),
+  .buttons({startstop, sst, setpc, button3, button4, button5}),
   .GREEN1(GREEN1), .GREEN2(GREEN2),
   .RED1(RED1), .RED2(RED2),
   .YELLOW1(YELLOW1), .YELLOW2(YELLOW2),
@@ -142,7 +141,7 @@ Sequencer theSEQUENCER(
   // Inputs
   .HALT((oprHLT & ck2)), //FIX
   .DONE(done), 
-  .startstop(startstop),
+  .startstop(startstop|sw_RUN),
   .sst(sst),
   .SEQTYPE({instIsPPIND,instIsIND}),
   // Outputs

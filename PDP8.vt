@@ -16,16 +16,16 @@ PDP8 dut(
   .reset(reset),
   .sw_CLEAR(clear),
   .sw_RUN(run), 
-  .sw_HALT(halt),
   .rx(RxD), .tx(TxD),
   .LED1(LED1), .LED2(LED2),
   .GREEN1(GREEN1), .GREEN2(GREEN2),
   .RED1(RED1), .RED2(RED2),
   .YELLOW1(YELLOW1), .YELLOW2(YELLOW2),
-  .PLED1(PLED1), .PLED2(PLED2), .PLED3(PLED3), .PLED4(PLED4), .PLED5(PLED5), .PLED6(PLED6)
+  .PLED1(PLED1), .PLED2(PLED2), .PLED3(PLED3), .PLED4(PLED4), .PLED5(PLED5), .PLED6(PLED6),
+  .SW1(1'b0), .SW2(1'b0), .SW3(1'b0)
   );
     
-  reg [20:0] cnt=0;
+  reg [24:0] cnt=0;
 
     always begin
         #2 CLK<=~CLK;
@@ -47,7 +47,7 @@ PDP8 dut(
     initial begin
         $dumpfile("PDP8.vcd");
         $dumpvars(0,PDP8_tb);
-        #3000000 begin $display("DONE after %d instructions",cnt); $finish; end
+        #`CNT begin $display("DONE after %d instructions",cnt); $finish; end
     end
 
     always @(CLK) begin
@@ -66,11 +66,11 @@ PDP8 dut(
             );
 
     `endif
-            if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bx)) begin $display("X in theACC.data"); $finish; end
-            if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bz)) begin $display("Z in theACC.data"); $finish; end
+        if (dut.thePC.PCLAT == 12'o`BP) begin $display("BP at %o after %d instructions",dut.thePC.PCLAT, cnt); $finish; end
+            // if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bx)) begin $display("X in theACC.data"); $finish; end
+            // if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bz)) begin $display("Z in theACC.data"); $finish; end
         end
-            if (dut.theSEQUENCER.stepCnt==5'd8 & dut.busIR==12'o7402) begin $display("end by HLT after %d instructions",cnt); $finish; end
-
+        if (dut.theSEQUENCER.stepCnt==5'd8 & dut.busIR==12'o7402) begin $display("HLT at %o after %d instructions",dut.thePC.PCLAT, cnt); $finish; end
     end
     
 
