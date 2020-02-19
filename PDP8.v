@@ -46,7 +46,7 @@ ClockGen ClockGen(
 // ▁ ▂ ▄ ▅ ▆ ▇ █      OR'ed BUSSES     █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-reg [11:0] busIR;
+reg  [11:0] busIR;
 wire [11:0] busPC;
 wire [11:0] busLatPC;
 
@@ -293,16 +293,17 @@ MultiLatch theMQ(
   .RESET(reset),
   .CLK(clk),
   // Inputs
-  .in(accout1),
+  .in(accIn),
   .latch(mq_ck), 
+  .latch3(mq_tmpLatch),
   .hold(mq_hold),
   .oe1(mq2orbus), 
   .oe2(1'b0),
+  .oe3(mq_tmpOE),
   // Outputs
   .out1(mqout1) 
 );
 /* verilator lint_on PINMISSING */
-
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ LINK █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -371,9 +372,11 @@ MultiLatch theACC(
   // Inputs
   .in(accIn),
   .latch(ac_ck),
+  .latch3(1'b0),
   .hold(1'b0),
   .oe1(1'b1),
   .oe2(ac2ramd),
+  .oe3(1'b0),
   // Outputs
   .out1(accout1), 
   .out2(busData_acc) 
@@ -445,9 +448,11 @@ MultiLatch theIndReg(
   // Inputs
   .in(busData), 
   .latch(ind_ck),
+  .latch3(1'b0),
   .hold(1'b0),
   .oe1(ind2inc),
   .oe2(ind2rama),
+  .oe3(1'b0),
   // Outputs
   .out1(busReg_ind), 
   .out2(busAddress_ind)
@@ -467,9 +472,11 @@ MultiLatch theDataReg(
   // Inputs
   .in(busData), 
   .latch(data_ck),
+  .latch3(1'b0),
   .hold(1'b0),
   .oe1(ld2inc),
   .oe2(1'b0),
+  .oe3(1'b0),
   // Outputs
   .out1(busReg_data)
 );
@@ -537,6 +544,9 @@ wire ac_ck7;
 wire rot2ac7;
 wire done7;
 wire mq2orbus7;
+wire mq_tmpLatch;
+wire mq_tmpOE;
+
 
 InstructionOPR theinst7 (
   // Inputs
@@ -560,7 +570,9 @@ InstructionOPR theinst7 (
   .mq_hold(mq_hold7),
   .mq2orbus(mq2orbus7),
   .pc_ck(pc_ck7),
-  .rot2ac(rot2ac7)
+  .rot2ac(rot2ac7),
+  .mq_tmpLatch(mq_tmpLatch),
+  .mq_tmpOE(mq_tmpOE)
 );
 
 

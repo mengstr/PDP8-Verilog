@@ -3,8 +3,7 @@
 echo --------------------------------------------------------------------
 echo InstTest1-D0AB
 cp hex/InstTest1-D0AB.hex initialRAM.hex
-make OSR=7777 CNT=100000 BP=7777 TRACE= test
-exit
+make OSR=7777 CNT=100000 BP=5276 TRACE= test
 
 echo --------------------------------------------------------------------
 echo InstTest2-D0BB
