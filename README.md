@@ -1,5 +1,60 @@
 # PDP8/X-Verilog
 
+
+## Busses
+
+* busIR
+* busPC
+* busLatPC
+* busReg 
+  * busReg_ind
+  * busReg_data
+* busAddress 
+  * busAddress_ind 
+  * busAddress_pc 
+  * busAddress_ir
+* busData       
+  * busData_inc 
+  * busData_ram 
+  * busData_acc 
+  * busData_pc
+* busPCin       
+  * busPCin_ir 
+  * busPCin_reg 
+  * (setpc ? switches : 12'o0000)
+* busORacc      
+  * mqout1 
+  * busACGTF 
+  * busACTTY 
+  * (oprOSR ? 12'o`OSR : 12'o0000)
+* accIn         
+  * accIn_andadd 
+  * accIn_rotater
+
+* busPCin_ir    = ir2pc ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0 // First OC12 module
+* busPCin_reg   = reg2pc ? busReg : 12'b0
+* busAddress_ir = ir2rama ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0 // Second OC12 module
+* busAddress_pc = ckFetch ? busPC : 12'b0
+* busData_pc    = pc2ramd ? busPC : 12'b0
+* busData_ram
+* accIn_andadd
+* busData_acc
+* accIn_rotater
+* busAddress_ind
+* busReg_ind
+* busReg_data
+* busData_inc
+
+* switches
+* mqout1
+* accout1
+* clorinOut
+* incOut
+* busACGTF
+* busACTTY
+
+
+
 ## Usage of Sequencer signals
 
 FILE | ckFetch | stbFetch | ckAuto1 | stbAuto1 | ckAuto2 | stbAuto2 | ckInd | stbInd
