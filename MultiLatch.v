@@ -17,6 +17,9 @@ module MultiLatch (
   output [11:0] out1, out2
 );
 
+reg lastLatch=0;
+reg lastLatch3=0;
+
 reg [11:0] data=0;
 reg [11:0] data3=0;
 
@@ -25,9 +28,11 @@ always @(posedge CLK) begin
     data<=0;
     data3<=0;
   end else begin
-    if (latch) data<=in;
-    if (latch3) data3<=in;
+    if (latch & ~lastLatch) data<=in;
+    if (latch3 & ~lastLatch3) data3<=in;
   end
+  lastLatch<=latch;
+  lastLatch3<=latch3;
 end
 
 wire [11:0] out1a=oe1 ? data : 12'b0;
