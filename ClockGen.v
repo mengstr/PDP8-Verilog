@@ -35,10 +35,15 @@ module ClockGen (
 // [16]    /131072 =                         120.58 ms
 
 
+`ifdef IVERILOG
+  parameter BAUDTAP=0;
+`else
+  parameter BAUDTAP=3;
+`endif
+
 reg [5:0] preDiv=0;
 parameter PREDIVTOP=23;
 reg [16:0] counter=0;
-parameter BAUDTAP=3;
 reg lastX7=0;
 reg lastFrontRefresh=0;
 
