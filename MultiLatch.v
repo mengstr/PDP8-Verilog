@@ -7,34 +7,32 @@
 
 `default_nettype none
 
-//
-// 12 bit asynch clear register with 2 outputs having separate enables
-//
-
 module MultiLatch (
   input RESET,
   input CLK, 
   input [11:0] in,
-  input hold,
   input latch,
-  input oe1,oe2,
+  input latch3,
+  input oe1,oe2,oe3,
   output [11:0] out1, out2
 );
 
 reg [11:0] data=0;
-reg [11:0] holdreg=0;
+reg [11:0] data3=0;
 
 always @(posedge CLK) begin
   if (RESET) begin
-    holdreg<=0;
     data<=0;
+    data3<=0;
   end else begin
-    if (!hold) holdreg<=in;
-    if (latch) data<=holdreg;
+    if (latch) data<=in;
+    if (latch3) data3<=in;
   end
 end
 
-assign out1=oe1 ? data : 12'b0;
+wire [11:0] out1a=oe1 ? data : 12'b0;
+wire [11:0] out1b=oe3 ? data3 : 12'b0;
+assign out1=out1a | out1b;
 assign out2=oe2 ? data : 12'b0;
 
 endmodule

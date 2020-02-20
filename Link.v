@@ -16,7 +16,7 @@ input CML,        // Complement link
 input SET,        // Update L to be FROM_ROTATER
 input FROM_ROTATER,
 output reg L,
-output TO_ROTATER
+output reg TO_ROTATER
 );
 
 //FIXME should be clocked with CLK not LINK_CK
@@ -35,8 +35,11 @@ always @(posedge LINK_CK or posedge CLEAR) begin
   end
 end
 
-// assign TO_ROTATER=L;
-assign TO_ROTATER=((L&(~CLL))^CML);
+// assign TO_ROTATER=((L&(~CLL))^CML);
+wire TO_ROTATER_=((L&(~CLL))^CML);
+always @(posedge LINK_CK) begin
+  TO_ROTATER<=TO_ROTATER_;
+end
 
 endmodule
   

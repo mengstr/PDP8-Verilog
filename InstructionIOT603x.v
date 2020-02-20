@@ -147,11 +147,11 @@ reg lastRxRdy=0;
 reg [1:0] cnt=0;
 
 always @(posedge CLK) begin
-    if (clear)   begin
+    if (clear) begin
         flgTTYIE<=1;
         flgKBD<=0;
         flgPRN<=0;
-        // txtick<=0;
+        lastTxRdy<=1;
     end else begin
       if (instKIE) flgTTYIE<=ACbit11; ////Keyboard Interrupt Set/Reset
       if (instKCF) flgKBD<=0; //Keyboard Clear Flags

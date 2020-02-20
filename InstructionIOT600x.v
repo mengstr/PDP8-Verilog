@@ -72,6 +72,7 @@ module InstructionIOT600x(
   output rot2ac,
   output ac_ck,
   output clr,
+  output ACclr,
   output linkclr,
   output linkcml,
   output link_ck,
@@ -94,8 +95,8 @@ or(linkclr, linkclr5, linkclr7);
 wire        linkcml5;
 or(linkcml, linkcml5);
 
-wire    clr4, clr7;
-or(clr, clr4, clr7);
+wire    clr7;
+or(clr, clr7);
 
 wire       rot2ac4, rot2ac7;
 or(rot2ac, rot2ac4, rot2ac7);
@@ -165,7 +166,7 @@ reg U=0;        // TODO User mode flag
 //                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
 assign rot2ac4=   instGTF & ck1;                  // 6004 GTF
 assign ACGTF =    instGTF & ck1 ? {LINK, GT, irqRq, II, IE , U, 1'b0, IF, 1'b0, DF} : 12'b0;
-assign clr4=      instGTF & ck1;
+assign ACclr=     instGTF & ck1;
 assign ac_ck4=    instGTF & stb1;
 assign done4=     instGTF & ck2;
 

@@ -25,10 +25,11 @@ module InstructionOPR (
   output done,
   output link_ck,
   output mq_ck,
-  output mq_hold,
   output mq2orbus,
   output pc_ck,
-  output rot2ac
+  output rot2ac,
+  output mq_tmpLatch,
+  output mq_tmpOE
 );
 
 wire      ac_ckOPR1, ac_ckOPR2, ac_ckOPR3B, ac_ckOPR3C, ac_ckOPR3D, ac_ckOPR3I, ac_ckOPR3J, ac_ckOPR3K, ac_ckOPR3L;
@@ -46,9 +47,6 @@ or(link_ck, link_ckOPR1);
 wire      mq_ckOPR3I, mq_ckOPR3J, mq_ckOPR3K, mq_ckOPR3L;
 or(mq_ck, mq_ckOPR3I, mq_ckOPR3J, mq_ckOPR3K, mq_ckOPR3L);
 
-wire        mq_holdOPR3K, mq_holdOPR3L;
-or(mq_hold, mq_holdOPR3K, mq_holdOPR3L);
-
 wire         mq2orbusOPR3C, mq2orbusOPR3D, mq2orbusOPR3K, mq2orbusOPR3L;
 or(mq2orbus, mq2orbusOPR3C, mq2orbusOPR3D, mq2orbusOPR3K, mq2orbusOPR3L);
 
@@ -57,6 +55,13 @@ or(pc_ck, pc_ckOPR2);
 
 wire       rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L;
 or(rot2ac, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2acOPR3I, rot2acOPR3J, rot2acOPR3K, rot2acOPR3L);
+
+wire            mq_tmpLatch3K, mq_tmpLatch3L;
+or(mq_tmpLatch, mq_tmpLatch3K, mq_tmpLatch3L);
+
+wire         mq_tmpOE3K, mq_tmpOE3L;
+or(mq_tmpOE, mq_tmpOE3K, mq_tmpOE3L);
+
 
     wire OP1=(instOPR & opr1);
     wire OP2=(instOPR & opr2);
@@ -162,22 +167,34 @@ or(rot2ac, rot2acOPR1, rot2acOPR2, rot2acOPR3B, rot2acOPR3C, rot2acOPR3D, rot2ac
     //                            1     1      2     2      3     3      4     4      5     5      6     6
     //                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
     assign rot2acOPR3K=      O3k&(ck1 |        ck2 |        ck3                                              );
-    assign mq2orbusOPR3K=    O3k&(ck1|ck2|ck3);
-    assign mq_holdOPR3K=     O3k&(ck1 |        ck2 |        ck3                                              );
-    assign claO3K=           O3k&(             ck2                                                           );
+    assign mq_tmpLatch3K=    O3k&(      stb1                                                                 );
+    assign claO3K=           O3k&(             ck2 |        ck3                                              );
+    assign mq2orbusOPR3K=    O3k&(             ck2                                                           );
     assign ac_ckOPR3K=       O3k&(                   stb2                                                    );
-    assign mq_ckOPR3K=       O3k&(                          ck3                                              );
+    assign mq_tmpOE3K=       O3k&(                          ck3                                              );
+    assign mq_ckOPR3K=       O3k&(                                stb3                                       );
     assign doneOPR3K=        O3k&(                                       ck4                                 );
 
     // CLA, SWP   7721    load AC from MQ then clear MQ     (CLA,MQL,MQA,SWP)
     //                            1     1      2     2      3     3      4     4      5     5      6     6
     //                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 
-    assign rot2acOPR3L=      O3l&(ck1 |        ck2                                                           );
+    assign rot2acOPR3L=      O3l&(ck1 |        ck2 |        ck3                                              );
+    assign mq_tmpLatch3L=    O3l&(      stb1                                                                 );
+    assign claO3L=           O3l&(             ck2 |        ck3                                              );
     assign mq2orbusOPR3L=    O3l&(             ck2                                                           );
-    assign claO3L=           O3l&(ck1                                                                        );
-    assign ac_ckOPR3L=       O3l&(      stb1 |       stb2                                                    );
-    assign mq_holdOPR3L=     O3l&(             ck2                                                           );
-    assign mq_ckOPR3L=       O3l&(                   stb2                                                    );
-    assign doneOPR3L=        O3l&(                          ck3                                              );
+    assign ac_ckOPR3L=       O3l&(                   stb2                                                    );
+    assign mq_tmpOE3L=       O3l&(                          ck3                                              );
+    assign mq_ckOPR3L=       O3l&(                                stb3                                       );
+    assign doneOPR3L=        O3l&(                                       ck4                                 );
+
+
+    // assign rot2acOPR3L=      O3l&(ck1 |        ck2                                                           );
+    // assign mq2orbusOPR3L=    O3l&(             ck2                                                           );
+    // assign claO3L=           O3l&(ck1                                                                        );
+    // assign ac_ckOPR3L=       O3l&(      stb1 |       stb2                                                    );
+    // assign mq_holdOPR3L=     O3l&(             ck2                                                           );
+    // assign mq_ckOPR3L=       O3l&(                   stb2                                                    );
+    // assign doneOPR3L=        O3l&(                          ck3                                              );
+
 
 endmodule
