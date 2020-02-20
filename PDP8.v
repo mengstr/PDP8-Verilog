@@ -71,10 +71,10 @@ wire [11:0] accIn         = accIn_andadd | accIn_rotater;
 // 5 input or
 wire done         = done05 | doneIOT0 | doneIOT34 | done7 | doneIgnore;
 wire pc_ck        = pc_ckIFI | pc_ck05 | pc_ckIOT0 | pc_ckIOT34 | pc_ck7 | setpc;
+wire clorinCLR    = claDCA | oprCLA | iotCLR0 |clrTTY | ACclrIOT0;
 // 4 input or
 wire ac_ck        = ac_ck05 | ac_ckIOT0 | ac_ck7 | ac_ckTTY;
 wire rot2ac       = rot2ac05 | rot2acIOT0 | rot2ac7 | rot2acTTY;
-wire clorinCLR    = claDCA | oprCLA | iotCLR0 |clrTTY;
 // 3 input or
 wire link_ck      = link_ck05 | link_ckIOT0 | link_ck7;
 // 2 input or
@@ -88,7 +88,6 @@ wire ir2rama      = ir2ramaIFI | ir2rama05;
 wire pc_ld        = pc_ld05  | setpc;
 wire irqRq        = irqRqIOT34;  // Some device is asserting irq
 wire mq_ck        = mq_ck7;
-wire mq_hold      = mq_hold7;
 wire mq2orbus     = mq2orbus7;
 wire ramd2ac_add  = ramd2ac_add05;
 wire ramd2ac_and  = ramd2ac_and05;
@@ -296,7 +295,6 @@ MultiLatch theMQ(
   .in(accIn),
   .latch(mq_ck), 
   .latch3(mq_tmpLatch),
-  .hold(mq_hold),
   .oe1(mq2orbus), 
   .oe2(1'b0),
   .oe3(mq_tmpOE),
@@ -373,7 +371,6 @@ MultiLatch theACC(
   .in(accIn),
   .latch(ac_ck),
   .latch3(1'b0),
-  .hold(1'b0),
   .oe1(1'b1),
   .oe2(ac2ramd),
   .oe3(1'b0),
@@ -449,7 +446,6 @@ MultiLatch theIndReg(
   .in(busData), 
   .latch(ind_ck),
   .latch3(1'b0),
-  .hold(1'b0),
   .oe1(ind2inc),
   .oe2(ind2rama),
   .oe3(1'b0),
@@ -473,7 +469,6 @@ MultiLatch theDataReg(
   .in(busData), 
   .latch(data_ck),
   .latch3(1'b0),
-  .hold(1'b0),
   .oe1(ld2inc),
   .oe2(1'b0),
   .oe3(1'b0),
@@ -537,7 +532,6 @@ InstructionFetch theinstFI (
 
 wire pc_ck7;
 wire mq_ck7;
-wire mq_hold7;
 wire link_ck7;
 wire cla7;
 wire ac_ck7;
@@ -567,7 +561,6 @@ InstructionOPR theinst7 (
   .done(done7),
   .link_ck(link_ck7),
   .mq_ck(mq_ck7),
-  .mq_hold(mq_hold7),
   .mq2orbus(mq2orbus7),
   .pc_ck(pc_ck7),
   .rot2ac(rot2ac7),
@@ -651,6 +644,7 @@ wire doneIOT0;
 wire [11:0] busACGTF;
 wire irqOverride;
 wire GIE; //FIX
+wire ACclrIOT0;
 
 InstructionIOT600x theInterrupt(
   //Inputs
@@ -670,6 +664,7 @@ InstructionIOT600x theInterrupt(
   .rot2ac(rot2acIOT0),
   .ac_ck(ac_ckIOT0),
   .clr(iotCLR0),
+  .ACclr(ACclrIOT0),
   .linkclr(linkclrIOT0),
   .linkcml(linkcmlIOT0),
   .link_ck(link_ckIOT0),
