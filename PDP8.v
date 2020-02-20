@@ -194,17 +194,22 @@ RAM theRAM(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ IR █ ▇ ▆ ▅ ▄ ▂ ▁
 //
-IR theIR(   // TODO Should IR be a Multilatch?
-  .CLK(clk),
-  .RESET(reset),
-  // Inputs
-  .ckFetch(ckFetch),
-  .irqOverride(irqOverride),
-  .busData(busData),
-  // Outputs
-  .busIR(busIR)
-);
 
+/* verilator lint_off PINMISSING */
+MultiLatch theIR(
+  .RESET(reset),
+  .CLK(clk),
+  // Inputs
+  .in(irqOverride ? 12'o4000 : busData), //FIXME
+  .latch(ckFetch),
+  .latch3(1'b0),
+  .oe1(1'b1),
+  .oe2(1'b0),
+  .oe3(1'b0),
+  // Outputs
+  .out1(busIR)
+);
+/* verilator lint_on PINMISSING */
 
 
 //
