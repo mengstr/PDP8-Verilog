@@ -26,25 +26,24 @@ ICARUS:=$(DOCKER) cranphin/iverilog
 VERILATOR:=$(DOCKER) --entrypoint /usr/local/bin/verilator verilator/verilator 
 ICEFLASH:=../verilog_old/upload/iceflash 
 
+rev=$$(tput bold)
+norm=$$(tput sgr0)
+
 
 all: $(TARGET).bin report
 .PHONY: all report upload lint clean test
 
 $(TARGET).json: $(SOURCES) initialRAM.hex Makefile $(PCF)
-	@echo "###"
-	@echo "### yosys $(DEFS)"
-	@echo "###"
+	@echo "${rev}###  yosys $(DEFS) ###${norm}"
 	@$(ICESTORM) yosys \
-	$(DEFS) \
-	-q \
-	-p 'synth_ice40 -top $(TARGET)_top -json $@' \
-	$(SOURCES) > yosys.tmp
+	  $(DEFS) \
+	  -q \
+	  -p 'synth_ice40 -top $(TARGET)_top -json $@'  \
+	  $(SOURCES) > yosys.tmp
 
 
 $(TARGET).asc: $(TARGET).json
-	@echo "###"
-	@echo "### nextpnr --freq $(PNRCLKGOAL)"
-	@echo "###"
+	@echo "${rev}###  nextpnr --freq $(PNRCLKGOAL) ###${norm}"
 	@$(ICESTORM) nextpnr-ice40 \
 	--$(DEVICE) \
 	--package $(PACKAGE) \
@@ -56,18 +55,14 @@ $(TARGET).asc: $(TARGET).json
 
 
 $(TARGET).bin: $(TARGET).asc
-	@echo "###"
-	@echo "### icepack"
-	@echo "###"
+	@echo "${rev}###  icepack ###${norm}"
 	@$(ICESTORM) icepack \
 	$< \
 	$@ 2>&1 | tee icepack.tmp
 
 
 icetime0.tmp: $(TARGET).asc
-	@echo "###"
-	@echo "### icetime -c $(PNRCLKGOAL)"
-	@echo "###"
+	@echo "${rev}###  icetime -c $(PNRCLKGOAL) ###${norm}"
 	@$(ICESTORM) icetime \
 	-d $(DEVICE) \
 	-c $(PNRCLKGOAL) \
@@ -84,17 +79,13 @@ report: icetime0.tmp
 
 
 upload:$(TARGET).bin
-	@echo "###"
-	@echo "### iceflash $(PORT) -h -e -w $(TARGET).bin -t -G"
-	@echo "###"
+	@echo "${rev}###  iceflash $(PORT) -h -e -w $(TARGET).bin -t -G ###${norm}"
 	@$(ICEFLASH) $(PORT) -h -e -w $(TARGET).bin -t -G
 	tio $(PORT) 
 
 
 lint: $(SOURCES)
-	@echo "###"
-	@echo "### verilator --lint-only $(DEFS)"
-	@echo "###"
+	@echo "${rev}###  verilator --lint-only $(DEFS) ###${norm}"
 	@$(VERILATOR) \
 		-Wall \
 		-Wno-UNUSED \
@@ -110,9 +101,7 @@ BP:=7777
 TRACE:=
 
 test:
-	@echo "###"
-	@echo "### iverilog -DOSR=$(OSR) -DCNT=$(CNT) -DBP=$(BP) -D$(TRACE)TRACE "
-	@echo "###"
+	@echo "${rev}###  iverilog -DOSR=$(OSR) -DCNT=$(CNT) -DBP=$(BP) -D$(TRACE)TRACE  ###${norm}"
 	@$(ICARUS) iverilog -g2012 \
 		-DIVERILOG \
 		-DOSR=$(OSR) \
@@ -140,19 +129,10 @@ clean:
 
 
 #
-# @echo "verilator --top-module $(basename $@) --lint-only $<"
-# @$(VERILATOR) /bin/sh -c "verilator -DNOTOP --top-module $(basename $@) --lint-only $<"
+# 	  -p 'synth_ice40 -top $(TARGET)_top -json $@; cd IRdecode; show -width -enum -stretch -prefix $(TARGET) -format dot'  \
+#	@$(ICESTORM) dot -Tpng -O $(TARGET).dot
 #
 # TARGET=CLORIN
 # image:
 # 	@$(ICESTORM) yosys -p "prep; show -stretch -prefix $(TARGET) -format dot" $(TARGET).v > /dev/null
 # 	@$(ICESTORM) dot -Tpng -O $(TARGET).dot > a.a
-#
-# tb:
-# 	@$(ICARUS) iverilog -DTB -o $(TARGET).vvp $(TARGET).v $(TARGET)_tb.v
-# 	@$(ICARUS) vvp $(TARGET).vvp
-#
-#	@echo icetime -d $(DEVICE) -mtr $@ $<
-#	@cat $(basename $@).tmp | /usr/bin/sed -ne '/^Info: Device utilisation:/,$$ p' | /usr/bin/sed -n '/^[[:space:]]*$$/q;p' | sed 's/Info: //g'
-#	@$(ICESTORM) icetime -d $(DEVICE) -mtr $@ $< | grep 'Timing' | sed 's/\/\/ //g'
-#

@@ -7,8 +7,8 @@
 `default_nettype none
 
 module Sequencer (
-  input CLK,           //
-  input RESET,            //
+  input clk,           //
+  input reset,            //
   input DONE,             // Reset step counter before the natural end at step 31
   input HALT,             // Rising edge halts at next instruction
   input startstop,        // Strobe -  toggles continous run/halt
@@ -26,8 +26,8 @@ reg singleinst=0;
 reg lastSst=0;
 reg lastStartstop=0;
 
-always @(posedge CLK) begin 
-    if (RESET) begin
+always @(posedge clk) begin 
+    if (reset) begin
         running<=0;
         singleinst<=0;
         stepCnt<=31;
@@ -57,26 +57,26 @@ always @(posedge CLK) begin
     end
 end
 
-assign ckFetch  = !RESET & (stepCnt==0 || stepCnt==1);
-assign ckAuto1  = !RESET & (stepCnt==2 || stepCnt==3);
-assign ckAuto2  = !RESET & (stepCnt==4 || stepCnt==5);
-assign ckInd    = !RESET & (stepCnt==6 || stepCnt==7);
-assign ck1      = !RESET & (stepCnt==8 || stepCnt==9);
-assign ck2      = !RESET & (stepCnt==10 || stepCnt==11);
-assign ck3      = !RESET & (stepCnt==12 || stepCnt==13);
-assign ck4      = !RESET & (stepCnt==14 || stepCnt==15);
-assign ck5      = !RESET & (stepCnt==16 || stepCnt==17);
-assign ck6      = !RESET & (stepCnt==18 || stepCnt==19);
+assign ckFetch  = !reset & (stepCnt==0 || stepCnt==1);
+assign ckAuto1  = !reset & (stepCnt==2 || stepCnt==3);
+assign ckAuto2  = !reset & (stepCnt==4 || stepCnt==5);
+assign ckInd    = !reset & (stepCnt==6 || stepCnt==7);
+assign ck1      = !reset & (stepCnt==8 || stepCnt==9);
+assign ck2      = !reset & (stepCnt==10 || stepCnt==11);
+assign ck3      = !reset & (stepCnt==12 || stepCnt==13);
+assign ck4      = !reset & (stepCnt==14 || stepCnt==15);
+assign ck5      = !reset & (stepCnt==16 || stepCnt==17);
+assign ck6      = !reset & (stepCnt==18 || stepCnt==19);
 
-assign stbFetch = !RESET & (stepCnt==1);
-assign stbAuto1 = !RESET & (stepCnt==3);
-assign stbAuto2 = !RESET & (stepCnt==5);
-assign stbInd   = !RESET & (stepCnt==7);
-assign stb1     = !RESET & (stepCnt==9);
-assign stb2     = !RESET & (stepCnt==11);
-assign stb3     = !RESET & (stepCnt==13);
-assign stb4     = !RESET & (stepCnt==15);
-assign stb5     = !RESET & (stepCnt==17);
-assign stb6     = !RESET & (stepCnt==19);
+assign stbFetch = !reset & (stepCnt==1);
+assign stbAuto1 = !reset & (stepCnt==3);
+assign stbAuto2 = !reset & (stepCnt==5);
+assign stbInd   = !reset & (stepCnt==7);
+assign stb1     = !reset & (stepCnt==9);
+assign stb2     = !reset & (stepCnt==11);
+assign stb3     = !reset & (stepCnt==13);
+assign stb4     = !reset & (stepCnt==15);
+assign stb5     = !reset & (stepCnt==17);
+assign stb6     = !reset & (stepCnt==19);
 
 endmodule

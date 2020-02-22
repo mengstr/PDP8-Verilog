@@ -8,8 +8,8 @@
 `default_nettype none
 
 module MultiLatch (
-  input RESET,
-  input CLK, 
+  input clk, 
+  input reset,
   input [11:0] in,
   input latch,
   input latch3,
@@ -23,8 +23,8 @@ reg lastLatch3=0;
 reg [11:0] data=0;
 reg [11:0] data3=0;
 
-always @(posedge CLK) begin
-  if (RESET) begin
+always @(posedge clk) begin
+  if (reset) begin
     data<=0;
     data3<=0;
   end else begin

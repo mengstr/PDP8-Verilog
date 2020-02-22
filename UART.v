@@ -7,8 +7,7 @@
 `default_nettype none
 
 module UART (
-  input CLK,
-  input RESET,
+  input clk,
   input baudX7,
   input [7:0] txData, // data to be transmitted serially onto tx
   input txStb,        // positive going strobe for the txData - 1 CLK
@@ -33,14 +32,9 @@ module UART (
 
 reg baudTick=0;       // Strobes at baudrate speed - 1 CLK
 
-always @(posedge CLK) begin
-  if (RESET) begin
-  end
-end
-
 reg [2:0] baud7Xcnt=0;
 
-always @(posedge CLK) begin
+always @(posedge clk) begin
   if (baudX7) baud7Xcnt <= baud7Xcnt + 1;
   if (baud7Xcnt > 6) begin
     baud7Xcnt <= 0;
@@ -61,7 +55,7 @@ reg [3:0] nextMiddle=0;
 reg rxReady=0;
 reg samplePoint=0;
 
-always @(posedge CLK) begin
+always @(posedge clk) begin
   if (rxAck) rxReady<=0;
   if (baudX7) begin
     if (rxCnt==0) begin
@@ -106,7 +100,7 @@ reg [9:0] txBuf=0;    // The byte being transmitted plus Start and Stop bits
 reg [3:0] txCnt=0;    // Counter for the bits of the byte while transmitting
 reg txTriggered=0;    // Set high at txStb and low when the transmission starts
                       // at the next baudTick
-always @(posedge CLK) begin
+always @(posedge clk) begin
 
   // If upstream wants to send something, store the data and set the triggered 
   // flag to start waiting for the next baudTick

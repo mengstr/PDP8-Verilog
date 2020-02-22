@@ -8,7 +8,9 @@
 
 
 module RAM(
-  input clk,oe,we,
+  input clk,
+  input oe,
+  input we,
   input [11:0] addr, 
   input [11:0] dataI, 
   output [11:0] dataO

@@ -135,8 +135,8 @@ wire stb1, stb2, stb3, stb4, stb5, stb6;
 wire running;
 
 Sequencer theSEQUENCER(
-  .CLK(clk),
-  .RESET(reset),
+  .clk(clk),
+  .reset(reset),
   // Inputs
   .HALT((oprHLT & ck2)), //FIX
   .DONE(done), 
@@ -159,8 +159,8 @@ assign LED1=running;
 wire inIrq=(busIR==12'o4000) | irqOverride; //FIX
 
 ProgramCounter thePC(
-  .CLK(clk),
-  .RESET(reset),
+  .clk(clk),
+  .reset(reset),
   // Inputs
   .IN(busPCin),
   .LD(pc_ld),
@@ -197,8 +197,8 @@ RAM theRAM(
 
 /* verilator lint_off PINMISSING */
 MultiLatch theIR(
-  .RESET(reset),
-  .CLK(clk),
+  .reset(reset),
+  .clk(clk),
   // Inputs
   .in(irqOverride ? 12'o4000 : busData), //FIXME
   .latch(ckFetch),
@@ -221,7 +221,6 @@ wire instIsPPIND, instIsIND, instIsDIR, instIsMP;
 wire instAND, instTAD, instISZ, instDCA, instJMS, instJMP, instIOT, instOPR;
 
 IRdecode theIRDECODER(
-  .RESET(reset),
   // Inputs
   .PCLATCHED(busLatPC),
   .IR(busIR),
@@ -294,8 +293,8 @@ wire [11:0] mqout1;
 
 /* verilator lint_off PINMISSING */
 MultiLatch theMQ(
-  .RESET(reset),
-  .CLK(clk),
+  .reset(reset),
+  .clk(clk),
   // Inputs
   .in(accIn),
   .latch(mq_ck), 
@@ -316,8 +315,8 @@ wire link;
 wire rotaterLI;
 
 Link theLINK(
-  .CLK(clk),
-  .RESET(reset),
+  .clk(clk),
+  .reset(reset),
   .CLEAR(reset), // FIX
   // Inputs
   .LINK_CK(link_ck),
@@ -370,8 +369,8 @@ wire [11:0] busData_acc;
 
 wire [11:0] accout1;
 MultiLatch theACC(
-  .RESET(reset),
-  .CLK(clk),
+  .reset(reset),
+  .clk(clk),
   // Inputs
   .in(accIn),
   .latch(ac_ck),
@@ -445,8 +444,8 @@ wire [11:0] busAddress_ind;
 wire [11:0] busReg_ind;
 
 MultiLatch theIndReg(
-  .RESET(reset),
-  .CLK(clk),
+  .reset(reset),
+  .clk(clk),
   // Inputs
   .in(busData), 
   .latch(ind_ck),
@@ -468,8 +467,8 @@ wire [11:0] busReg_data;
 
 /* verilator lint_off PINMISSING */
 MultiLatch theDataReg(
-  .RESET(reset),
-  .CLK(clk),
+  .reset(reset),
+  .clk(clk),
   // Inputs
   .in(busData), 
   .latch(data_ck),
@@ -653,8 +652,8 @@ wire ACclrIOT0;
 
 InstructionIOT600x theInterrupt(
   //Inputs
-  .CLK(clk),
-  .RESET(reset),
+  .clk(clk),
+  .reset(reset),
   .CLEAR(sw_CLEAR),
   .EN(instIOT & (busIR[8:3]==6'o00)), //FIX
   .IR(busIR[2:0]),
@@ -692,7 +691,7 @@ wire doneIOT34;
 wire rot2acTTY;
 
 InstructionIOT603x theTTY(
-  .CLK(clk),
+  .clk(clk),
   .clear(reset | iotCLR0), //FIX
   //Inputs
   .baudX7(baudX7),

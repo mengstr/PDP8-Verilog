@@ -15,8 +15,7 @@ reg rxAck=0;
 wire rxRdy;
 
 UART UART(
-  .CLK(clk),
-  .RESET(reset),
+  .clk(clk),
   .baudX7(baudX7),
   .txData(txData), // data to be transmitted serially onto tx
   .txStb(txStb),        // positive going strobe for the txData - 1 CLK

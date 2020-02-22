@@ -57,7 +57,7 @@
 
 
 module InstructionIOT603x(
-  input CLK,
+  input clk,
   input clear,
   input baudX7,
   input EN1,                             // High when this module is to be activated  603x
@@ -86,8 +86,7 @@ wire [7:0] rxData;
 reg rxAck=0;
 
 UART uart(
-    .CLK(CLK),
-    .RESET(1'b0),
+    .clk(clk),
     .baudX7(baudX7),
     .txData(txData),
     .txStb(txStb),
@@ -146,7 +145,7 @@ reg lastTxRdy=0;
 reg lastRxRdy=0;
 reg [1:0] cnt=0;
 
-always @(posedge CLK) begin
+always @(posedge clk) begin
     if (clear) begin
         flgTTYIE<=1;
         flgKBD<=0;

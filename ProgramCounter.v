@@ -8,8 +8,8 @@
 `default_nettype none
 
 module ProgramCounter (
-  input CLK,
-  input RESET,
+  input clk,
+  input reset,
   input [11:0] IN,
   input CK,
   input LD,
@@ -27,8 +27,8 @@ reg prevFetch=0;
 assign PC=thisPC;
 assign PCLAT=thisPCLAT;
 
-always @(posedge CLK) begin 
-  if (RESET) begin
+always @(posedge clk) begin 
+  if (reset) begin
     thisPC<=12'o0200;
     thisPCLAT<=12'o0200;
     prevLD<=0;
