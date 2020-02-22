@@ -19,27 +19,25 @@ output reg L,
 output reg TO_ROTATER
 );
 
-//FIXME should be clocked with clk not LINK_CK
-always @(posedge LINK_CK or posedge CLEAR) begin 
-/* verilator lint_off SYNCASYNCNET */
-  // FIXME
+reg lastLinkck=0;
+
+always @(posedge clk) begin 
   if (CLEAR) L<=0;
-/* verilator lint_on SYNCASYNCNET */
   else begin
-    if (SET==1) L<=FROM_ROTATER;
-    else begin
-      if (CLL==1 && CML==0) L<=0;
-      if (CLL==1 && CML==1) L<=1;
-      if (CLL==0 && CML==1) L<=~L;
+    if (LINK_CK & ~lastLinkck) begin
+      if (SET==1) L<=FROM_ROTATER;
+      else begin
+        if (CLL==1 && CML==0) L<=0;
+        if (CLL==1 && CML==1) L<=1;
+        if (CLL==0 && CML==1) L<=~L;
+      end
     end
   end
+  TO_ROTATER<=((L&(~CLL))^CML);
+  lastLinkck<=LINK_CK;
 end
 
-// assign TO_ROTATER=((L&(~CLL))^CML);
-wire TO_ROTATER_=((L&(~CLL))^CML);
-always @(posedge LINK_CK) begin
-  TO_ROTATER<=TO_ROTATER_;
-end
+
 
 endmodule
   
