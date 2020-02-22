@@ -74,12 +74,15 @@ assign OPR   = IRinst==3'd7;
 //  x  x  x . 1  x  x . x  x  x . x  x  x   Indirect addressing
 //
 
-wire isPP1   = ~(PCLATCHED[11] | PCLATCHED[10] | PCLATCHED[9] | PCLATCHED[8] | PCLATCHED[7]);
-wire isPP2   = ~(IR[6] | ~IR[5] | IR[4] | ~IR[3]);
-wire isPP    = (isPP1 | ~MP) & isPP2; 
+// wire isPP1   = ~(PCLATCHED[11] | PCLATCHED[10] | PCLATCHED[9] | PCLATCHED[8] | PCLATCHED[7]);
+// wire isPP2   = ~(IR[6] | ~IR[5] | IR[4] | ~IR[3]);
+// wire isPP    = (isPP1 | ~MP) & isPP2; 
+
+wire isPP1 = ~PCLATCHED[11] & ~PCLATCHED[10] & ~PCLATCHED[9] & ~PCLATCHED[8] & ~PCLATCHED[7];
+wire isPP2 = ~IR[6] & ~IR[5] & ~IR[4] & IR[3];
+wire isPP = (isPP1 | ~MP) & isPP2;
 
 wire normalInstruction = ~IOT & ~OPR;
-
 assign IND   = normalInstruction &  IR[8] & ~isPP;
 assign PPIND = normalInstruction &  IR[8] &  isPP;
 assign DIR   = normalInstruction & ~IR[8];
