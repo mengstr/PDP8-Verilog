@@ -7,18 +7,12 @@ PACKAGE 	:= vq100
 PCF    		:= olimex-pdp8.pcf
 PNRCLKGOAL  := 25
 
-EXTCLK_FREQ	:= 100
-EXTCLK_DIV  := 2
-CLK_FREQ := $(shell expr \( $(EXTCLK_FREQ) \* 1000000 \) / $(EXTCLK_DIV) )
-BAUD		:= 9600
 OSR			:= 0000
-DEBOUNCECNT	:= 250000 
 DEFS		:= 	-DOSR=$(OSR) 
 
 TARGET 		:= PDP8
 SOURCES		:= $(wildcard *.v)
 DIR         := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-
 
 DOCKER:=docker run --rm --log-driver=none -a stdout -a stderr -w/work -v$(DIR)/:/work
 ICESTORM:=$(DOCKER) cranphin/icestorm
@@ -28,7 +22,6 @@ ICEFLASH:=../verilog_old/upload/iceflash
 
 rev=$$(tput bold)
 norm=$$(tput sgr0)
-
 
 all: $(TARGET).bin report
 .PHONY: all report upload lint clean test
