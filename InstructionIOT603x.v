@@ -251,8 +251,8 @@ assign done44 = instTPC & ck1;
 // ------------------------------------------------------------------------------------------------------------------------------
 // 6045 - TSK Teleprinter Skip
 //  If either the print flag or the keyboard flag are set, the next instruction in sequence is skipped. 
-assign pc_ck45= instTSF & (flgPRN | flgKBD) & stb1;
-assign done45 = instTSF & ck2;
+assign pc_ck45= instTSK & (flgPRN | flgKBD) & stb1;
+assign done45 = instTSK & ck2;
 
 // ------------------------------------------------------------------------------------------------------------------------------
 // 6046 - TLS Teleprinter Load and start
