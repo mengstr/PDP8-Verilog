@@ -319,11 +319,11 @@ Link theLINK(
   .reset(reset),
   .CLEAR(reset), // FIX
   // Inputs
-  .LINK_CK(link_ck),
-  .CLL(oprCLL | linkclrIOT0), // FIX
-  .CML(((oprCML ^ (incC & oprIAC)) | (andaddC & instTAD)) | linkcmlIOT0), // FIX
-  .SET(oprLEFT|oprRIGHT), // FIX
-  .FROM_ROTATER(rotaterLO),
+  .L_ck(link_ck),
+  .L_clear(oprCLL | linkclrIOT0), // FIX
+  .L_compl(((oprCML ^ (incC & oprIAC)) | (andaddC & instTAD)) | linkcmlIOT0), // FIX
+  .L_force(oprLEFT|oprRIGHT), // FIX
+  .L_input(rotaterLO),
   // Outputs
   .L(link),
   .TO_ROTATER(rotaterLI)
