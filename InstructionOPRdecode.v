@@ -7,7 +7,7 @@
 
 `default_nettype none
 
-module OPRdecoder  (
+module InstructionOPRdecode  (
   input [8:0] IR,
   input OPR,
   output opr1,opr2,opr3,

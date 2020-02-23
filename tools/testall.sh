@@ -11,7 +11,6 @@ echo InstTest2-D0BB
 cp hex/InstTest2-D0BB.hex initialRAM.hex
 time make OSR=0000 CNT=100000 BP=3731 TRACE=NO test
 
-
 echo --------------------------------------------------------------------
 echo JMPJMS-D0IB
 cp hex/JMPJMS-D0IB.hex initialRAM.hex

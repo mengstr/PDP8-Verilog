@@ -11,7 +11,6 @@ module InstructionOPR (
   input ck1, ck2, ck3, ck4, ck5, ck6,
   input stb1,stb2,stb3,stb4,stb5,stb6,
   input doSkip,
-  input instOPR,
   input opr1,
   input opr2,
   input opr3,
@@ -63,24 +62,24 @@ wire         mq_tmpOE3K, mq_tmpOE3L;
 or(mq_tmpOE, mq_tmpOE3K, mq_tmpOE3L);
 
 
-    wire OP1=(instOPR & opr1);
-    wire OP2=(instOPR & opr2);
-    wire O3a=instOPR & opr3 & !oprCLA & !oprMQA & !oprSCA & !oprMQL; // 7401 NOP
-    wire O3b=instOPR & opr3 &  oprCLA & !oprMQA & !oprSCA & !oprMQL; // 7601 CLA
-    wire O3c=instOPR & opr3 & !oprCLA &  oprMQA & !oprSCA & !oprMQL; // 7501 MQA
-    wire O3d=instOPR & opr3 &  oprCLA &  oprMQA & !oprSCA & !oprMQL; // 7701 ACL
-    // wire O3e=instOPR & opr3 & !oprCLA & !oprMQA &  oprSCA & !oprMQL;
-    // wire O3f=instOPR & opr3 &  oprCLA & !oprMQA &  oprSCA & !oprMQL;
-    // wire O3g=instOPR & opr3 & !oprCLA &  oprMQA &  oprSCA & !oprMQL;
-    // wire O3h=instOPR & opr3 &  oprCLA &  oprMQA &  oprSCA & !oprMQL;
-    wire O3i=instOPR & opr3 & !oprCLA & !oprMQA & !oprSCA &  oprMQL; // 7421 MQL
-    wire O3j=instOPR & opr3 &  oprCLA & !oprMQA & !oprSCA &  oprMQL; // 7621 CAM
-    wire O3k=instOPR & opr3 & !oprCLA &  oprMQA & !oprSCA &  oprMQL; // 7521 SWP
-    wire O3l=instOPR & opr3 &  oprCLA &  oprMQA & !oprSCA &  oprMQL; // 7721 CLA, SWP
-    // wire O3m=instOPR & opr3 & !oprCLA & !oprMQA &  oprSCA &  oprMQL;
-    // wire O3n=instOPR & opr3 &  oprCLA & !oprMQA &  oprSCA &  oprMQL;
-    // wire O3o=instOPR & opr3 & !oprCLA &  oprMQA &  oprSCA &  oprMQL;
-    // wire O3p=instOPR & opr3 &  oprCLA &  oprMQA &  oprSCA &  oprMQL;
+    wire OP1=opr1;
+    wire OP2=opr2;
+    wire O3a=opr3 & !oprCLA & !oprMQA & !oprSCA & !oprMQL; // 7401 NOP
+    wire O3b=opr3 &  oprCLA & !oprMQA & !oprSCA & !oprMQL; // 7601 CLA
+    wire O3c=opr3 & !oprCLA &  oprMQA & !oprSCA & !oprMQL; // 7501 MQA
+    wire O3d=opr3 &  oprCLA &  oprMQA & !oprSCA & !oprMQL; // 7701 ACL
+    // wire O3e=opr3 & !oprCLA & !oprMQA &  oprSCA & !oprMQL;
+    // wire O3f=opr3 &  oprCLA & !oprMQA &  oprSCA & !oprMQL;
+    // wire O3g=opr3 & !oprCLA &  oprMQA &  oprSCA & !oprMQL;
+    // wire O3h=opr3 &  oprCLA &  oprMQA &  oprSCA & !oprMQL;
+    wire O3i=opr3 & !oprCLA & !oprMQA & !oprSCA &  oprMQL; // 7421 MQL
+    wire O3j=opr3 &  oprCLA & !oprMQA & !oprSCA &  oprMQL; // 7621 CAM
+    wire O3k=opr3 & !oprCLA &  oprMQA & !oprSCA &  oprMQL; // 7521 SWP
+    wire O3l=opr3 &  oprCLA &  oprMQA & !oprSCA &  oprMQL; // 7721 CLA, SWP
+    // wire O3m=opr3 & !oprCLA & !oprMQA &  oprSCA &  oprMQL;
+    // wire O3n=opr3 &  oprCLA & !oprMQA &  oprSCA &  oprMQL;
+    // wire O3o=opr3 & !oprCLA &  oprMQA &  oprSCA &  oprMQL;
+    // wire O3p=opr3 &  oprCLA &  oprMQA &  oprSCA &  oprMQL;
 
     //                            1     1      2     2      3     3      4     4      5     5      6     6
     //                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 

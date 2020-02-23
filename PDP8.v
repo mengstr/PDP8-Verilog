@@ -252,7 +252,7 @@ wire oprMQL, oprSWP, oprMQA, oprSCA;                              // OPR 3
 wire oprSCL, oprMUY, oprDVI, oprNMI, oprSHL, oprASL, oprLSR;      // OPR 3
 wire oprCLA;
 
-OPRdecoder  theOPRDECODER(
+InstructionOPRdecode theOPRDECODER(
   // Inputs
   .IR(busIR[8:0]),
   .OPR(instOPR),
@@ -551,7 +551,6 @@ InstructionOPR theinst7 (
   .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
   .doSkip(doSkip),
-  .instOPR(instOPR),
   .opr1(opr1),
   .opr2(opr2),
   .opr3(opr3),
