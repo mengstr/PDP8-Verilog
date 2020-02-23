@@ -60,7 +60,7 @@ wire [11:0] busReg        = busReg_ind | busReg_data;
 wire [11:0] busAddress    = busAddress_ind | busAddress_pc | busAddress_ir;
 wire [11:0] busPCin       = busPCin_ir | busPCin_reg | (setpc ? switches : 12'o0000); 
 wire [11:0] busData       = busData_inc | busData_ram |busData_acc | busData_pc;
-wire [11:0] busORacc      = mqout1 | busACGTF | busACTTY | (oprOSR ? 12'o`OSR : 12'o0000);
+wire [11:0] busORacc      = mqout1 | busACGTF | {4'b0, busACTTY} | (oprOSR ? 12'o`OSR : 12'o0000);
 wire [11:0] accIn         = accIn_andadd | accIn_rotater; 
 
 
@@ -669,7 +669,7 @@ InstructionIOT600x theInterrupt(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 603x/604x IOT TTY █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-wire [11:0] busACTTY;
+wire [7:0] busACTTY;
 wire clrTTY;
 wire ac_ckTTY;
 wire pc_ckIOT34;
@@ -686,8 +686,8 @@ InstructionIOT603x theTTY(
   .EN2(instIOT & (busIR[8:3]==6'o04)), //FIX
   .op(busIR[2:0]),
   .AC(accout1),
-  .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),
-  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5),
+  .ck1(ck1),   .ck2(ck2),
+  .stb1(stb1),
   .done(doneIOT34),
   .pc_ck(pc_ckIOT34),
   .irq(irqRqIOT34),
