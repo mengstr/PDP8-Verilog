@@ -129,9 +129,9 @@ FrontPanel thePanel(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ SEQUENCER & START/STOP █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 wire ckFetch, ckAuto1, ckAuto2, ckInd;
-wire ck1, ck2, ck3, ck4, ck5, ck6;
+wire ck1, ck2, ck3, ck4, ck5;
 wire stbFetch, stbAuto1, stbAuto2, stbInd;
-wire stb1, stb2, stb3, stb4, stb5, stb6;
+wire stb1, stb2, stb3, stb4, stb5;
 wire running;
 
 Sequencer theSEQUENCER(
@@ -145,9 +145,9 @@ Sequencer theSEQUENCER(
   .SEQTYPE({instIsPPIND,instIsIND}),
   // Outputs
   .ckFetch(ckFetch), .ckAuto1(ckAuto1), .ckAuto2(ckAuto2), .ckInd(ckInd),
-  .ck1(ck1), .ck2(ck2), .ck3(ck3), .ck4(ck4), .ck5(ck5), .ck6(ck6),
+  .ck1(ck1), .ck2(ck2), .ck3(ck3), .ck4(ck4), .ck5(ck5),
   .stbFetch(stbFetch), .stbAuto1(stbAuto1), .stbAuto2(stbAuto2), .stbInd(stbInd), 
-  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
+  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5),
   .running(running)
 );
 assign LED1=running;
@@ -353,18 +353,6 @@ AddAnd theADDAND(
 // ▁ ▂ ▄ ▅ ▆ ▇ █ ACCUMULATOR █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-//
-//             +--------------------> theADDAND -->--------------->+
-//             ^                                                   v
-//             +--> theSkip                                        v
-//             ^                                                   v
-//             +--> theMQ-+                                        v
-//             ^          v                                        v
-// +--> theAcc +--> theCLORIN --> theIncrementer --> theRotater -->+
-// |                                                               v
-// +-<---------------------------<------------------------------<--+
-//
-//
 wire [11:0] busData_acc;
 
 wire [11:0] accout1;
@@ -548,8 +536,8 @@ wire mq_tmpOE;
 
 InstructionOPR theinst7 (
   // Inputs
-  .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
-  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
+  .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),
+  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5),
   .doSkip(doSkip),
   .opr1(opr1),
   .opr2(opr2),
@@ -604,8 +592,8 @@ Instructions theinst0_5 (
   .instAND(instAND), .instDCA(instDCA), .instISZ(instISZ), .instJMP(instJMP), .instJMS(instJMS), .instTAD(instTAD),
   .incZero(incZero),
   .irqOverride(irqOverride),
-  .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
-  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
+  .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),
+  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5),
   // Outputs
   .ac2ramd(ac2ramd05),
   .cla(cla05),
@@ -658,8 +646,8 @@ InstructionIOT600x theInterrupt(
   .IR(busIR[2:0]),
   .AC(accout1),
   .LINK(link),
-  .ckFetch(ckFetch), .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
-  .stbFetch(stbFetch), .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
+  .ckFetch(ckFetch), .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),
+  .stbFetch(stbFetch), .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5),
   .irqRq(irqRq),
   .anyDone(done),
   // Outputs
@@ -698,8 +686,8 @@ InstructionIOT603x theTTY(
   .EN2(instIOT & (busIR[8:3]==6'o04)), //FIX
   .IR(busIR[2:0]),
   .AC(accout1),
-  .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),   .ck6(ck6),
-  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5), .stb6(stb6),
+  .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),
+  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5),
   .done(doneIOT34),
   .pc_ck(pc_ckIOT34),
   .irq(irqRqIOT34),
@@ -715,7 +703,7 @@ InstructionIOT603x theTTY(
 
 
 //601x 607x 610x 614x 615x 616x 617x 624x 633x 634x 676x 677x
-wire doneIgnore=ck6 &  //FIX - Move this to TB
+wire doneIgnore=ck1 &  //FIX - Move this to TB
   & ((busIR==12'o6011) // RSF  PR8-E: Skip on Reader Flag
   |  (busIR==12'o6012) // RRB  PR8-E: Read Reader Buffer
   |  (busIR==12'o6077)

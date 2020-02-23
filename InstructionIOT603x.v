@@ -64,8 +64,8 @@ module InstructionIOT603x(
   input EN2,                             // High when this module is to be activated  604x
   input [2:0] IR,
   input [11:0] AC,
-  input ck1, ck2, ck3, ck4, ck5, ck6,
-  input stb1,stb2,stb3,stb4,stb5,stb6,
+  input ck1, ck2, ck3, ck4, ck5,
+  input stb1,stb2,stb3,stb4,stb5,
   output done,
   output pc_ck,
   output irq,

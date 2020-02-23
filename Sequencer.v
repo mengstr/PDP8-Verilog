@@ -15,9 +15,9 @@ module Sequencer (
   input sst,              // Strobe - executes one instruction 
   input [1:0] SEQTYPE,    // ({instIsPPIND,instIsIND}),
   output ckFetch, ckAuto1, ckAuto2, ckInd,
-  output ck1, ck2, ck3, ck4, ck5, ck6,
+  output ck1, ck2, ck3, ck4, ck5,
   output stbFetch, stbAuto1, stbAuto2, stbInd,
-  output stb1, stb2, stb3, stb4, stb5, stb6,
+  output stb1, stb2, stb3, stb4, stb5,
   output reg running=0
 );
 
@@ -66,7 +66,6 @@ assign ck2      = !reset & (stepCnt==10 || stepCnt==11);
 assign ck3      = !reset & (stepCnt==12 || stepCnt==13);
 assign ck4      = !reset & (stepCnt==14 || stepCnt==15);
 assign ck5      = !reset & (stepCnt==16 || stepCnt==17);
-assign ck6      = !reset & (stepCnt==18 || stepCnt==19);
 
 assign stbFetch = !reset & (stepCnt==1);
 assign stbAuto1 = !reset & (stepCnt==3);
@@ -77,6 +76,5 @@ assign stb2     = !reset & (stepCnt==11);
 assign stb3     = !reset & (stepCnt==13);
 assign stb4     = !reset & (stepCnt==15);
 assign stb5     = !reset & (stepCnt==17);
-assign stb6     = !reset & (stepCnt==19);
 
 endmodule
