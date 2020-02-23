@@ -69,7 +69,7 @@ wire [11:0] accIn         = accIn_andadd | accIn_rotater;
 //
 
 // 5 input or
-wire done         = done05 | doneIOT0 | doneIOT34 | done7 | doneIgnore;
+wire done         = done05 | doneIOT0 | doneIOT34 | done7;
 wire pc_ck        = pc_ckIFI | pc_ck05 | pc_ckIOT0 | pc_ckIOT34 | pc_ck7 | setpc;
 wire clorinCLR    = claDCA | oprCLA | iotCLR0 |clrTTY | ACclrIOT0;
 // 4 input or
@@ -702,24 +702,6 @@ InstructionIOT603x theTTY(
 );
 
 
-//601x 607x 610x 614x 615x 616x 617x 624x 633x 634x 676x 677x
-wire doneIgnore=ck1 &  //FIX - Move this to TB
-  & ((busIR==12'o6011) // RSF  PR8-E: Skip on Reader Flag
-  |  (busIR==12'o6012) // RRB  PR8-E: Read Reader Buffer
-  |  (busIR==12'o6077)
-  |  (busIR==12'o6101) // SMP  MP8-E: Skip on No Memory Parity Error
-  |  (busIR==12'o6141)
-  |  (busIR==12'o6142) 
-  |  (busIR==12'o6152)
-  |  (busIR==12'o6167)
-  |  (busIR==12'o6171)
-  |  (busIR==12'o6244) // RMF  KM8-E: Restore Memory Field
-  |  (busIR==12'o6331)
-  |  (busIR==12'o6344)
-  |  (busIR==12'o6346)
-  |  (busIR==12'o6762) // DTCA TC08-P: Clear Status Register A
-  |  (busIR==12'o6772) // DTRB TC08-P: Read Status Register B
-  );
 
 endmodule
 

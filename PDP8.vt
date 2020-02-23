@@ -51,7 +51,25 @@ PDP8 dut(
     end
 
     always @(CLK) begin
-        if (dut.theSEQUENCER.stepCnt==5'd30) begin $display("Unhandled OP"); $finish; end
+
+        if ((dut.theSEQUENCER.stepCnt==5'd30) 
+            & (dut.busIR != 12'o6011) // RSF  PR8-E: Skip on Reader Flag
+            & (dut.busIR != 12'o6012) // RRB  PR8-E: Read Reader Buffer
+            & (dut.busIR != 12'o6077)
+            & (dut.busIR != 12'o6101) // SMP  MP8-E: Skip on No Memory Parity Error
+            & (dut.busIR != 12'o6141)
+            & (dut.busIR != 12'o6142) 
+            & (dut.busIR != 12'o6152)
+            & (dut.busIR != 12'o6167)
+            & (dut.busIR != 12'o6171)
+            & (dut.busIR != 12'o6244) // RMF  KM8-E: Restore Memory Field
+            & (dut.busIR != 12'o6331)
+            & (dut.busIR != 12'o6344)
+            & (dut.busIR != 12'o6346)
+            & (dut.busIR != 12'o6762) // DTCA TC08-P: Clear Status Register A
+            & (dut.busIR != 12'o6772) // DTRB TC08-P: Read Status Register B
+        ) begin $display("Unhandled OP"); $finish; end
+
         if (dut.theSEQUENCER.stepCnt==5'd1 && dut.clk==0) begin:PRN    
         cnt<=cnt+1;
 //      if ((cnt%1000)==0) $display("%d",cnt);
