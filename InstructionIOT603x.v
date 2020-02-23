@@ -62,7 +62,7 @@ module InstructionIOT603x(
   input baudX7,
   input EN1,                             // High when this module is to be activated  603x
   input EN2,                             // High when this module is to be activated  604x
-  input [2:0] IR,
+  input [2:0] op,
   input [11:0] AC,
   input ck1, ck2, ck3, ck4, ck5,
   input stb1,stb2,stb3,stb4,stb5,
@@ -122,22 +122,22 @@ wire      ac_ck36;
 or(ac_ck, ac_ck36);
 
 
-wire instKCF=(EN1 & (IR==3'o0)); //Keyboard Clear Flags
-wire instKSF=(EN1 & (IR==3'o1)); //Keyboard Skip if Flag
-wire instKCC=(EN1 & (IR==3'o2)); //Keyboard Clear and read character
-// 6033 is an invalid instruction
-wire instKRS=(EN1 & (IR==3'o4)); //Keyboard Read Static
-wire instKIE=(EN1 & (IR==3'o5)); //Keyboard Interrupt Enable
-wire instKRB=(EN1 & (IR==3'o6)); //Keyboard Read and begin next read
-// 6037 is an invalid instruction
-wire instTFL=(EN2 & (IR==3'o0)); //Teleprinter Flag set
-wire instTSF=(EN2 & (IR==3'o1)); //Teleprinter Skip if Flag
-wire instTFC=(EN2 & (IR==3'o2)); //Teleprinter Flag clear
-// 6043 is an invalid instruction
-wire instTPC=(EN2 & (IR==3'o4)); //Teleprinter Print Character
-wire instTSK=(EN2 & (IR==3'o5)); //Teleprinter Skip
-wire instTLS=(EN2 & (IR==3'o6)); //Teleprinter Load and start
-// 6047 is an invalid instruction
+wire instKCF=(EN1 & (op==3'o0)); // 6030 Keyboard Clear Flags
+wire instKSF=(EN1 & (op==3'o1)); // 6031 Keyboard Skip if Flag
+wire instKCC=(EN1 & (op==3'o2)); // 6032 Keyboard Clear and read character
+                                 // 6033 invalid
+wire instKRS=(EN1 & (op==3'o4)); // 6034 Keyboard Read Static
+wire instKIE=(EN1 & (op==3'o5)); // 6035 Keyboard Interrupt Enable
+wire instKRB=(EN1 & (op==3'o6)); // 6036 Keyboard Read and begin next read
+                                 // 6037 invalid
+wire instTFL=(EN2 & (op==3'o0)); // 6040 Teleprinter Flag set
+wire instTSF=(EN2 & (op==3'o1)); // 6041 Teleprinter Skip if Flag
+wire instTFC=(EN2 & (op==3'o2)); // 6042 Teleprinter Flag clear
+                                 // 6043 invalid
+wire instTPC=(EN2 & (op==3'o4)); // 6044 Teleprinter Print Character
+wire instTSK=(EN2 & (op==3'o5)); // 6045 Teleprinter Skip
+wire instTLS=(EN2 & (op==3'o6)); // 6046 Teleprinter Load and start
+                                // 6047 invalid
 
 wire ACbit11=AC[0:0]; // PDP has the bit order reversed
 

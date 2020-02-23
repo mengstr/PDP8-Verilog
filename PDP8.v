@@ -684,7 +684,7 @@ InstructionIOT603x theTTY(
   .baudX7(baudX7),
   .EN1(instIOT & (busIR[8:3]==6'o03)), //FIX
   .EN2(instIOT & (busIR[8:3]==6'o04)), //FIX
-  .IR(busIR[2:0]),
+  .op(busIR[2:0]),
   .AC(accout1),
   .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5),
