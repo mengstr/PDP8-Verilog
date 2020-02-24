@@ -63,7 +63,7 @@ module InstructionIOT603x(
   input EN1,                             // High when this module is to be activated  603x
   input EN2,                             // High when this module is to be activated  604x
   input [2:0] op,
-  input [11:0] AC,
+  input [7:0] dataIn,
   input ck1, ck2,
   input stb1,
   output done,
@@ -72,7 +72,7 @@ module InstructionIOT603x(
   input rx,
   output tx,
   output LED2,
-  output [7:0] ACTTY,
+  output [7:0] dataOut,
   output rot2ac,
   output clr,
   output ac_ck
@@ -104,8 +104,8 @@ reg flgKBD=0;
 reg flgPRN=0;
 assign irq=(flgTTYIE) & (flgKBD | flgPRN);
 
-wire [7:0] ACTTY34, ACTTY36;
-assign ACTTY = ACTTY34 | ACTTY36;
+wire [7:0] dataOut34, dataOut36;
+assign dataOut = dataOut34 | dataOut36;
 
 wire     done30, done31, done32, done34, done35, done36, done40, done41, done42, done44, done45, done46;
 or(done, done30, done31, done32, done34, done35, done36, done40, done41, done42, done44, done45, done46);
@@ -140,7 +140,7 @@ wire instTSK=(EN2 & (op==3'o5)); // 6045 Teleprinter Skip
 wire instTLS=(EN2 & (op==3'o6)); // 6046 Teleprinter Load and start
                                  // 6047 invalid
 
-wire ACbit11=AC[0:0]; // PDP has the bit order reversed
+wire ACbit11=dataIn[0]; // PDP has the bit order reversed
 
 reg lastTxRdy=0;
 reg lastRxRdy=0;
@@ -161,16 +161,16 @@ always @(posedge clk) begin
       if (instTFC) flgPRN<=0;           // 6042 Teleprinter Flag clear
       if (instTPC) begin                // 6044 Teleprinter Print Character
 `ifdef IVERILOG
-      if (ck1) $display("TX %d (%c)", {1'b0,AC[6:0]},{1'b0,AC[6:0]} );
+      if (ck1) $display("TX %d (%c)", {1'b0,dataIn[6:0]},{1'b0,dataIn[6:0]} );
 `endif
-      if (ck1) begin txData<={1'b0,AC[6:0]}; txStb<=1; end;
+      if (ck1) begin txData <= dataIn; txStb<=1; end;
     end
     if (instTLS) begin      //Teleprinter Load and start
       flgPRN<=0;
 `ifdef IVERILOG
-      if (ck1) $display("TX %d [%c]", {1'b0,AC[6:0]},{1'b0,AC[6:0]} );
+      if (ck1) $display("TX %d [%c]", dataIn[7:0], {1'b0,dataIn[6:0]} );
 `endif
-      if (ck1) begin txData<={1'b0,AC[6:0]}; txStb<=1; end;
+      if (ck1) begin txData <= dataIn; txStb<=1; end;
     end
     if (txStb==1) txStb<=0; 
     if (txRdy & ~lastTxRdy) flgPRN<=1;
@@ -208,7 +208,7 @@ assign done32 =    instKCC & ck2;
 // 6034 - KRS Keyboard Read Static
 //  The 8-bit character in the keyboard buffer is ored with the accumulator.
 assign rot2ac34=   instKRS & ck1;
-assign ACTTY34 =   instKRS & ck1 ? rxData : 8'b0;
+assign dataOut34 =   instKRS & ck1 ? rxData : 8'b0;
 assign ac_ck34=    instKRS & stb1;
 assign done34=     instKRS & ck2;
 
@@ -221,7 +221,7 @@ assign done35 = instKIE & ck1;      // also handled in the always @(posedge
 //  The 8 bit character in the keyboard buffer is transferred to the accumulator, and the keyboard flag is cleared, allowing the 
 //  reading of the next character to begin. In effect, this operation combines the KCC and KRS operations;
 assign rot2ac36=   instKRB & ck1;       // also handled in the always @(posedge
-assign ACTTY36 =   instKRB & ck1 ? rxData : 8'b0;
+assign dataOut36 =   instKRB & ck1 ? rxData : 8'b0;
 assign clr36=      instKRB & ck1;
 assign ac_ck36=    instKRB & stb1;
 assign done36=     instKRB & ck2;

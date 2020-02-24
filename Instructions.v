@@ -11,9 +11,8 @@ module Instructions (
   input instIsDIR, instIsIND, instIsPPIND,
   input instAND, instDCA, instISZ, instJMP, instJMS, instTAD,
   input incZero,
-  input irqOverride,
   input ck1, ck2, ck3, ck4, ck5, 
-  input stb1,stb2,stb3,stb4,stb5,
+  input stb1, stb2, stb3, stb4,
   
   output ac2ramd,
   output cla,

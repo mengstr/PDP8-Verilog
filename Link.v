@@ -8,7 +8,6 @@
 
 module Link (
 input clk,
-input reset,
 input CLEAR,
 input L_ck,
 input L_clear,        // Clear link

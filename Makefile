@@ -81,8 +81,6 @@ lint: $(SOURCES)
 	@echo "${rev}###  verilator --lint-only $(DEFS) ###${norm}"
 	@$(VERILATOR) \
 		-Wall \
-		-Wno-UNUSED \
-		-DNOTOP \
 		$(DEFS) \
 		--top-module $(TARGET)_top \
 		--lint-only \

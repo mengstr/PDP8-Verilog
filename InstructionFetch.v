@@ -12,7 +12,6 @@ module InstructionFetch (
   input instIsPPIND,
   input ckFetch, ckAuto1, ckAuto2, ckInd,
   input stbFetch, stbAuto1, stbAuto2, stbInd, 
-  input irqOverride,
   output inc2ramd,
   output ind_ck,
   output ind2inc,

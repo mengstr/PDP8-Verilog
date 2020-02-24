@@ -62,10 +62,12 @@ module InstructionIOT600x(
   input CLEAR,
   input EN,                             // High when this module is to be activated
   input [2:0] IR,
+  /* verilator lint_off UNUSED */
   input [11:0] AC,
+  /* verilator lint_on UNUSED */
   input LINK,
-  input ckFetch, ck1,ck2,ck3,ck4,ck5,
-  input stbFetch,stb1,stb2,stb3,stb4,stb5,
+  input ckFetch, ck1,ck2,
+  input stbFetch,stb1,
   input irqRq,
   input anyDone,
   output done,
@@ -116,7 +118,9 @@ wire instIOF= (EN & (IR==3'o2));
 wire instSRQ= (EN & (IR==3'o3));
 wire instGTF= (EN & (IR==3'o4));
 wire instRTF= (EN & (IR==3'o5));
-wire instSGT= (EN & (IR==3'o6));
+  /* verilator lint_off UNUSED */
+wire instSGT= (EN & (IR==3'o6));    // TODO
+  /* verilator lint_on UNUSED */
 wire instCAF= (EN & (IR==3'o7));
 
 wire AC8=~AC[8];
@@ -133,7 +137,6 @@ always @(posedge clk) begin
   if (stb1 & instION)      begin IE<=1; IEdly1<=1; IEdly2<=1; end
   if (anyDone & IEdly1)           begin IEdly1<=0; end
   if (anyDone & IEdly2 & ~IEdly1) begin IEdly2<=0; end
-  // if (anyDone & GIE & irqRq)      begin IE<=0; end
   if (anyDone & GIE & irqActive)      begin IE<=0; irqActive<=0; end
 end
 
@@ -187,91 +190,3 @@ assign link_ck7=  instCAF & stb1;
 assign done7=     instCAF & ck2;
 
 endmodule
-
-
-// FROM SIMH
-//    2. Interrupts.  Interrupts are maintained by three parallel variables:
-
-//         dev_done        device done flags
-//         int_enable      interrupt enable flags
-//         int_req         interrupt requests
-
-//       In addition, int_req contains the interrupt enable flag, the
-//       CIF not pending flag, and the ION not pending flag.  If all
-//       three of these flags are set, and at least one interrupt request
-//       is set, then an interrupt occurs.
-//
-// int32 dev_done = 0;                                     /* dev done flags */
-// int32 int_enable = INT_INIT_ENABLE;                     /* intr enables */
-// int32 int_req = 0;                                      /* intr requests */
-//     { FLDATAD (ION, int_req, INT_V_ION, "interrupt enable") },
-//     { FLDATAD (ION_DELAY, int_req, INT_V_NO_ION_PENDING, "interrupt enable delay for ION") },
-//     { FLDATAD (CIF_DELAY, int_req, INT_V_NO_CIF_PENDING, "interrupt enable delay for CIF") },
-//     { ORDATAD (INT, int_req, INT_V_ION+1, "interrupt pending flags"), REG_RO },
-//     { ORDATAD (DONE, dev_done, INT_V_DIRECT, "device done flags"), REG_RO },
-//     { ORDATAD (ENABLE, int_enable, INT_V_DIRECT, "device interrupt enable flags"), REG_RO },
-
-//     if (int_req > INT_PENDING) {                        /* interrupt? */
-//         int_req = int_req & ~INT_ION;                   /* interrupts off */
-//         SF = (UF << 6) | (IF >> 9) | (DF >> 12);        /* form save field */
-//         PCQ_ENTRY (IF | PC);                            /* save old PC with IF */
-//         IF = IB = DF = UF = UB = 0;                     /* clear mem ext */
-//         M[0] = PC;                                      /* save PC in 0 */
-//         PC = 1;                                         /* fetch next from 1 */
-//     }
-
-//     PC = (PC + 1) & 07777;                              /* increment PC */
-//     int_req = int_req | INT_NO_ION_PENDING;             /* clear ION delay */
-
-            // case 0:                                     /* SKON */
-            //     if (int_req & INT_ION)
-            //         PC = (PC + 1) & 07777;
-            //     int_req = int_req & ~INT_ION;
-            //     break;
-
-            // case 1:                                     /* ION */
-            //     int_req = (int_req | INT_ION) & ~INT_NO_ION_PENDING;
-            //     break;
-
-            // case 2:                                     /* IOF */
-            //     int_req = int_req & ~INT_ION;
-            //     break;
-
-            // case 3:                                     /* SRQ */
-            //     if (int_req & INT_ALL)
-            //         PC = (PC + 1) & 07777;
-            //     break;
-
-            // case 4:                                     /* GTF */
-            //     LAC = (LAC & 010000) |
-            //           ((LAC & 010000) >> 1) | (gtf << 10) |
-            //           (((int_req & INT_ALL) != 0) << 9) |
-            //           (((int_req & INT_ION) != 0) << 7) | SF;
-            //     break;
-
-            // case 5:                                     /* RTF */
-            //     gtf = ((LAC & 02000) >> 10);
-            //     UB = (LAC & 0100) >> 6;
-            //     IB = (LAC & 0070) << 9;
-            //     DF = (LAC & 0007) << 12;
-            //     LAC = ((LAC & 04000) << 1) | iot_data;
-            //     int_req = (int_req | INT_ION) & ~INT_NO_CIF_PENDING;
-            //     break;
-
-            // case 6:                                     /* SGT */
-            //     if (gtf)
-            //         PC = (PC + 1) & 07777;
-            //     break;
-
-            // case 7:                                     /* CAF */
-            //     gtf = 0;
-            //     emode = 0;
-            //     int_req = int_req & INT_NO_CIF_PENDING;
-            //     dev_done = 0;
-            //     int_enable = INT_INIT_ENABLE;
-            //     LAC = 0;
-            //     reset_all (1);                          /* reset all dev */
-            //     break;
-            //     }                                       /* end switch pulse */
-            // break;           
-            

@@ -8,8 +8,8 @@
 `default_nettype none
 
 module InstructionOPR (
-  input ck1, ck2, ck3, ck4, ck5,
-  input stb1,stb2,stb3,stb4,stb5,
+  input ck1, ck2, ck3, ck4,
+  input stb1,stb2,stb3,
   input doSkip,
   input opr1,
   input opr2,

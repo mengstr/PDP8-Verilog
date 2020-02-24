@@ -104,7 +104,9 @@ wire pc2ramd      = pc2ramd05;
 // ▁ ▂ ▄ ▅ ▆ ▇ █ FRONT PANEL █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 wire [11:0]switches;
+/* verilator lint_off UNUSED */
 wire startstop, sst, setpc, button3, button4, button5;
+/* verilator lint_on UNUSED */
 
 FrontPanel thePanel(
   // Inputs
@@ -128,10 +130,12 @@ FrontPanel thePanel(
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ SEQUENCER & START/STOP █ ▇ ▆ ▅ ▄ ▂ ▁
 //
+  /* verilator lint_off UNUSED */
 wire ckFetch, ckAuto1, ckAuto2, ckInd;
 wire ck1, ck2, ck3, ck4, ck5;
 wire stbFetch, stbAuto1, stbAuto2, stbInd;
 wire stb1, stb2, stb3, stb4, stb5;
+  /* verilator lint_on UNUSED */
 wire running;
 
 Sequencer theSEQUENCER(
@@ -248,8 +252,10 @@ IRdecode theIRDECODER(
 wire opr1,opr2,opr3;
 wire oprIAC, oprX2, oprLEFT, oprRIGHT, oprCML, oprCMA, oprCLL;    // OPR 1
 wire oprHLT, oprOSR, oprTSTINV, oprSNLSZL, oprSZASNA, oprSMASPA;  // OPR 2
+/* verilator lint_off UNUSED */
 wire oprMQL, oprSWP, oprMQA, oprSCA;                              // OPR 3 
 wire oprSCL, oprMUY, oprDVI, oprNMI, oprSHL, oprASL, oprLSR;      // OPR 3
+/* verilator lint_on UNUSED */
 wire oprCLA;
 
 InstructionOPRdecode theOPRDECODER(
@@ -316,8 +322,7 @@ wire rotaterLI;
 
 Link theLINK(
   .clk(clk),
-  .reset(reset),
-  .CLEAR(reset), // FIX
+  .CLEAR(reset),
   // Inputs
   .L_ck(link_ck),
   .L_clear(oprCLL | linkclrIOT0), // FIX
@@ -506,7 +511,6 @@ InstructionFetch theinstFI (
   .instIsPPIND(instIsPPIND),
   .ckFetch(ckFetch), .ckAuto1(ckAuto1), .ckAuto2(ckAuto2), .ckInd(ckInd),
   .stbFetch(stbFetch), .stbAuto2(stbAuto2), .stbAuto1(stbAuto1), .stbInd(stbInd),
-  .irqOverride(irqOverride),
   // Outputs
   .inc2ramd(inc2ramdIFI),
   .ind_ck(ind_ckIFI),
@@ -536,8 +540,8 @@ wire mq_tmpOE;
 
 InstructionOPR theinst7 (
   // Inputs
-  .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),
-  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5),
+  .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),
+  .stb1(stb1), .stb2(stb2), .stb3(stb3),
   .doSkip(doSkip),
   .opr1(opr1),
   .opr2(opr2),
@@ -591,9 +595,8 @@ Instructions theinst0_5 (
   .instIsDIR(instIsDIR), .instIsIND(instIsIND), .instIsPPIND(instIsPPIND),
   .instAND(instAND), .instDCA(instDCA), .instISZ(instISZ), .instJMP(instJMP), .instJMS(instJMS), .instTAD(instTAD),
   .incZero(incZero),
-  .irqOverride(irqOverride),
   .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),
-  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5),
+  .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4),
   // Outputs
   .ac2ramd(ac2ramd05),
   .cla(cla05),
@@ -634,7 +637,9 @@ wire rot2acIOT0;
 wire doneIOT0;
 wire [11:0] busACGTF;
 wire irqOverride;
+/* verilator lint_off UNUSED */
 wire GIE; //FIX
+/* verilator lint_on UNUSED */
 wire ACclrIOT0;
 
 InstructionIOT600x theInterrupt(
@@ -646,8 +651,8 @@ InstructionIOT600x theInterrupt(
   .IR(busIR[2:0]),
   .AC(accout1),
   .LINK(link),
-  .ckFetch(ckFetch), .ck1(ck1),   .ck2(ck2),   .ck3(ck3),   .ck4(ck4),   .ck5(ck5),
-  .stbFetch(stbFetch), .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5),
+  .ckFetch(ckFetch), .ck1(ck1),   .ck2(ck2),
+  .stbFetch(stbFetch), .stb1(stb1),
   .irqRq(irqRq),
   .anyDone(done),
   // Outputs
@@ -685,7 +690,7 @@ InstructionIOT603x theTTY(
   .EN1(instIOT & (busIR[8:3]==6'o03)), //FIX
   .EN2(instIOT & (busIR[8:3]==6'o04)), //FIX
   .op(busIR[2:0]),
-  .AC(accout1),
+  .dataIn(accout1[7:0]),
   .ck1(ck1),   .ck2(ck2),
   .stb1(stb1),
   .done(doneIOT34),
@@ -695,7 +700,7 @@ InstructionIOT603x theTTY(
   // Outputs
   .tx(tx),
   .LED2(LED2),
-  .ACTTY(busACTTY),
+  .dataOut(busACTTY),
   .rot2ac(rot2acTTY),
   .clr(clrTTY),
   .ac_ck(ac_ckTTY)

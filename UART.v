@@ -53,7 +53,6 @@ reg [3:0] rxCnt=0;
 reg [8:0] rxBuf=0;
 reg [3:0] nextMiddle=0;
 reg rxReady=0;
-reg samplePoint=0;
 
 always @(posedge clk) begin
   if (rxAck) rxReady<=0;
@@ -64,13 +63,11 @@ always @(posedge clk) begin
         nextMiddle <= 8;
         rxCnt <= rxCnt + 1;
         rxBuf <= 0;
-        samplePoint<=1;
         rxReady <= 0;
       end
     end else if (nextMiddle!=0) begin
       nextMiddle <= nextMiddle-1;
     end else begin
-      samplePoint<=1;
       rxBuf <= rxBuf >> 1;
       rxBuf[8] <= rx;
       rxCnt <= rxCnt+1;
@@ -82,7 +79,6 @@ always @(posedge clk) begin
 
     end
   end
- samplePoint <= 0;
 end
 
 assign rxData = rxBuf[7:0];
