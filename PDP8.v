@@ -11,6 +11,7 @@ module PDP8(
   input reset,       // Power On Reset
   input sw_CLEAR,    // Clear CPU (button)
   input sw_RUN,      // Start CPU
+  input sw_SST,      // Single Step
   output LED1, LED2,
   // UART
   input rx,
@@ -53,16 +54,24 @@ wire [11:0] busLatPC;
 wire [11:0] busPCin_ir    = ir2pc ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0; // First OC12 module
 wire [11:0] busPCin_reg   = reg2pc ? busReg : 12'b0; 
 wire [11:0] busAddress_ir = ir2rama ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0; // Second OC12 module
-wire [11:0] busAddress_pc = ckFetch ? busPC : 12'b0;
+wire [11:0] busAddress_pc = (ckFetch) ? busPC : 12'b0;
+// wire [11:0] busAddress_pc = (ckFetch & ~outOfReset) ? busPC : 12'b0;
+//wire [11:0] busAddress_latpc = (outOfReset) ? busLatPC : 12'b0;
 wire [11:0] busData_pc    = pc2ramd ? busPC : 12'b0; 
 
 wire [11:0] busReg        = busReg_ind | busReg_data;
-wire [11:0] busAddress    = busAddress_ind | busAddress_pc | busAddress_ir;
+wire [11:0] busAddress    = busAddress_ind | busAddress_pc | busAddress_ir; // | busAddress_latpc;
 wire [11:0] busPCin       = busPCin_ir | busPCin_reg | (setpc ? switches : 12'o0000); 
-wire [11:0] busData       = busData_inc | busData_ram |busData_acc | busData_pc;
+wire [11:0] busData       = busData_inc | busData_ram | busData_acc | busData_pc;
 wire [11:0] busORacc      = mqout1 | busACGTF | {4'b0, busACTTY} | (oprOSR ? 12'o`OSR : 12'o0000);
 wire [11:0] accIn         = accIn_andadd | accIn_rotater; 
 
+// reg lastReset=1;
+// reg outOfReset=0;
+// always @(posedge clk) begin
+//   outOfReset<=(~reset & lastReset);
+//   lastReset<=reset;
+// end
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ OR'ed CONTROL SIGNALS █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -70,7 +79,7 @@ wire [11:0] accIn         = accIn_andadd | accIn_rotater;
 
 // 5 input or
 wire done         = done05 | doneIOT0 | doneIOT34 | done7;
-wire pc_ck        = pc_ckIFI | pc_ck05 | pc_ckIOT0 | pc_ckIOT34 | pc_ck7 | setpc;
+wire pc_inc       = pc_ckIFI | pc_ck05 | pc_ckIOT0 | pc_ckIOT34 | pc_ck7 | setpc;
 wire clorinCLR    = claDCA | oprCLA | iotCLR0 |clrTTY | ACclrIOT0;
 // 4 input or
 wire ac_ck        = ac_ck05 | ac_ckIOT0 | ac_ck7 | ac_ckTTY;
@@ -85,7 +94,7 @@ wire ind2inc      = ind2incIFI | ind2reg05;
 wire inc2ramd     = inc2ramdIFI | inc2ramd05;
 wire ir2rama      = ir2ramaIFI | ir2rama05;
 // Direct connected
-wire pc_ld        = pc_ld05  | setpc;
+wire pc_load        = pc_ld05  | setpc;
 wire irqRq        = irqRqIOT34;  // Some device is asserting irq
 wire mq_ck        = mq_ck7;
 wire mq2orbus     = mq2orbus7;
@@ -135,23 +144,25 @@ wire ckFetch, ckAuto1, ckAuto2, ckInd;
 wire ck1, ck2, ck3, ck4, ck5;
 wire stbFetch, stbAuto1, stbAuto2, stbInd;
 wire stb1, stb2, stb3, stb4, stb5;
-  /* verilator lint_on UNUSED */
+wire stbFetch2;
+/* verilator lint_on UNUSED */
 wire running;
 
 Sequencer theSEQUENCER(
   .clk(clk),
   .reset(reset),
   // Inputs
-  .HALT((oprHLT & ck2)), //FIX
-  .DONE(done), 
+  .halt((oprHLT & ck2)), //FIX
+  .done(done), 
   .startstop(startstop|sw_RUN),
-  .sst(sst),
+  .sst(sst|sw_SST),
   .SEQTYPE({instIsPPIND,instIsIND}),
   // Outputs
   .ckFetch(ckFetch), .ckAuto1(ckAuto1), .ckAuto2(ckAuto2), .ckInd(ckInd),
   .ck1(ck1), .ck2(ck2), .ck3(ck3), .ck4(ck4), .ck5(ck5),
   .stbFetch(stbFetch), .stbAuto1(stbAuto1), .stbAuto2(stbAuto2), .stbInd(stbInd), 
   .stb1(stb1), .stb2(stb2), .stb3(stb3), .stb4(stb4), .stb5(stb5),
+  .stbFetch2(stbFetch2),
   .running(running)
 );
 assign LED1=running;
@@ -160,17 +171,17 @@ assign LED1=running;
 // ▁ ▂ ▄ ▅ ▆ ▇ █ PROGRAM COUNTER █ ▇ ▆ ▅ ▄ ▂ ▁
 //
 
-wire inIrq=(busIR==12'o4000) | irqOverride; //FIX
+//wire inIrq=(busIR==12'o4000) | irqOverride; //FIX
 
 ProgramCounter thePC(
   .clk(clk),
   .reset(reset),
   // Inputs
-  .IN(busPCin),
-  .LD(pc_ld),
-  .CK(pc_ck & ~(inIrq & ckFetch)), //FIX
-  .LATCH(1'b0),
-  .FETCH(ckFetch & ~inIrq), //FIX
+  .in(busPCin),
+  .load(pc_load),
+  .inc(pc_inc & ~(irqOverride & ckFetch)),  //FIX
+  .LATCH(ckFetch),
+  // .FETCH(ckFetch & ~inIrq), //FIX
   //Outputs
   .PC(busPC),
   .PCLAT(busLatPC)
@@ -205,14 +216,16 @@ MultiLatch theIR(
   .clk(clk),
   // Inputs
   .in(irqOverride ? 12'o4000 : busData), //FIXME
-  .latch(ckFetch),
+  .latch(stbFetch),// ckFetch), //f2
   .latch3(1'b0),
   .oe1(1'b1),
   .oe2(1'b0),
   .oe3(1'b0),
   // Outputs
-  .out1(busIR)
+  .out1(busIR1)
 );
+wire [11:0] busIR1;
+assign busIR=stbFetch?busData:busIR1;
 /* verilator lint_on PINMISSING */
 
 
@@ -511,6 +524,7 @@ InstructionFetch theinstFI (
   .instIsPPIND(instIsPPIND),
   .ckFetch(ckFetch), .ckAuto1(ckAuto1), .ckAuto2(ckAuto2), .ckInd(ckInd),
   .stbFetch(stbFetch), .stbAuto2(stbAuto2), .stbAuto1(stbAuto1), .stbInd(stbInd),
+  .stbFetch2(stbFetch2),
   // Outputs
   .inc2ramd(inc2ramdIFI),
   .ind_ck(ind_ckIFI),
@@ -653,6 +667,7 @@ InstructionIOT600x theInterrupt(
   .LINK(link),
   .ckFetch(ckFetch), .ck1(ck1),   .ck2(ck2),
   .stbFetch(stbFetch), .stb1(stb1),
+  .stbFetch2(stbFetch2),
   .irqRq(irqRq),
   .anyDone(done),
   // Outputs
@@ -687,8 +702,8 @@ InstructionIOT603x theTTY(
   .clear(reset | iotCLR0), //FIX
   //Inputs
   .baudX7(baudX7),
-  .EN1(instIOT & (busIR[8:3]==6'o03)), //FIX
-  .EN2(instIOT & (busIR[8:3]==6'o04)), //FIX
+  .EN1(instIOT & (busIR[8:3]==6'o03) & (ck1|ck2|ck3)), //FIX
+  .EN2(instIOT & (busIR[8:3]==6'o04) & (ck1|ck2|ck3)), //FIX
   .op(busIR[2:0]),
   .dataIn(accout1[7:0]),
   .ck1(ck1),   .ck2(ck2),

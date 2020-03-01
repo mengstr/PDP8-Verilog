@@ -39,6 +39,7 @@ PDP8 cpu(
   .reset(reset),
   .sw_CLEAR(~nBUT2),
   .sw_RUN(~nBUT1), 
+  .sw_SST(0),
   .rx(RxD), .tx(TxD),
   .LED1(LED1), .LED2(LED2),
   .GREEN1(GREEN1), .GREEN2(GREEN2),

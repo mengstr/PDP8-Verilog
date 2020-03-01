@@ -12,6 +12,7 @@ module InstructionFetch (
   input instIsPPIND,
   input ckFetch, ckAuto1, ckAuto2, ckInd,
   input stbFetch, stbAuto1, stbAuto2, stbInd, 
+  input stbFetch2,
   output inc2ramd,
   output ind_ck,
   output ind2inc,
@@ -46,7 +47,7 @@ or(ram_we, ram_wePPIND);
 // ▁ ▂ ▄ ▅ ▆ ▇ █ FETCH CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
 // 
 assign ram_oeFETCH=   ckFetch;
-assign pc_ckFETCH=    stbFetch;
+assign pc_ckFETCH=    stbFetch2;
 
 // 
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT W. AUTOINC CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁

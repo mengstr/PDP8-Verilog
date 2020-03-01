@@ -17,12 +17,16 @@ module RAM(
 );
 
 initial $readmemh("initialRAM.hex", mem);
+
+// reg startFix=0;
 reg [11:0] mem [0:4095];
 reg [11:0] DO;
 
-always @(negedge clk) begin
+always @(posedge clk) begin
+// always @(negedge clk) begin
+  // if (~clk & ~startFix) DO<=mem[addr];
+  // startFix<=1;
   if (we) mem[addr] <= dataI;
-//  if (we & addr>=12'o2170 & addr<=12'o2177) $display("Writing %o to address %o",dataI, addr);
   if (oe) DO<=mem[addr];
 end
 

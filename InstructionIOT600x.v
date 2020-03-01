@@ -68,6 +68,7 @@ module InstructionIOT600x(
   input LINK,
   input ckFetch, ck1,ck2,
   input stbFetch,stb1,
+  input stbFetch2,
   input irqRq,
   input anyDone,
   output done,
@@ -128,7 +129,7 @@ wire preIrq;
 
 always @(posedge clk) begin
   if (CLEAR | reset)       begin IE<=0; IEdly1<=0; IEdly2<=0; irqActive<=0; end
-  if (ckFetch & ~stbFetch & preIrq)    begin irqActive<=1; end
+  if (ckFetch & ~stbFetch& ~stbFetch2 & preIrq)    begin irqActive<=1; end
   if (stb1 & instCAF)      begin IE<=0; IEdly1<=0; IEdly2<=0; end
   if (stb1 & instIOF)      begin IE<=0; IEdly1<=0; IEdly2<=0; end
   if (stb1 & instSKON)     begin IE<=0; IEdly1<=0; IEdly2<=0; end
@@ -142,7 +143,7 @@ end
 
 assign GIE=IE & ~IEdly1 & ~IEdly2;
 assign preIrq=GIE & irqRq;
-assign irqOverride=preIrq & (irqActive | ckFetch);
+assign irqOverride=preIrq & (irqActive | ~ckFetch);
 
 //                            1     1      2     2      3     3      4     4      5     5      6     6
 //                            ### | #### | ### | #### | ### | #### | ### | #### | ### | #### | ### | #### 

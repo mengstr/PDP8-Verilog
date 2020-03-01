@@ -10,19 +10,17 @@
 module ProgramCounter (
   input clk,
   input reset,
-  input [11:0] IN,
-  input CK,
-  input LD,
+  input [11:0] in,
+  input inc,
+  input load,
   input LATCH,
-  input FETCH,
   output [11:0] PC,
   output [11:0] PCLAT
 );
 
 reg [11:0] thisPC=0;
 reg [11:0] thisPCLAT=0;
-reg prevLD=0;
-reg prevFetch=0;
+reg prevLoad=0;
 
 assign PC=thisPC;
 assign PCLAT=thisPCLAT;
@@ -31,20 +29,15 @@ always @(posedge clk) begin
   if (reset) begin
     thisPC<=12'o0200;
     thisPCLAT<=12'o0200;
-    prevLD<=0;
-    prevFetch<=0;
-  end else if (LD && !prevLD) begin
-    thisPC<=IN;
-  end else if (FETCH & !prevFetch) begin
-    thisPCLAT<=thisPC;
+    prevLoad<=0;
+  end else if (load && !prevLoad) begin
+    thisPC <= in;
+  end else if (inc) begin
     thisPC<=thisPC+1;
-  end else if (CK & !prevFetch) begin
-    thisPC<=thisPC+1;
-    if (LATCH) thisPCLAT<=thisPC;
   end
+  if (LATCH) thisPCLAT<=thisPC;
 
-  prevLD<=LD;
-  prevFetch<=FETCH;
+  prevLoad <= load;
 end
 
 

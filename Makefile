@@ -9,6 +9,7 @@ PNRCLKGOAL  := 25
 
 OSR			:= 0000
 DEFS		:= 	-DOSR=$(OSR) 
+DELAY		:= 0
 
 TARGET 		:= PDP8
 SOURCES		:= $(wildcard *.v)
@@ -92,13 +93,14 @@ BP:=7777
 TRACE:=
 
 test:
-	@echo "${rev}###  iverilog -DOSR=$(OSR) -DCNT=$(CNT) -DBP=$(BP) -D$(TRACE)TRACE  ###${norm}"
+	@echo "${rev}###  iverilog -DOSR=$(OSR) -DCNT=$(CNT) -DBP=$(BP) -DDELAY=$(DELAY) -D$(TRACE)TRACE  ###${norm}"
 	@$(ICARUS) iverilog -g2012 \
 		-DIVERILOG \
 		-DOSR=$(OSR) \
 		-DBP=$(BP) \
 		-D$(TRACE)TRACE \
 		-DCNT=$(CNT) \
+		-DDELAY=$(DELAY) \
 		-o $(TARGET).vvp \
 		$(TARGET).vt $(filter-out $(TARGET)_top.v, $(SOURCES))
 	@$(ICARUS) vvp $(TARGET).vvp | tools/showop.sh | tee test.tmp

@@ -3,7 +3,7 @@
 
 module PDP8_tb();
     reg CLK=0;
-    reg reset=0, clear=0, run=0, halt=0;
+    reg reset=1, clear=1, run=0, halt=0, sst=0;
     reg RxD=1;
     wire TxD;
     wire LED1, LED2;
@@ -15,7 +15,8 @@ PDP8 dut(
   .clk(CLK),
   .reset(reset),
   .sw_CLEAR(clear),
-  .sw_RUN(run), 
+  .sw_RUN(run),
+  .sw_SST(sst), 
   .rx(RxD), .tx(TxD),
   .LED1(LED1), .LED2(LED2),
   .GREEN1(GREEN1), .GREEN2(GREEN2),
@@ -23,73 +24,86 @@ PDP8 dut(
   .YELLOW1(YELLOW1), .YELLOW2(YELLOW2),
   .PLED1(PLED1), .PLED2(PLED2), .PLED3(PLED3), .PLED4(PLED4), .PLED5(PLED5), .PLED6(PLED6),
   .SW1(1'b0), .SW2(1'b0), .SW3(1'b0)
-  );
+);
     
-  reg [24:0] cnt=0;
+localparam EXTRA_FETCH=1;
 
-    always begin
-        #2 CLK<=~CLK;
-    end
+reg [24:0] instructionCount=0;
+reg [24:0] tick=0;
 
-    // Clear/reset the entire system
-    initial begin 
-        reset=1; 
-        clear=1; 
-        #100;
-        reset=0; 
-        clear=0; 
-        #100;
-        run=1; 
-        #100;
-        run=0; 
-    end  
-    
-    initial begin
-        $dumpfile("PDP8.vcd");
-        $dumpvars(0,PDP8_tb);
-        #`CNT begin $display("DONE after %d instructions",cnt); $finish; end
-    end
+always begin
+  CLK <= ~CLK; 
+  if (CLK) tick <= tick+1;
+  #1;
+end
 
-    always @(CLK) begin
+always begin
+  if (tick==5) begin reset=0; clear=0; end
 
-        if ((dut.theSEQUENCER.stepCnt==5'd30) 
-            & (dut.busIR != 12'o6011) // RSF  PR8-E: Skip on Reader Flag
-            & (dut.busIR != 12'o6012) // RRB  PR8-E: Read Reader Buffer
-            & (dut.busIR != 12'o6077)
-            & (dut.busIR != 12'o6101) // SMP  MP8-E: Skip on No Memory Parity Error
-            & (dut.busIR != 12'o6141)
-            & (dut.busIR != 12'o6142) 
-            & (dut.busIR != 12'o6152)
-            & (dut.busIR != 12'o6167)
-            & (dut.busIR != 12'o6171)
-            & (dut.busIR != 12'o6244) // RMF  KM8-E: Restore Memory Field
-            & (dut.busIR != 12'o6331)
-            & (dut.busIR != 12'o6344)
-            & (dut.busIR != 12'o6346)
-            & (dut.busIR != 12'o6762) // DTCA TC08-P: Clear Status Register A
-            & (dut.busIR != 12'o6772) // DTRB TC08-P: Read Status Register B
-        ) begin $display("Unhandled OP"); $finish; end
+  if (`DELAY>0) begin
+    if (tick>=20) sst=((tick-20)%`DELAY==0);
+  end
+  if (`DELAY==0) begin
+    if (tick==16) run=1;
+    if (tick==17) run=0;
+  end
+  #1;
+end
 
-        if (dut.theSEQUENCER.stepCnt==5'd1 && dut.clk==0) begin:PRN    
-        cnt<=cnt+1;
-//      if ((cnt%1000)==0) $display("%d",cnt);
- `ifdef TRACE
-            $display("[%04o] IRQ,DLY,IE=%d,%d,%d L/AC:%d/%04o MQ:%04o IR:%04o",
-                dut.thePC.PCLAT,
-                dut.theInterrupt.irqRq, dut.theInterrupt.IEdly1|dut.theInterrupt.IEdly2, dut.theInterrupt.IE,
-                dut.link,
-                dut.theACC.data,
-                dut.theMQ.data,
-                dut.busIR 
-            );
 
+initial begin
+//  #2
+  $dumpfile("PDP8.vcd");
+  $dumpvars(0,PDP8_tb);
+  #`CNT begin $display("DONE after %d instructions",instructionCount); $finish; end
+end
+
+always @(CLK) begin
+
+  if ((dut.theSEQUENCER.stepCnt==5'd30) 
+      & (dut.busIR != 12'o6011) // RSF  PR8-E: Skip on Reader Flag
+      & (dut.busIR != 12'o6012) // RRB  PR8-E: Read Reader Buffer
+      & (dut.busIR != 12'o6077)
+      & (dut.busIR != 12'o6101) // SMP  MP8-E: Skip on No Memory Parity Error
+      & (dut.busIR != 12'o6141)
+      & (dut.busIR != 12'o6142) 
+      & (dut.busIR != 12'o6152)
+      & (dut.busIR != 12'o6167)
+      & (dut.busIR != 12'o6171)
+      & (dut.busIR != 12'o6244) // RMF  KM8-E: Restore Memory Field
+      & (dut.busIR != 12'o6331)
+      & (dut.busIR != 12'o6344)
+      & (dut.busIR != 12'o6346)
+      & (dut.busIR != 12'o6762) // DTCA TC08-P: Clear Status Register A
+      & (dut.busIR != 12'o6772) // DTRB TC08-P: Read Status Register B
+  ) begin $display("Unhandled OP"); $finish; end
+
+  if (dut.theSEQUENCER.stepCnt==(5'd1+EXTRA_FETCH) && dut.clk==0) begin:PRN    
+    instructionCount<=instructionCount+1;
+    `ifdef TRACE
+      $display("[%04o] IRQ,DLY,IE=%d,%d,%d L/AC:%d/%04o MQ:%04o IR:%04o",
+          dut.thePC.PCLAT,
+          dut.theInterrupt.irqRq, dut.theInterrupt.IEdly1|dut.theInterrupt.IEdly2, dut.theInterrupt.IE,
+          dut.link,
+          dut.theACC.data,
+          dut.theMQ.data,
+          dut.busIR 
+      );
     `endif
-        if (dut.thePC.PCLAT == 12'o`BP) begin $display("BP at %o after %d instructions",dut.thePC.PCLAT, cnt); $finish; end
-            // if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bx)) begin $display("X in theACC.data"); $finish; end
-            // if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bz)) begin $display("Z in theACC.data"); $finish; end
-        end
-        if (dut.theSEQUENCER.stepCnt==5'd8 & dut.busIR==12'o7402) begin $display("HLT at %o after %d instructions",dut.thePC.PCLAT, cnt); $finish; end
-    end
+    if (dut.thePC.PCLAT == 12'o`BP) begin $display("BP at %o after %d instructions",dut.thePC.PCLAT, instructionCount); $finish; end
+    // if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bx)) begin $display("X in theACC.data"); $finish; end
+    // if ((dut.theSEQUENCER.running==1'b1) && (dut.theACC.data[0:0]===1'bz)) begin $display("Z in theACC.data"); $finish; end
+  end
+  if (dut.theSEQUENCER.stepCnt==(5'd8+EXTRA_FETCH) & dut.busIR==12'o7402) begin $display("HLT at %o after %d instructions",dut.thePC.PCLAT, instructionCount); $finish; end
+end
     
 
 endmodule
+
+// InstTest1
+//--------------------
+// 0200 5144 JMP 0144
+// 0144 1067 TAD 0067
+// 0145 7200 CLA 
+// 0146 7000 NOP
+
