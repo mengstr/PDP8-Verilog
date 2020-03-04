@@ -1,7 +1,7 @@
 #/bin/bash
 
-signals1=(ckFetch stbFetch ckAuto1 stbAuto1 ckAuto2 stbAuto2 ckInd stbInd)
-signals2=(ck1 stb1 ck2 stb2 ck3 stb3 ck4 stb4 ck5 stb5 ch6 stb6)
+signals1=(ckFetch stbFetchA stbFetchB ckAuto1 stbAuto1 ckAuto2 stbAuto2 ckInd stbInd)
+signals2=(ck1 stb1 ck2 stb2 ck3 stb3 ck4 stb4)
 
 for no in 1 2; do
 	if [ "$no" == "1" ]; then signals=("${signals1[@]}"); fi

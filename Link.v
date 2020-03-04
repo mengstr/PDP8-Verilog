@@ -4,6 +4,9 @@
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
+// Link | 0 | 7 | 0 | 2
+//
+
 `default_nettype none
 
 module Link (

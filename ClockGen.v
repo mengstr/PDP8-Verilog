@@ -4,6 +4,9 @@
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
+// ClockGen | 0 | 1 | 0 | 3
+//
+
 `default_nettype none
 
 module ClockGen (

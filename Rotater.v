@@ -4,6 +4,8 @@
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
+// Rotater | 1 | 5 | 1 | 1
+//
 
 `default_nettype none
 

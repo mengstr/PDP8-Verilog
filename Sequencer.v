@@ -4,6 +4,9 @@
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
+// Sequencer | 0 | 8 | 0 | 20
+//
+
 `default_nettype none
 
 module Sequencer (
@@ -15,15 +18,13 @@ module Sequencer (
   input sst,              // Strobe - executes one instruction 
   input [1:0] SEQTYPE,    // ({instIsPPIND,instIsIND}),
   output ckFetch, ckAuto1, ckAuto2, ckInd,
-  output ck1, ck2, ck3, ck4, ck5,
-  output stbFetch, stbAuto1, stbAuto2, stbInd,
-  output stb1, stb2, stb3, stb4, stb5,
-  output stbFetch2,
+  output ck1, ck2, ck3, ck4,
+  output stbFetchA, stbAuto1, stbAuto2, stbInd,
+  output stb1, stb2, stb3, stb4, 
+  output stbFetchB,
   output reg running=0
 );
 
-localparam EXTRA_FETCH=1;
-if (EXTRA_FETCH==0) assign stbFetch2 = 0;
 
 reg [4:0] stepCnt; 
 reg haltAt1=0;
@@ -68,7 +69,7 @@ always @(posedge clk) begin
       if (haltAt1 & stepCnt==0) running<=0;
       // Restart step counter when done is signalled
       if (done) stepCnt <= 0;
-      else if (stepCnt==1+EXTRA_FETCH) begin
+      else if (stepCnt==2) begin
           case (SEQTYPE)
               2'b00: stepCnt <= stepCnt+7;
               2'b01: stepCnt <= stepCnt+5;
@@ -82,26 +83,27 @@ always @(posedge clk) begin
 
 end
 
-assign ckFetch  = !reset & (stepCnt==0 || stepCnt==1 || stepCnt==2);
-assign ckAuto1  = !reset & (stepCnt==2+EXTRA_FETCH || stepCnt==3+EXTRA_FETCH);
-assign ckAuto2  = !reset & (stepCnt==4+EXTRA_FETCH || stepCnt==5+EXTRA_FETCH);
-assign ckInd    = !reset & (stepCnt==6+EXTRA_FETCH || stepCnt==7+EXTRA_FETCH);
-assign ck1      = !reset & (stepCnt==8+EXTRA_FETCH || stepCnt==9+EXTRA_FETCH);
-assign ck2      = !reset & (stepCnt==10+EXTRA_FETCH || stepCnt==11+EXTRA_FETCH);
-assign ck3      = !reset & (stepCnt==12+EXTRA_FETCH || stepCnt==13+EXTRA_FETCH);
-assign ck4      = !reset & (stepCnt==14+EXTRA_FETCH || stepCnt==15+EXTRA_FETCH);
-assign ck5      = !reset & (stepCnt==16+EXTRA_FETCH || stepCnt==17+EXTRA_FETCH);
+assign ckFetch   = stepCnt==0 || stepCnt==1 || stepCnt==2;
+assign stbFetchA = stepCnt==1;
+assign stbFetchB = stepCnt==2;
 
-assign stbFetch = !reset & (stepCnt==1);
-assign stbFetch2 = !reset & (stepCnt==2);
-assign stbAuto1 = !reset & (stepCnt==3+EXTRA_FETCH);
-assign stbAuto2 = !reset & (stepCnt==5+EXTRA_FETCH);
-assign stbInd   = !reset & (stepCnt==7+EXTRA_FETCH);
-assign stb1     = !reset & (stepCnt==9+EXTRA_FETCH);
-assign stb2     = !reset & (stepCnt==11+EXTRA_FETCH);
-assign stb3     = !reset & (stepCnt==13+EXTRA_FETCH);
-assign stb4     = !reset & (stepCnt==15+EXTRA_FETCH);
-assign stb5     = !reset & (stepCnt==17+EXTRA_FETCH);
+assign ckAuto1   = stepCnt==3 || stepCnt==4;
+assign stbAuto1  = stepCnt==4;
+assign ckAuto2   = stepCnt==5 || stepCnt==6;
+assign stbAuto2  = stepCnt==6;
+
+assign ckInd     = stepCnt==7 || stepCnt==8;
+assign stbInd    = stepCnt==8;
+
+assign ck1       = stepCnt==9 || stepCnt==10;
+assign stb1      = stepCnt==10;
+assign ck2       = stepCnt==11 || stepCnt==12;
+assign stb2      = stepCnt==12;
+assign ck3       = stepCnt==13 || stepCnt==14;
+assign stb3      = stepCnt==14;
+assign ck4       = stepCnt==15 || stepCnt==16;
+assign stb4      = stepCnt==16;
+
 
 endmodule
 

@@ -4,6 +4,9 @@
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
+// UART | 0 | 13 | 0 | 11
+//
+
 `default_nettype none
 
 module UART (

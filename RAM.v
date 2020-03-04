@@ -4,8 +4,10 @@
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
-`default_nettype none
+// RAM | 2 | 3 | 1 | 0
+//
 
+`default_nettype none
 
 module RAM(
   input clk,
@@ -18,14 +20,10 @@ module RAM(
 
 initial $readmemh("initialRAM.hex", mem);
 
-// reg startFix=0;
 reg [11:0] mem [0:4095];
 reg [11:0] DO;
 
 always @(posedge clk) begin
-// always @(negedge clk) begin
-  // if (~clk & ~startFix) DO<=mem[addr];
-  // startFix<=1;
   if (we) mem[addr] <= dataI;
   if (oe) DO<=mem[addr];
 end

@@ -4,6 +4,8 @@
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
+// InstructionIOT600x | 1 | 16 | 1 | 10
+//
 
 `default_nettype none
 
@@ -56,6 +58,7 @@
 //            If EAE is present, then it is set to mode "A" and the "GT" flag is cleared.
 //
 
+
 module InstructionIOT600x(
   input clk,
   input reset,
@@ -66,9 +69,8 @@ module InstructionIOT600x(
   input [11:0] AC,
   /* verilator lint_on UNUSED */
   input LINK,
-  input ckFetch, ck1,ck2,
-  input stbFetch,stb1,
-  input stbFetch2,
+  input ckFetch, ck1, ck2,
+  input stbFetchA, stbFetchB, stb1,
   input irqRq,
   input anyDone,
   output done,
@@ -81,7 +83,6 @@ module InstructionIOT600x(
   output link_ck,
   output pc_ck,
   output [11:0] ACGTF,
-  output GIE,
   output irqOverride
 );
 
@@ -125,11 +126,10 @@ wire instSGT= (EN & (IR==3'o6));    // TODO
 wire instCAF= (EN & (IR==3'o7));
 
 wire AC8=~AC[8];
-wire preIrq;
 
 always @(posedge clk) begin
   if (CLEAR | reset)       begin IE<=0; IEdly1<=0; IEdly2<=0; irqActive<=0; end
-  if (ckFetch & ~stbFetch& ~stbFetch2 & preIrq)    begin irqActive<=1; end
+  if (ckFetch & ~stbFetchA & ~stbFetchB & preIrq)    begin irqActive<=1; end
   if (stb1 & instCAF)      begin IE<=0; IEdly1<=0; IEdly2<=0; end
   if (stb1 & instIOF)      begin IE<=0; IEdly1<=0; IEdly2<=0; end
   if (stb1 & instSKON)     begin IE<=0; IEdly1<=0; IEdly2<=0; end
@@ -141,8 +141,8 @@ always @(posedge clk) begin
   if (anyDone & GIE & irqActive)      begin IE<=0; irqActive<=0; end
 end
 
-assign GIE=IE & ~IEdly1 & ~IEdly2;
-assign preIrq=GIE & irqRq;
+wire GIE=IE & ~IEdly1 & ~IEdly2;
+wire preIrq=GIE & irqRq;
 assign irqOverride=preIrq & (irqActive | ~ckFetch);
 
 //                            1     1      2     2      3     3      4     4      5     5      6     6

@@ -4,58 +4,66 @@
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
+// RIMloader | 0 | 2 | 2 | 2
+//
 
 `default_nettype none
 
-
-//
-// Halt CPU
-// Aquire control over RAM address and data busses
-// Set internal addr to 0
-// Loop
-//   Assert address and data onto busses
-//   Strobe WE
-//   Increment internal addr
-// Until addr[4]==1
-// Set PC to 7756
-// Release control over RAM address and data busses
-//
-
 module RIMloader(
- output [11:0] address,
- output reg [11:0] data,
- output we
+  input clk,
+  input start,
+  output [11:0] address,
+  output  [11:0] data,
+  output reg we=0,
+  output reg loading=0
 );
 
 reg [4:0] addr=0;
+reg [1:0] cnt=0;
 
+always @(posedge clk) begin
+  if (start) loading<=1;
+  if (loading==0) begin
+    addr  <= 0;
+    cnt   <= 0;
+    we    <= 0;
+  end else begin
+    cnt <= cnt + 1;
+    if (cnt==1) we <= 1; else we <= 0;
+    if (cnt==3) addr <= addr + 1;
+    if (addr[4]) loading <= 0;
+  end
+end
+
+reg [11:0] dataTemp;
 always @* begin
-  case (addr[3:0])
-    4'd0:   data = 12'o6032;
-    4'd1:   data = 12'o6031;
-    4'd2:   data = 12'o5357;
-    4'd3:   data = 12'o6036;
-    4'd4:   data = 12'o7106;
-    4'd5:   data = 12'o7006;
-    4'd6:   data = 12'o7510;
-    4'd7:   data = 12'o5357;
-    4'd8:   data = 12'o7006;
-    4'd9:   data = 12'o6031;
-    4'd10:  data = 12'o5367;
-    4'd11:  data = 12'o6034;
-    4'd12:  data = 12'o7420;
-    4'd13:  data = 12'o3776;
-    4'd14:  data = 12'o3376;
-    4'd15:  data = 12'o5356;
-    default:data = 12'o0000;
+  case (addr[3:0])               // Starting address 7756=FEE
+    4'd0:   dataTemp = 12'o6032; // C1A
+    4'd1:   dataTemp = 12'o6031; // C19
+    4'd2:   dataTemp = 12'o5357; // AEF
+    4'd3:   dataTemp = 12'o6036; // C1E
+    4'd4:   dataTemp = 12'o7106; // E46
+    4'd5:   dataTemp = 12'o7006; // E06
+    4'd6:   dataTemp = 12'o7510; // F48
+    4'd7:   dataTemp = 12'o5357; // AEF
+    4'd8:   dataTemp = 12'o7006; // E06
+    4'd9:   dataTemp = 12'o6031; // C19
+    4'd10:  dataTemp = 12'o5367; // AF7
+    4'd11:  dataTemp = 12'o6034; // C1C
+    4'd12:  dataTemp = 12'o7420; // F10
+    4'd13:  dataTemp = 12'o3776; // 7FE
+    4'd14:  dataTemp = 12'o3376; // 6FE
+    4'd15:  dataTemp = 12'o5356; // AEE
   endcase
 end
 
-assign address=12'o7756 + {8'b0,addr[3:0]};
-
+assign data    = loading ? dataTemp : 12'b0;
+assign address = loading ? 12'o7756 + {8'b0,addr[3:0]} : 12'b0;
 
 endmodule
 
+// 7756 111 111 101 110
+//      111 111 1xx xxx
 
 
 //   RIM Loader       RIM Loader         RIM Loader                RIM Loader         

@@ -5,6 +5,13 @@ norm=$(tput sgr0)
 
 DELAY=0
 
+echo --------------------------------------------------------------------
+echo InstTest1-D0AB should halt
+cp hex/InstTest1-D0AB.hex initialRAM.hex
+make OSR=1234 CNT=100000 BP=5276 DELAY=$DELAY TRACE=NO test
+grep -q -s 'HLT at' test.tmp
+if [ "$?" == "0" ]; then echo "$green    SUCCESS    $norm"; else echo "$red      FAIL     $norm"; fi
+
 
 echo --------------------------------------------------------------------
 echo InstTest1-D0AB
@@ -12,6 +19,7 @@ cp hex/InstTest1-D0AB.hex initialRAM.hex
 make OSR=7777 CNT=100000 BP=5276 DELAY=$DELAY TRACE=NO test
 grep -q -s 'BP at' test.tmp
 if [ "$?" == "0" ]; then echo "$green    SUCCESS    $norm"; else echo "$red      FAIL     $norm"; fi
+
 
 echo --------------------------------------------------------------------
 echo InstTest2-D0BB

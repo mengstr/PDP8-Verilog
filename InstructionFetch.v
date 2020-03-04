@@ -4,6 +4,8 @@
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
+// InstructionFetch | 0 | 10 | 0 | 7
+//
 
 `default_nettype none
 
@@ -11,8 +13,7 @@ module InstructionFetch (
   input instIsIND,
   input instIsPPIND,
   input ckFetch, ckAuto1, ckAuto2, ckInd,
-  input stbFetch, stbAuto1, stbAuto2, stbInd, 
-  input stbFetch2,
+  input stbFetchB, stbAuto1, stbAuto2, stbInd, 
   output inc2ramd,
   output ind_ck,
   output ind2inc,
@@ -47,7 +48,7 @@ or(ram_we, ram_wePPIND);
 // ▁ ▂ ▄ ▅ ▆ ▇ █ FETCH CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁
 // 
 assign ram_oeFETCH=   ckFetch;
-assign pc_ckFETCH=    stbFetch2;
+assign pc_ckFETCH=    stbFetchB;
 
 // 
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INDIRECT W. AUTOINC CYCLE █ ▇ ▆ ▅ ▄ ▂ ▁

@@ -4,6 +4,8 @@
 // github.com/SmallRoomLabs/PDP8-Verilog
 // Mats Engstrom - mats.engstrom@gmail.com
 //
+// MultiLatch | 1 | 7 | 2 | 0
+//
 
 `default_nettype none
 
@@ -14,7 +16,8 @@ module MultiLatch (
   input latch,
   input latch3,
   input oe1,oe2,oe3,
-  output [11:0] out1, out2
+  output [11:0] out1,
+  output [11:0] out2
 );
 
 reg lastLatch=0;

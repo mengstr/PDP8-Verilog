@@ -42,6 +42,7 @@ always begin
 
   if (`DELAY>0) begin
     if (tick>=20) sst=((tick-20)%`DELAY==0);
+    // if (tick==100) dut.loader.loading=1;
   end
   if (`DELAY==0) begin
     if (tick==16) run=1;
@@ -50,12 +51,14 @@ always begin
   #1;
 end
 
-
 initial begin
 //  #2
   $dumpfile("PDP8.vcd");
   $dumpvars(0,PDP8_tb);
-  #`CNT begin $display("DONE after %d instructions",instructionCount); $finish; end
+  #`CNT begin $display("DONE after %d instructions",instructionCount);
+    $writememh("ramdump.hex", dut.theRAM.mem);
+    $finish;
+  end
 end
 
 always @(CLK) begin
