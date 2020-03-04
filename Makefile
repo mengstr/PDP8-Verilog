@@ -91,7 +91,7 @@ TRACE:=
 
 test:
 	@echo "${rev}###  iverilog -DOSR=$(OSR) -DCNT=$(CNT) -DBP=$(BP) -DDELAY=$(DELAY) -D$(TRACE)TRACE  ###${norm}"
-	@$(RUN) iverilog -g2012 \
+	$(RUN) iverilog -g2012 \
 		-DIVERILOG \
 		-DOSR=$(OSR) \
 		-DBP=$(BP) \
@@ -100,7 +100,7 @@ test:
 		-DDELAY=$(DELAY) \
 		-o $(TARGET).vvp \
 		$(TARGET).vt $(filter-out $(TARGET)_top.v, $(SOURCES))
-	@$(RUN) vvp $(TARGET).vvp | tools/showop.sh | tee test.tmp
+	$(RUN) vvp $(TARGET).vvp | tools/showop.sh | tee test.tmp
 
 modules:
 	# $(ICARUS) iverilog -g2012 -o Skip.vvp Skip.vt Skip.v
