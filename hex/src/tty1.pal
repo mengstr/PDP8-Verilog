@@ -1,0 +1,10 @@
+*200
+
+        CLA IAC BSW     / INIT CHAR TO @
+loop,   TPC             / PRINT CHAR
+wait,   TSF             / WAIT UNTIL PRINTED
+        JMP wait        / SPIN
+        IAC             / INCRE CHAR
+        JMP loop        / LOOP
+
+$

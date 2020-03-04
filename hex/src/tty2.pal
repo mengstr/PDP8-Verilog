@@ -1,0 +1,21 @@
+*200
+
+/
+/ Echo received character three times
+/
+        KCC     / CLEAR FLAG
+L1,     KSF     / SKIP IF CHAR
+        JMP L1  / SPIN
+        KRB     / READ CHAR
+        TLS     / PRINT CHAR
+L2,     TSF     / WAIT UNTIL PRINTED
+        JMP L2  / SPIN
+        TLS     / PRINT CHAR
+L3,     TSF     / WAIT UNTIL PRINTED
+        JMP L3  / SPIN
+        TLS     / PRINT CHAR
+L4,     TSF     / WAIT UNTIL PRINTED
+        JMP L4  / SPIN
+        JMP L1  / LOOP
+
+$
