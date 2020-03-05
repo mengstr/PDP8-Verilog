@@ -193,6 +193,10 @@ sw/hex/%.hex: sw/src/%.bin
 	@mkdir -p sw/tmp sw/hex
 	$(T2H) < $< > sw/hex/$(basename $(notdir $<)).hex
 
+patchhexes: $(HEXTARGETS)
+	# Patch initial HLT to be a NOP
+	sed -i '' '103s/f02/e00/' sw/hex/InstTest1-D0AB.hex
+
 initialRAM.hex : sw/hex/NOP.hex
 	@cp $< $@
 	
