@@ -143,7 +143,7 @@ testall: $(HEXTARGETS)
 	echo "${yellow}    MAYBE     ${norm}"
 
 	@$(call runtest,focal-8,0000,200000,7777,0,NO); \
-	if [ $$(grep -c 'TX 33 ' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi
+	if [ $$(grep -c 'TX 33' test.tmp) -gt 0 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi
 
 # echo --------------------------------------------------------------------
 # echo focal-8 multitests
