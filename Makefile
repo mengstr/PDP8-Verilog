@@ -119,7 +119,10 @@ testall: $(HEXTARGETS)
 	
 	@$(call runtest,InstTest2-D0BB,0000,100000,3731,0,NO); \
 	if [ $$(grep -c 'BP at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi ; \
-	
+
+	@$(call runtest,JMPJMS-D0IB,0000,1000000,3551,0,NO); \
+	if [ $$(grep -c 'BP at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi ; \
+
 
 define runtest
 	echo 
