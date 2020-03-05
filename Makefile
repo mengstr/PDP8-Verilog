@@ -15,14 +15,25 @@ TARGET 		:= PDP8
 SOURCES		:= $(wildcard *.v)
 DIR         := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
-RUN:=docker run --rm --log-driver=none -a stdout -a stderr -w/work -v$(DIR)/:/work viacard/veritools
-ICEFLASH:=../verilog_old/upload/iceflash 
+ifeq ($(CI),"true")
+	RUN		:= ""
+else
+	RUN		:= docker run --rm --log-driver=none -a stdout -a stderr -w/work -v$(DIR)/:/work viacard/veritools
+endif
 
-rev=$$(tput bold)
-norm=$$(tput sgr0)
+ICEFLASH	:= ../verilog_old/upload/iceflash 
+PAL			:= tools/palbart
+T2H			:= tools/tape2hexram.sh
 
-all: $(TARGET).bin report
+rev			:= $$(tput bold)
+norm		:= $$(tput sgr0)
+
+HEXSOURCES 	:= $(addsuffix .hex,$(basename $(wildcard sw/src/*.pal sw/src/*.pt sw/src/*.bin sw/src/*.bn)))
+HEXTARGETS 	:= $(subst sw/src/,sw/hex/,$(HEXSOURCES))
+
 .PHONY: all report upload lint clean test
+
+all:  $(HEXTARGETS) $(TARGET).bin report
 
 $(TARGET).json: $(SOURCES) initialRAM.hex Makefile $(PCF)
 	@echo "${rev}###  yosys $(DEFS) ###${norm}"
@@ -91,7 +102,7 @@ TRACE:=
 
 test:
 	@echo "${rev}###  iverilog -DOSR=$(OSR) -DCNT=$(CNT) -DBP=$(BP) -DDELAY=$(DELAY) -D$(TRACE)TRACE  ###${norm}"
-	$(RUN) iverilog -g2012 \
+	@$(RUN) iverilog -g2012 \
 		-DIVERILOG \
 		-DOSR=$(OSR) \
 		-DBP=$(BP) \
@@ -100,16 +111,38 @@ test:
 		-DDELAY=$(DELAY) \
 		-o $(TARGET).vvp \
 		$(TARGET).vt $(filter-out $(TARGET)_top.v, $(SOURCES))
-	$(RUN) vvp $(TARGET).vvp | tools/showop.sh | tee test.tmp
+	@$(RUN) vvp $(TARGET).vvp | tools/showop.sh | tee test.tmp
 
 modules:
 	# $(ICARUS) iverilog -g2012 -o Skip.vvp Skip.vt Skip.v
 	# $(ICARUS) vvp Skip.vvp 
-	$(RUN) iverilog -g2012 -o UART.vvp UART.vt UART.v ClockGen.v
-	$(RUN) vvp UART.vvp 
+	@$(RUN) iverilog -g2012 -o UART.vvp UART.vt UART.v ClockGen.v
+	@$(RUN) vvp UART.vvp 
 
+sw/hex/%.hex: sw/src/%.pal
+	@mkdir -p sw/tmp sw/hex
+	@cp -f $< $(dir $<)../tmp/
+	$(PAL) -a -r sw/tmp/$(basename $(notdir $<)).pal
+	$(T2H) < sw/tmp/$(basename $(notdir $<)).rim > sw/hex/$(basename $(notdir $<)).hex
+
+sw/hex/%.hex: sw/src/%.pt
+	@mkdir -p sw/tmp sw/hex
+	$(T2H) < $< > sw/hex/$(basename $(notdir $<)).hex
+
+sw/hex/%.hex: sw/src/%.bn
+	@mkdir -p sw/tmp sw/hex
+	$(T2H) < $< > sw/hex/$(basename $(notdir $<)).hex
+
+sw/hex/%.hex: sw/src/%.bin
+	@mkdir -p sw/tmp sw/hex
+	$(T2H) < $< > sw/hex/$(basename $(notdir $<)).hex
+
+initialRAM.hex : sw/hex/NOP.hex
+	@cp $< $@
+	
 clean:
-	@rm -f *.{tmp,blif,asc,bin,rpt,dot,png,json,vvp,vcd,svg,out,log}
+	@rm -f *.{tmp,blif,asc,bin,rpt,dot,png,json,vvp,vcd,svg,out,log,hex}
+	@rm -f sw/{hex,tmp}/*
 	@rm -f .*_history
 	@rm -f *~
 

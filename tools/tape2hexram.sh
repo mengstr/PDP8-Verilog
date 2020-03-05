@@ -38,6 +38,9 @@
 #
 #
 
+verbose=0
+if [ "$1" == "-v" ]; then verbose=1; fi 
+
 # Size of RAM in PDP8-words
 WORDS=4096
 
@@ -69,7 +72,7 @@ while read line; do
     # Field records - update the field variable (unused in this code)
     if [ "$op" == "3" ]; then
         field=${line:1:1}
-	>&2 echo "Field record "$field
+        if [ "$verbose" == "1" ]; then >&2 echo "Field record "$field; fi
         continue
     fi
 
@@ -77,7 +80,7 @@ while read line; do
     if [ $mode == 1 ]; then
         origin=$origin${line:1:2}
         address=$((8#$origin))
-	>&2 echo "Origin record " $origin 
+        if [ "$verbose" == "1" ]; then >&2 echo "Origin record " $origin; fi
         mode=0
         continue
     fi
@@ -101,13 +104,13 @@ while read line; do
                 ram[$address]=$data
 #                >&2 echo "ram["$(printf "%04o" $address)"]=" $data
             else
-                 >&2 echo "Overwriting address" $(printf "%04o" $address) "old data" ${ram[$address]} "with new data" $data
+                 if [ "$verbose" == "1" ]; then >&2 echo "Overwriting address" $(printf "%04o" $address) "old data" ${ram[$address]} "with new data" $data; fi
                 ram[$address]=$data
     	    fi
             (( address++ ))
         else
             if [ "$field" != "$lastField" ]; then
-                >&2 echo "Wrong field for addr:" $(printf "%04o" $address) "with data" $data
+                if [ "$verbose" == "1" ]; then >&2 echo "Wrong field for addr:" $(printf "%04o" $address) "with data" $data; fi
             fi
             lastField=$field
         fi
@@ -126,7 +129,7 @@ rm $tmpfile
 #ram[$lastAddress]=$lastData
 
 # Write all the ram data as plain binary chars to stdout 
->&2 echo "Writing..."
+if [ "$verbose" == "1" ]; then >&2 echo "Writing..."; fi
 for ((i=0; i<WORDS; i++)); do
    printf "%03x\n" $((8#$o${ram[$i]}))
 done

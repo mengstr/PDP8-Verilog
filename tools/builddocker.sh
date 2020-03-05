@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -f Dockerfile.veritools -t viacard/veritools:latest .
+docker build --rm -f Dockerfile.veritools -t viacard/veritools:latest .

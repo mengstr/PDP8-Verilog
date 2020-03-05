@@ -26,4 +26,4 @@ done
 done
 
 # Patch initial HLT to be a NOP in Inst1.hex
-sed -i '' '103s/f02/e00/' hex/InstTest1-D0AB.hex
+#sed -i '' '103s/f02/e00/' hex/InstTest1-D0AB.hex
