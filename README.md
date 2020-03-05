@@ -1,57 +1,6 @@
-# PDP8/X-Verilog
+# PDP8-Verilog [![CircleCI Build Status](https://circleci.com/gh/SmallRoomLabs/PDP8-Verilog.svg?style=svg)](https://circleci.com/gh/SmallRoomLabs/PDP8-Verilog)
 
-
-## Busses
-
-* busIR
-* busPC
-* busLatPC
-* busReg 
-  * busReg_ind
-  * busReg_data
-* busAddress 
-  * busAddress_ind 
-  * busAddress_pc 
-  * busAddress_ir
-* busData       
-  * busData_inc 
-  * busData_ram 
-  * busData_acc 
-  * busData_pc
-* busPCin       
-  * busPCin_ir 
-  * busPCin_reg 
-  * (setpc ? switches : 12'o0000)
-* busORacc      
-  * mqout1 
-  * busACGTF 
-  * busACTTY 
-  * (oprOSR ? 12'o`OSR : 12'o0000)
-* accIn         
-  * accIn_andadd 
-  * accIn_rotater
-
-* busPCin_ir    = ir2pc ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0 // First OC12 module
-* busPCin_reg   = reg2pc ? busReg : 12'b0
-* busAddress_ir = ir2rama ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0 // Second OC12 module
-* busAddress_pc = ckFetch ? busPC : 12'b0
-* busData_pc    = pc2ramd ? busPC : 12'b0
-* busData_ram
-* accIn_andadd
-* busData_acc
-* accIn_rotater
-* busAddress_ind
-* busReg_ind
-* busReg_data
-* busData_inc
-
-* switches
-* mqout1
-* accout1
-* clorinOut
-* incOut
-* busACGTF
-* busACTTY
+This is a work in progress for a PDP-8 written in Verilog. It is meant to be implemented as one FPGA on a separate PCB for each module in order to later on replace each FPGA board with regular 74-series logic ICs.
 
 ## Ports on modules
 ` head -10 *.v | grep -E '^// \w{3,} \| \d+ \| \d+ \| \d+ \| \d+' | cut -c 4- | sort`
@@ -133,6 +82,58 @@ Rotater.v                |  |  |  |  |  |  |  |
 Sequencer.v              | 2 | 2 | 1 | 1 | 1 | 1 | 1 | 1
 Skip.v                   |  |  |  |  |  |  |  |
 UART.v                   |  |  |  |  |  |  |  |
+
+## Busses
+
+* busIR
+* busPC
+* busLatPC
+* busReg 
+  * busReg_ind
+  * busReg_data
+* busAddress 
+  * busAddress_ind 
+  * busAddress_pc 
+  * busAddress_ir
+* busData       
+  * busData_inc 
+  * busData_ram 
+  * busData_acc 
+  * busData_pc
+* busPCin       
+  * busPCin_ir 
+  * busPCin_reg 
+  * (setpc ? switches : 12'o0000)
+* busORacc      
+  * mqout1 
+  * busACGTF 
+  * busACTTY 
+  * (oprOSR ? 12'o`OSR : 12'o0000)
+* accIn         
+  * accIn_andadd 
+  * accIn_rotater
+
+* busPCin_ir    = ir2pc ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0 // First OC12 module
+* busPCin_reg   = reg2pc ? busReg : 12'b0
+* busAddress_ir = ir2rama ? { (instIsMP ? busLatPC[11:7] : 5'b00000) , busIR[6:0]} : 12'b0 // Second OC12 module
+* busAddress_pc = ckFetch ? busPC : 12'b0
+* busData_pc    = pc2ramd ? busPC : 12'b0
+* busData_ram
+* accIn_andadd
+* busData_acc
+* accIn_rotater
+* busAddress_ind
+* busReg_ind
+* busReg_data
+* busData_inc
+
+* switches
+* mqout1
+* accout1
+* clorinOut
+* incOut
+* busACGTF
+* busACTTY
 
 ## Interrupts
 

@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  push:
+  watch:
+    types: [started] 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run a multi-line script
+      run: |
+        docker pull viacard/veritools
+        docker run --rm --log-driver=none -a stdout -a stderr -w/work -v${PWD}/:/work -e "CI=true" viacard/veritools make testall
