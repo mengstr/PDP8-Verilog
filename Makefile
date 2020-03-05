@@ -28,8 +28,9 @@ T2H			:= tools/tape2hexram.sh
 
 rev			= $$(tput -Txterm-256color bold)
 norm		= $$(tput -Txterm-256color sgr0)
-green		= $$(tput -Txterm-256color setab 2)
 red			= $$(tput -Txterm-256color setab 1)
+green		= $$(tput -Txterm-256color setab 2)
+yellow		= $$(tput -Txterm-256color setab 3)
 
 HEXSOURCES 	:= $(addsuffix .hex,$(basename $(wildcard sw/src/*.pal sw/src/*.pt sw/src/*.bin sw/src/*.bn)))
 HEXTARGETS 	:= $(subst sw/src/,sw/hex/,$(HEXSOURCES))
@@ -112,16 +113,47 @@ test: initialRAM.hex
 
 testall: $(HEXTARGETS)
 	@$(call runtest,InstTest1-D0AB,1234,100000,5276,0,NO); \
-	if [ $$(grep -c 'HLT at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi ; \
+	if [ $$(grep -c 'HLT at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi
 
 	@$(call runtest,InstTest1-D0AB,7777,100000,5276,0,NO); \
-	if [ $$(grep -c 'BP at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi ; \
+	if [ $$(grep -c 'BP at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi 
 	
 	@$(call runtest,InstTest2-D0BB,0000,100000,3731,0,NO); \
-	if [ $$(grep -c 'BP at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi ; \
+	if [ $$(grep -c 'BP at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi 
 
 	@$(call runtest,JMPJMS-D0IB,0000,1000000,3551,0,NO); \
-	if [ $$(grep -c 'BP at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi ; \
+	if [ $$(grep -c 'BP at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi 
+
+	@$(call runtest,RandJMPJMS-D0JB,0000,1000000,0346,0,NO); \
+	echo "${yellow}    MAYBE     ${norm}"
+
+	@$(call runtest,RandAND-D0DB,0000,100000,0322,0,NO); \
+	if [ $$(grep -c 'BP at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi
+
+	@$(call runtest,RandTAD-D0EB,0000,100000,6743,0,NO); \
+	echo "${yellow}    MAYBE     ${norm}"
+
+	@$(call runtest,RandDCA-D0GC,0000,500000,7777,0,NO); \
+	echo "${yellow}    MAYBE     ${norm}"
+
+	@$(call runtest,RandISZ-D0FC,0000,1000000,7777,0,NO); \
+	echo "${yellow}    MAYBE     ${norm}"
+
+	@$(call runtest,MemChecker-D1AA,0000,500000,7777,0,NO); \
+	echo "${yellow}    MAYBE     ${norm}"
+
+	@$(call runtest,focal-8,0000,200000,7777,0,NO); \
+	if [ $$(grep -c 'TX 33 ' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi
+
+# echo --------------------------------------------------------------------
+# echo focal-8 multitests
+# focal-8.hex initialRAM.hex
+# for dly in {19..20}; do
+#     make OSR=0000 CNT=200000 BP=7777 DELAY=$dly TRACE=NO test
+#     grep -q -s 'TX 33 (!)' test.tmp
+#     if [ "$?" == "0" ]; then echo "$green    SUCCESS    $norm"; else echo "$red      FAIL     $norm"; fi
+# done
+#AddTest-D0CC OSR=0000 CNT=100000 BP=3731 TRACE=NO test
 
 
 define runtest
