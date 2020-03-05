@@ -1,4 +1,4 @@
-PORT:=/dev/cu.usbmodem48065801
+SHELL := /bin/bash
 
 # Building for the iCE40HX1K in a VQ100 package on the Olimex board
 # having 100 MHz Crystal and target clock at 12.5 MHz
@@ -6,6 +6,7 @@ DEVICE 		:= hx1k
 PACKAGE 	:= vq100
 PCF    		:= olimex-pdp8.pcf
 PNRCLKGOAL  := 25
+PORT		:= /dev/cu.usbmodem48065801
 
 OSR			:= 0000
 DEFS		:= -DOSR=$(OSR) 
@@ -15,18 +16,20 @@ TARGET 		:= PDP8
 SOURCES		:= $(wildcard *.v)
 DIR         := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
-ifeq ($(CI),"true")
-	RUN		:= ""
+ifeq ($(CI), true)
+	RUN		:= 
 else
 	RUN		:= docker run --rm --log-driver=none -a stdout -a stderr -w/work -v$(DIR)/:/work viacard/veritools
 endif
 
-ICEFLASH	:= ../verilog_old/upload/iceflash 
 PAL			:= tools/palbart
+ICEFLASH	:= ../verilog_old/upload/iceflash 
 T2H			:= tools/tape2hexram.sh
 
-rev			:= $$(tput bold)
-norm		:= $$(tput sgr0)
+rev			= $$(tput -Txterm-256color bold)
+norm		= $$(tput -Txterm-256color sgr0)
+green		= $$(tput -Txterm-256color setab 2)
+red			= $$(tput -Txterm-256color setab 1)
 
 HEXSOURCES 	:= $(addsuffix .hex,$(basename $(wildcard sw/src/*.pal sw/src/*.pt sw/src/*.bin sw/src/*.bn)))
 HEXTARGETS 	:= $(subst sw/src/,sw/hex/,$(HEXSOURCES))
@@ -73,6 +76,7 @@ icetime0.tmp: $(TARGET).asc
 	-r icetime0.tmp \
 	$(TARGET).asc 2>icetime2.tmp 1>icetime1.tmp
 
+
 report: icetime0.tmp
 	@echo ""
 	@grep "Device utilisation:" -A6 nextpnr2.tmp | tail -6 | sed "s/Info://g" | cut -c 9-
@@ -95,23 +99,37 @@ lint: $(SOURCES)
 		--lint-only \
 		$^ 2>&1 | tee lint.tmp
 
-CNT:=100000
-OSR:=0000
-BP:=7777
-TRACE:=
+CNT?=100
+OSR?=0000
+BP?=7777
+TRACE?=
+DELAY:=0
 
-test:
-	@echo "${rev}###  iverilog -DOSR=$(OSR) -DCNT=$(CNT) -DBP=$(BP) -DDELAY=$(DELAY) -D$(TRACE)TRACE  ###${norm}"
-	@$(RUN) iverilog -g2012 \
-		-DIVERILOG \
-		-DOSR=$(OSR) \
-		-DBP=$(BP) \
-		-D$(TRACE)TRACE \
-		-DCNT=$(CNT) \
-		-DDELAY=$(DELAY) \
-		-o $(TARGET).vvp \
-		$(TARGET).vt $(filter-out $(TARGET)_top.v, $(SOURCES))
-	@$(RUN) vvp $(TARGET).vvp | tools/showop.sh | tee test.tmp
+
+test: initialRAM.hex
+	@$(call runtest,../../initalRAM.hex,0000,100000,7777,0,); \
+
+
+testall: $(HEXTARGETS)
+	@$(call runtest,InstTest1-D0AB,1234,100000,5276,0,NO); \
+	if [ $$(grep -c 'HLT at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi ; \
+
+	@$(call runtest,InstTest1-D0AB,7777,100000,5276,0,NO); \
+	if [ $$(grep -c 'BP at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi ; \
+	
+	@$(call runtest,InstTest2-D0BB,0000,100000,3731,0,NO); \
+	if [ $$(grep -c 'BP at' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi ; \
+	
+
+define runtest
+	echo 
+	echo ${rev} ---  iverilog -DOSR=$(2) -DCNT=$(3) -DBP=$(4) -DDELAY=$(5) -D$(6)TRACE $(1) --- ${norm}
+	cp sw/hex/$(1).hex initialRAM.hex 2> /dev/null || true
+	$(RUN) iverilog -g2012 -DIVERILOG -DOSR=$(2) -DBP=$(4) -D$(6)TRACE -DCNT=$(3) -DDELAY=$(5) -o $(TARGET).vvp $(TARGET).vt $(filter-out $(TARGET)_top.v, $(SOURCES))
+	$(RUN) vvp $(TARGET).vvp | sed '/dumpfile/d' | tools/showop.sh | tee test.tmp
+endef
+
+
 
 modules:
 	# $(ICARUS) iverilog -g2012 -o Skip.vvp Skip.vt Skip.v
@@ -119,10 +137,13 @@ modules:
 	@$(RUN) iverilog -g2012 -o UART.vvp UART.vt UART.v ClockGen.v
 	@$(RUN) vvp UART.vvp 
 
-sw/hex/%.hex: sw/src/%.pal
+tools/palbart: tools/src/palbart.c
+	gcc -O -Wall -Wno-format-overflow -o $@ $<
+
+sw/hex/%.hex: sw/src/%.pal tools/palbart
 	@mkdir -p sw/tmp sw/hex
 	@cp -f $< $(dir $<)../tmp/
-	$(PAL) -a -r sw/tmp/$(basename $(notdir $<)).pal
+	$(PAL) -t 8 -a -r sw/tmp/$(basename $(notdir $<)).pal
 	$(T2H) < sw/tmp/$(basename $(notdir $<)).rim > sw/hex/$(basename $(notdir $<)).hex
 
 sw/hex/%.hex: sw/src/%.pt
@@ -143,15 +164,5 @@ initialRAM.hex : sw/hex/NOP.hex
 clean:
 	@rm -f *.{tmp,blif,asc,bin,rpt,dot,png,json,vvp,vcd,svg,out,log,hex}
 	@rm -f sw/{hex,tmp}/*
-	@rm -f .*_history
-	@rm -f *~
-
-
-#
-# 	  -p 'synth_ice40 -top $(TARGET)_top -json $@; cd IRdecode; show -width -enum -stretch -prefix $(TARGET) -format dot'  \
-#	@$(ICESTORM) dot -Tpng -O $(TARGET).dot
-#
-# TARGET=CLORIN
-# image:
-# 	@$(ICESTORM) yosys -p "prep; show -stretch -prefix $(TARGET) -format dot" $(TARGET).v > /dev/null
-# 	@$(ICESTORM) dot -Tpng -O $(TARGET).dot > a.a
+	@rm -f tools/palbart
+	@rm -f .*_history *~

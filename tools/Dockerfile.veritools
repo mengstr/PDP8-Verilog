@@ -17,7 +17,7 @@ COPY --from=IVERILOG  /usr/local/lib/                 /usr/local/lib
 COPY --from=ICESTORM  /usr/local/bin/                 /usr/local/bin
 COPY --from=ICESTORM  /usr/local/share/icebox/        /usr/local/share/icebox/
 COPY --from=ICESTORM  /usr/local/share/yosys/         /usr/local/share/yosys/
-RUN apt-get update && apt-get install -y git libreadline7 libtcl8.6 libftdi1 && apt-get clean
+RUN apt-get update && apt-get install -y gcc git libreadline7 libtcl8.6 libftdi1 && apt-get clean
 
 CMD ["/bin/bash"]
 
