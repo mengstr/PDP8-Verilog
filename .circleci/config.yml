@@ -4,7 +4,9 @@ jobs:
     docker:
       - image: viacard/veritools:latest
     steps:
-      - checkout
+      - checkout:
+      - setup_remote_docker: 
+          docker_layer_caching: true 
       - run:
           command: |
             make testall
