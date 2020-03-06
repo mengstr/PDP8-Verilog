@@ -1,14 +1,16 @@
-# MacOS specific files
+# MacOS/Win/Linux specific files
 .DS_Store
+._*
+Thumbs.db
+.directory
 
-# History files
-.*_history
 
 # Editor backup files 
 *~
 *.tmp*
 
-# verilog
+# verilog & tools
+.*_history
 *.blif
 *.asc
 *.bin
@@ -18,6 +20,12 @@
 *.vvp
 *.vcd
 *.log
+*.gtkw
+
+#Project generated files
 *.hex
 pdp8.*
 upload
+tools/palbart
+sw/tmp
+sw/hex
