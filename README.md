@@ -1,7 +1,6 @@
-# PDP8-Verilog
-[![SmallRoomLabs]https://circleci.com/gh/SmallRoomLabs/PDP8-Verilog.svg?style=svg](https://circleci.com/gh/SmallRoomLabs/PDP8-Verilog)
+# PDP8-Verilog [![CircleCI Build Status](https://circleci.com/gh/SmallRoomLabs/PDP8-Verilog.svg?style=svg](https://circleci.com/gh/SmallRoomLabs/PDP8-Verilog)
 
-This is a work in progress for a PDP-8 written in Verilog
+This is a work in progress for a PDP-8 written in Verilog. It is meant to be implemented as one FPGA on a separate PCB for each module in order to later on replace each FPGA board with regular 74-series logic ICs.
 
 ## Ports on modules
 ` head -10 *.v | grep -E '^// \w{3,} \| \d+ \| \d+ \| \d+ \| \d+' | cut -c 4- | sort`
