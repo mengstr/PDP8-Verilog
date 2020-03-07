@@ -155,6 +155,8 @@ test: initialRAM.hex
 # Runs all tests/MAINDECS and verifies that the execution was correct
 #
 testall: $(HEXTARGETS) patch.tmp
+	@echo CI=${CI}
+	@echo GITHUB_ACTIONS=${GITHUB_ACTIONS}
 	@$(call runtest,InstTest1-D0AB,1234,100000,5276,0,NO); \
 	if [ $$(grep -c 'HLT at 0500' test.tmp) -eq 1 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; fi
 
@@ -268,14 +270,14 @@ patch.tmp: $(HEXTARGETS)
 	@touch patch.tmp
 	# Patch initial HLT to be a NOP
 	# Patch loop counter initial and reload values to -1
-	sed -i $$(printf "%d" $$((0146+1)))s/$$(printf "%03x" 07402)/$$(printf "%03x" 07000)/ sw/hex/InstTest1-D0AB.hex
-	sed -i $$(printf "%d" $$((0121+1)))s/$$(printf "%03x" 05140)/$$(printf "%03x" 07777)/ sw/hex/InstTest1-D0AB.hex
-	sed -i $$(printf "%d" $$((0122+1)))s/$$(printf "%03x" 05140)/$$(printf "%03x" 07777)/ sw/hex/InstTest1-D0AB.hex
+	sed -i '' $$(printf "%d" $$((0146+1)))s/$$(printf "%03x" 07402)/$$(printf "%03x" 07000)/ sw/hex/InstTest1-D0AB.hex
+	sed -i '' $$(printf "%d" $$((0121+1)))s/$$(printf "%03x" 05140)/$$(printf "%03x" 07777)/ sw/hex/InstTest1-D0AB.hex
+	sed -i '' $$(printf "%d" $$((0122+1)))s/$$(printf "%03x" 05140)/$$(printf "%03x" 07777)/ sw/hex/InstTest1-D0AB.hex
 	#
 	# Patch loop counter stop value to -1
-	sed -i $$(printf "%d" $$((03750+1)))s/$$(printf "%03x" 04762)/$$(printf "%03x" 07777)/ sw/hex/InstTest2-D0BB.hex
+	sed -i '' $$(printf "%d" $$((03750+1)))s/$$(printf "%03x" 04762)/$$(printf "%03x" 07777)/ sw/hex/InstTest2-D0BB.hex
 	# Patch loop counter stop value to -1
-	sed -i $$(printf "%d" $$((03572+1)))s/$$(printf "%03x" 01200)/$$(printf "%03x" 07777)/ sw/hex/JMPJMS-D0IB.hex
+	sed -i '' $$(printf "%d" $$((03572+1)))s/$$(printf "%03x" 01200)/$$(printf "%03x" 07777)/ sw/hex/JMPJMS-D0IB.hex
 
 
 
