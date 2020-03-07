@@ -15,4 +15,5 @@ jobs:
       run: |
         set
         docker pull viacard/veritools
+        docker run --rm --log-driver=none -a stdout -a stderr -w/work -v${PWD}/:/work viacard/veritools set
         docker run --rm --log-driver=none -a stdout -a stderr -w/work -v${PWD}/:/work viacard/veritools make testall

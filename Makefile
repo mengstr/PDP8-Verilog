@@ -10,11 +10,11 @@ SOURCES		:= $(wildcard *.v)
 # If we run the makefile in CircleCI (or probably any other CI as well) we're running this from within a docker container
 # already having all the required tools already installed, so we can just run the executables directly. Else just the 
 # tools are run in a container with the work folder mapped to the real project folder at the host.
-ifeq ($(CI), true)
+ifdef ($(CI))
   RUN		:= 
   SEDi		:= sed -i
 else
-  ifeq ($(GITHUB_ACTIONS), true)
+  ifdef ($(GITHUB_ACTIONS))
     RUN		:= 
     SEDi	:= sed -i
   else
