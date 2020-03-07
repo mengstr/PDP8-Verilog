@@ -11,13 +11,14 @@ SOURCES		:= $(wildcard *.v)
 # already having all the required tools already installed, so we can just run the executables directly. Else just the 
 # tools are run in a container with the work folder mapped to the real project folder at the host.
 ifeq ($(CI), true)
-	RUN		:= 
+  RUN		:= 
 else
-ifeq ($(GITHUB_ACTIONS), true)
-	RUN		:= 
-else
-	DIR     := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-	RUN		:= docker run --rm --log-driver=none -a stdout -a stderr -w/work -v$(DIR)/:/work viacard/veritools
+  ifeq ($(GITHUB_ACTIONS), true)
+    RUN		:= 
+  else
+    DIR     := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+    RUN		:= docker run --rm --log-driver=none -a stdout -a stderr -w/work -v$(DIR)/:/work viacard/veritools
+  endif
 endif
 
 # Building for the iCE40HX1K in a VQ100 package on the Olimex board
