@@ -14,4 +14,4 @@ jobs:
     - name: Run a multi-line script
       run: |
         docker pull viacard/veritools
-        docker run --rm viacard/veritools find .
+        docker run --rm --log-driver=none -a stdout -a stderr -w/work -v${PWD}/:/work viacard/veritools make testall
