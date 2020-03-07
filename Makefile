@@ -164,13 +164,13 @@ testall: $(HEXTARGETS) patch.tmp
 	if [ $$(grep -c 'TX 135' test.tmp) -eq 5 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi 
 
 	@$(call runtest,RandAND-D0DB,0000,400000,0324,0,NO); \
-	if [ $$(grep -c 'DONE' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
+	if [ $$(grep -c 'DONE after 27326' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
 
 	@$(call runtest,RandTAD-D0EB,0000,400000,7443,0,NO); \
-	if [ $$(grep -c 'DONE' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
+	if [ $$(grep -c 'ONE after 28602' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
 
 	@$(call runtest,RandDCA-D0GC,0000,10000000,0150,0,NO); \
-	if [ $$(grep -c 'DONE' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
+	if [ $$(grep -c 'BP at 0150 after 369488' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
 
 	@$(call runtest,RandISZ-D0FC,0000,10000,7777,0,NO); \
 	if [ $$(grep -c 'DONE' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
