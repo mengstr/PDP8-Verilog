@@ -13,5 +13,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Run a multi-line script
       run: |
+        set
         docker pull viacard/veritools
         docker run --rm --log-driver=none -a stdout -a stderr -w/work -v${PWD}/:/work viacard/veritools make testall

@@ -10,13 +10,14 @@ SOURCES		:= $(wildcard *.v)
 # If we run the makefile in CircleCI (or probably any other CI as well) we're running this from within a docker container
 # already having all the required tools already installed, so we can just run the executables directly. Else just the 
 # tools are run in a container with the work folder mapped to the real project folder at the host.
-DIR     := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-RUN		:= docker run --rm --log-driver=none -a stdout -a stderr -w/work -v$(DIR)/:/work viacard/veritools
 ifeq ($(CI), true)
 	RUN		:= 
-endif
+else
 ifeq ($(GITHUB_ACTIONS), true)
 	RUN		:= 
+else
+	DIR     := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+	RUN		:= docker run --rm --log-driver=none -a stdout -a stderr -w/work -v$(DIR)/:/work viacard/veritools
 endif
 
 # Building for the iCE40HX1K in a VQ100 package on the Olimex board
