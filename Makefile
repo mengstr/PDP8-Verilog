@@ -275,7 +275,7 @@ patch.tmp: $(HEXTARGETS)
 	$(SEDi) $$(printf "%d" $$((03750+1)))s/$$(printf "%03x" 04762)/$$(printf "%03x" 07777)/ sw/hex/InstTest2-D0BB.hex
 	# Patch loop counter stop value to -1
 	$(SEDi) $$(printf "%d" $$((03572+1)))s/$$(printf "%03x" 01200)/$$(printf "%03x" 07777)/ sw/hex/JMPJMS-D0IB.hex
-	find sw/hex/ | sort | xargs md5
+	find sw/hex/ | sort | xargs md5sum
 
 
 
