@@ -1,6 +1,9 @@
 name: CI
 
-on: [push, started]
+on:
+  push:
+  watch:
+    types: [started] 
 
 jobs:
   build:
@@ -12,4 +15,3 @@ jobs:
       run: |
         docker pull viacard/veritools
         docker run --rm viacard/veritools find .
-        
