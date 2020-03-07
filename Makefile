@@ -186,6 +186,7 @@ testall: $(HEXTARGETS) patch.tmp
 	@$(call runtest,focal-8,0000,200000,7777,0,NO); \
 	if [ $$(grep -c 'TX 33' test.tmp) -gt 0 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
 
+
 # echo --------------------------------------------------------------------
 # echo focal-8 multitests
 # focal-8.hex initialRAM.hex
@@ -263,9 +264,6 @@ sw/hex/%.hex: sw/src/%.bin
 # Patch hexes to run better/faster in the testbench
 #
 patch.tmp: $(HEXTARGETS)
-	@echo SEDi=${SEDi}
-	@echo CI=${CI}
-	@echo GITHUB_ACTIONS=${GITHUB_ACTIONS}
 	@touch patch.tmp
 	# Patch initial HLT to be a NOP
 	# Patch loop counter initial and reload values to -1
@@ -277,6 +275,7 @@ patch.tmp: $(HEXTARGETS)
 	$(SEDi) $$(printf "%d" $$((03750+1)))s/$$(printf "%03x" 04762)/$$(printf "%03x" 07777)/ sw/hex/InstTest2-D0BB.hex
 	# Patch loop counter stop value to -1
 	$(SEDi) $$(printf "%d" $$((03572+1)))s/$$(printf "%03x" 01200)/$$(printf "%03x" 07777)/ sw/hex/JMPJMS-D0IB.hex
+	find sw/hex/ | sort | xargs md5
 
 
 
