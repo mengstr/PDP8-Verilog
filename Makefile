@@ -166,25 +166,25 @@ testall: $(HEXTARGETS) patch.tmp
 	if [ $$(grep -c 'TX 135' test.tmp) -eq 5 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi 
 
 	@$(call runtest,RandAND-D0DB,0000,400000,0324,0,NO); \
-	if [ $$(grep -c 'DONE after 27326' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
+	if [ $$(grep -c 'DONE after 27326' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS_   ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
 
 	@$(call runtest,RandTAD-D0EB,0000,400000,7443,0,NO); \
-	if [ $$(grep -c 'ONE after 28602' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
+	if [ $$(grep -c 'ONE after 28602' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS_   ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
 
 	@$(call runtest,RandDCA-D0GC,0000,10000000,0150,0,NO); \
-	if [ $$(grep -c 'BP at 0150 after 369488' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
+	if [ $$(grep -c 'BP at 0150 after 369488' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS_   ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
 
 	@$(call runtest,RandISZ-D0FC,0000,10000,7777,0,NO); \
-	if [ $$(grep -c 'DONE' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
+	if [ $$(grep -c 'DONE' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS_   ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
 
 	@$(call runtest,RandJMPJMS-D0JB,0000,10000,7777,0,NO); \
-	if [ $$(grep -c 'DONE' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
+	if [ $$(grep -c 'DONE' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS_   ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
 
 	@$(call runtest,MemChecker-D1AA,0000,10000,7777,0,NO); \
-	if [ $$(grep -c 'DONE' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
+	if [ $$(grep -c 'DONE' test.tmp) -eq 1 ]; then echo "${yellow}    SUCCESS_   ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
 
 	@$(call runtest,focal-8,0000,200000,7777,0,NO); \
-	if [ $$(grep -c 'TX 33' test.tmp) -gt 0 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
+	if [ $$(grep -c 'TX 33' test.tmp) -eq 2 ]; then echo "${green}    SUCCESS    ${norm}"; else echo "${red}      FAIL     ${norm}"; false; fi
 
 
 # echo --------------------------------------------------------------------
@@ -255,10 +255,6 @@ sw/hex/%.hex: sw/src/%.bn
 	@mkdir -p sw/tmp sw/hex
 	$(T2H) < $< > sw/hex/$(basename $(notdir $<)).hex
 
-sw/hex/%.hex: sw/src/%.bin
-	@mkdir -p sw/tmp sw/hex
-	$(T2H) < $< > sw/hex/$(basename $(notdir $<)).hex
-
 
 #
 # Patch hexes to run better/faster in the testbench
@@ -275,7 +271,6 @@ patch.tmp: $(HEXTARGETS)
 	$(SEDi) $$(printf "%d" $$((03750+1)))s/$$(printf "%03x" 04762)/$$(printf "%03x" 07777)/ sw/hex/InstTest2-D0BB.hex
 	# Patch loop counter stop value to -1
 	$(SEDi) $$(printf "%d" $$((03572+1)))s/$$(printf "%03x" 01200)/$$(printf "%03x" 07777)/ sw/hex/JMPJMS-D0IB.hex
-	find sw/hex/ | sort | xargs md5sum
 
 
 
