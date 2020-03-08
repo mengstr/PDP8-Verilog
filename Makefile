@@ -2,6 +2,8 @@ SHELL 		:= /bin/bash
 PAL			:= tools/palbart
 T2H			:= tools/tape2hexram.sh
 ICEFLASH	:= ../verilog_old/upload/iceflash 
+TERMINAL	= /Users/mats/Documents/Projects/PDP8-X/verilog/hold/tio/src/tio -b $(BAUDRATE) $(PORT) 
+
 
 #
 TARGET 		:= PDP8
@@ -26,6 +28,7 @@ PACKAGE 	:= vq100
 PCF    		:= olimex-pdp8.pcf
 PNRCLKGOAL  := 25
 PORT		:= /dev/cu.usbmodem48065801
+BAUDRATE	:= 9600
 
 # Default values for running the tests, can be overridden on the commandline like
 #	make test CNT=100 TRACE=NO
@@ -127,7 +130,7 @@ report: icetime0.tmp
 upload:$(TARGET).bin
 	@echo "${rev}###  iceflash $(PORT) -h -e -w $(TARGET).bin -t -G ###${norm}"
 	@$(ICEFLASH) $(PORT) -h -e -w $(TARGET).bin -t -G
-	tio $(PORT) 
+	$(TERMINAL)
 
 
 #
@@ -261,17 +264,15 @@ sw/hex/%.hex: sw/src/%.bn
 #
 patch.tmp: $(HEXTARGETS)
 	@touch patch.tmp
-	# Patch initial HLT to be a NOP
-	# Patch loop counter initial and reload values to -1
-	$(SEDi) $$(printf "%d" $$((0146+1)))s/$$(printf "%03x" 07402)/$$(printf "%03x" 07000)/ sw/hex/InstTest1-D0AB.hex
-	$(SEDi) $$(printf "%d" $$((0121+1)))s/$$(printf "%03x" 05140)/$$(printf "%03x" 07777)/ sw/hex/InstTest1-D0AB.hex
-	$(SEDi) $$(printf "%d" $$((0122+1)))s/$$(printf "%03x" 05140)/$$(printf "%03x" 07777)/ sw/hex/InstTest1-D0AB.hex
-	#
-	# Patch loop counter stop value to -1
-	$(SEDi) $$(printf "%d" $$((03750+1)))s/$$(printf "%03x" 04762)/$$(printf "%03x" 07777)/ sw/hex/InstTest2-D0BB.hex
-	# Patch loop counter stop value to -1
-	$(SEDi) $$(printf "%d" $$((03572+1)))s/$$(printf "%03x" 01200)/$$(printf "%03x" 07777)/ sw/hex/JMPJMS-D0IB.hex
-
+# Patch initial HLT to be a NOP
+# Patch loop counter initial and reload values to -1
+	@$(SEDi) $$(printf "%d" $$((0146+1)))s/$$(printf "%03x" 07402)/$$(printf "%03x" 07000)/ sw/hex/InstTest1-D0AB.hex
+	@$(SEDi) $$(printf "%d" $$((0121+1)))s/$$(printf "%03x" 05140)/$$(printf "%03x" 07777)/ sw/hex/InstTest1-D0AB.hex
+	@$(SEDi) $$(printf "%d" $$((0122+1)))s/$$(printf "%03x" 05140)/$$(printf "%03x" 07777)/ sw/hex/InstTest1-D0AB.hex
+# Patch loop counter stop value to -1
+	@$(SEDi) $$(printf "%d" $$((03750+1)))s/$$(printf "%03x" 04762)/$$(printf "%03x" 07777)/ sw/hex/InstTest2-D0BB.hex
+# Patch loop counter stop value to -1
+	@$(SEDi) $$(printf "%d" $$((03572+1)))s/$$(printf "%03x" 01200)/$$(printf "%03x" 07777)/ sw/hex/JMPJMS-D0IB.hex
 
 
 #
