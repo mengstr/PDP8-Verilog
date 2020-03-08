@@ -13,6 +13,7 @@ module MultiLatch (
   input clk, 
   input reset,
   input [11:0] in,
+  input setvalue,
   input latch,
   input latch3,
   input oe1,oe2,oe3,
@@ -26,13 +27,15 @@ reg lastLatch3=0;
 reg [11:0] data=0;
 reg [11:0] data3=0;
 
+wire [11:0] thisIn=setvalue ? 12'o4000 : in;
+
 always @(posedge clk) begin
   if (reset) begin
     data<=0;
     data3<=0;
   end else begin
-    if (latch & ~lastLatch) data<=in;
-    if (latch3 & ~lastLatch3) data3<=in;
+    if (latch & ~lastLatch) data<=thisIn;
+    if (latch3 & ~lastLatch3) data3<=thisIn;
   end
   lastLatch<=latch;
   lastLatch3<=latch3;

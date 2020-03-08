@@ -194,7 +194,7 @@ Sequencer theSEQUENCER(
   .clk(clk),
   .reset(reset),
   // Inputs
-  .halt((oprHLT & ck2)), //FIXME
+  .halt((oprHLT)), 
   .done(done), 
   .startstop(startstop|sw_RUN),
   .sst(sst|sw_SST),
@@ -220,7 +220,9 @@ ProgramCounter thePC(
   // Inputs
   .in(busPCin),
   .load(pc_load),
-  .inc(pc_inc & ~(irqOverride & ckFetch)),  //FIXME
+  .inc(pc_inc), 
+  .irqOverride(irqOverride),
+  .ckFetch(ckFetch), 
   .LATCH(ckFetch),
   //Outputs
   .PC(busPC),
@@ -255,7 +257,8 @@ MultiLatch theIR(
   .reset(reset),
   .clk(clk),
   // Inputs
-  .in(irqOverride ? 12'o4000 : busData), //FIXME
+  .in(busData),
+  .setvalue(irqOverride),
   .latch(stbFetchA),
   .latch3(1'b0),
   .oe1(1'b1),
@@ -354,6 +357,7 @@ MultiLatch theMQ(
   .clk(clk),
   // Inputs
   .in(accIn),
+  .setvalue(1'b0),
   .latch(mq_ck), 
   .latch3(mq_tmpLatch),
   .oe1(mq2orbus), 
@@ -417,6 +421,7 @@ MultiLatch theACC(
   .clk(clk),
   // Inputs
   .in(accIn),
+  .setvalue(1'b0),
   .latch(ac_ck),
   .latch3(1'b0),
   .oe1(1'b1),
@@ -492,6 +497,7 @@ MultiLatch theIndReg(
   .clk(clk),
   // Inputs
   .in(busData), 
+  .setvalue(1'b0),
   .latch(ind_ck),
   .latch3(1'b0),
   .oe1(ind2inc),
@@ -515,6 +521,7 @@ MultiLatch theDataReg(
   .clk(clk),
   // Inputs
   .in(busData), 
+  .setvalue(1'b0),
   .latch(data_ck),
   .latch3(1'b0),
   .oe1(ld2inc),
@@ -670,6 +677,21 @@ Instructions theinst0_5 (
   .done(done05)
 );
 
+//
+// ▁ ▂ ▄ ▅ ▆ ▇ █ DECODE IOT INSTRUCTIONS █ ▇ ▆ ▅ ▄ ▂ ▁
+//
+
+wire IOT00;
+wire IOT03;
+wire IOT04;
+
+InstructionIOTaddr theIOTaddrs(
+  .IR(busIR[8:3]),
+  .IOT(instIOT),
+  .IOT00(IOT00),
+  .IOT03(IOT03),
+  .IOT04(IOT04)
+);
 
 //
 // ▁ ▂ ▄ ▅ ▆ ▇ █ INSTRUCTION HANDLING - 600x IOT CPU/INT █ ▇ ▆ ▅ ▄ ▂ ▁
@@ -692,7 +714,7 @@ InstructionIOT600x theInterrupt(
   .clk(clk),
   .reset(reset),
   .CLEAR(sw_CLEAR),
-  .EN(instIOT & (busIR[8:3]==6'o00)), //FIXME
+  .EN(IOT00),
   .IR(busIR[2:0]),
   .AC(accout1),
   .LINK(link),
@@ -733,11 +755,12 @@ InstructionIOT603x theTTY(
   .clear(reset | iotCLR0), //FIXME
   //Inputs
   .baudX7(baudX7),
-  .EN1(instIOT & (busIR[8:3]==6'o03) & (ck1|ck2|ck3)), //FIXME
-  .EN2(instIOT & (busIR[8:3]==6'o04) & (ck1|ck2|ck3)), //FIXME
+  .EN1(IOT03), // & (ck1|ck2|ck3)), //FIXME when tested in Hardware
+  .EN2(IOT04), // & (ck1|ck2|ck3)), //FIXME when tested in Hardware
   .op(busIR[2:0]),
   .dataIn(accout1[7:0]),
-  .ck1(ck1),   .ck2(ck2),
+  .ck1(ck1),   
+  .ck2(ck2),
   .stb1(stb1),
   .done(doneIOT34),
   .pc_ck(pc_ckIOT34),

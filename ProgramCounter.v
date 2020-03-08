@@ -15,6 +15,8 @@ module ProgramCounter (
   input [11:0] in,
   input inc,
   input load,
+  input irqOverride,
+  input ckFetch,
   input LATCH,
   output [11:0] PC,
   output [11:0] PCLAT
@@ -23,6 +25,8 @@ module ProgramCounter (
 reg [11:0] thisPC=0;
 reg [11:0] thisPCLAT=0;
 reg prevLoad=0;
+
+wire thisInc=inc & ~(irqOverride & ckFetch);
 
 assign PC=thisPC;
 assign PCLAT=thisPCLAT;
@@ -34,7 +38,7 @@ always @(posedge clk) begin
     prevLoad<=0;
   end else if (load && !prevLoad) begin
     thisPC <= in;
-  end else if (inc) begin
+  end else if (thisInc) begin
     thisPC<=thisPC+1;
   end
   if (LATCH) thisPCLAT<=thisPC;
