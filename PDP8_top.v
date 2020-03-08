@@ -23,7 +23,7 @@ module PDP8_top(
 );
 
 reg reset=1;
-reg [3:0] cnt=0;
+reg [7:0] cnt=0;
 // The VQ100 package of the ICE40 lacks a PLL, so we have to
 // manually divide down the 100MHz clock input on the Olimex
 // board down to 25 MHz and and distribute it as the usual
@@ -32,7 +32,7 @@ reg [3:0] cnt=0;
 reg [1:0] extClkDivider=0;
 always @(posedge EXTCLK) begin
   extClkDivider <= extClkDivider + 1;
-  if (cnt==15) reset <= 0; else cnt<=cnt+1;
+  if (cnt==255) reset <= 0; else cnt<=cnt+1;
 end
 wire clk = extClkDivider[1];
 
