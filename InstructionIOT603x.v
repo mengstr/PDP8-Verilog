@@ -60,6 +60,7 @@
 
 module InstructionIOT603x(
   input clk,
+  input reset,
   input clear,
   input baudX7,
   input EN1,                             // High when this module is to be activated  603x
@@ -133,6 +134,7 @@ wire instKRS=(EN1 & (op==3'o4)); // 6034 Keyboard Read Static
 wire instKIE=(EN1 & (op==3'o5)); // 6035 Keyboard Interrupt Enable
 wire instKRB=(EN1 & (op==3'o6)); // 6036 Keyboard Read and begin next read
                                  // 6037 invalid
+
 wire instTFL=(EN2 & (op==3'o0)); // 6040 Teleprinter Flag set
 wire instTSF=(EN2 & (op==3'o1)); // 6041 Teleprinter Skip if Flag
 wire instTFC=(EN2 & (op==3'o2)); // 6042 Teleprinter Flag clear
@@ -149,7 +151,7 @@ reg lastRxRdy=0;
 reg [1:0] cnt=0;
 
 always @(posedge clk) begin
-    if (clear) begin
+    if (reset | clear) begin
         flgTTYIE<=1;
         flgKBD<=0;
         flgPRN<=0;

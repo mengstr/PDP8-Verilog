@@ -167,7 +167,7 @@ FrontPanel thePanel(
   .BUTTONDELAY(buttonDelay),
   .green(busLatPC),
   .red(busIR),
-  .yellow(switches),
+  .yellow(switches| accout1 ),
   // Outputs
   .toggles(switches),
   .buttons({startstop, sst, setpc, button3, button4, button5}),
@@ -184,9 +184,9 @@ FrontPanel thePanel(
 //
   /* verilator lint_off UNUSED */
 wire ckFetch, ckAuto1, ckAuto2, ckInd;
-wire ck1, ck2, ck3, ck4; //,ck5;
+wire ck1, ck2, ck3, ck4; 
 wire stbFetchA, stbFetchB, stbAuto1, stbAuto2, stbInd;
-wire stb1, stb2, stb3, stb4; //,stb5;
+wire stb1, stb2, stb3, stb4; 
 /* verilator lint_on UNUSED */
 wire running;
 
@@ -377,12 +377,19 @@ wire rotaterLI;
 
 Link theLINK(
   .clk(clk),
-  .CLEAR(reset),
+  .reset(reset),
   // Inputs
-  .L_ck(link_ck),
-  .L_clear(oprCLL | linkclrIOT0), // FIXME
-  .L_compl(((oprCML ^ (incC & oprIAC)) | (andaddC & instTAD)) | linkcmlIOT0), // FIXME
-  .L_force(oprLEFT|oprRIGHT), // FIXME
+  .ck(link_ck),
+  .clear1(oprCLL), 
+  .clear2(linkclrIOT0), 
+  .compl1(oprCML),
+  .compl2(incC),
+  .compl3(oprIAC),
+  .compl4(andaddC),
+  .compl5(instTAD),
+  .compl6(linkcmlIOT0), 
+  .force1(oprLEFT),
+  .force2(oprRIGHT),
   .L_input(rotaterLO),
   // Outputs
   .L(link),
@@ -752,11 +759,12 @@ wire rot2acTTY;
 
 InstructionIOT603x theTTY(
   .clk(clk),
-  .clear(reset | iotCLR0), //FIXME
+  .reset(reset),
+  .clear(iotCLR0),
   //Inputs
   .baudX7(baudX7),
-  .EN1(IOT03), // & (ck1|ck2|ck3)), //FIXME when tested in Hardware
-  .EN2(IOT04), // & (ck1|ck2|ck3)), //FIXME when tested in Hardware
+  .EN1(IOT03),
+  .EN2(IOT04),
   .op(busIR[2:0]),
   .dataIn(accout1[7:0]),
   .ck1(ck1),   
@@ -774,7 +782,6 @@ InstructionIOT603x theTTY(
   .clr(clrTTY),
   .ac_ck(ac_ckTTY)
 );
-
 
 
 endmodule
