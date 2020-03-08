@@ -32,43 +32,45 @@ set_io SW3     18          # 3_8A
 #
 # Pins for SRAM on the olimex board
 #
-set_io -nowarn P4      74          # RAMOE 74
-set_io -nowarn P5      73          # RAMWE 73
-set_io -nowarn P6      78          # RAMCS 78
-set_io -nowarn P7      62          # DAT[0] 62
-set_io -nowarn P8      63          # DAT[1] 63
-set_io -nowarn P9      64          # DAT[2] 64
-set_io -nowarn P10     65          # DAT[3] 65
-set_io -nowarn P11     66          # DAT[4] 66
-set_io -nowarn P12     68          # DAT[5] 68
-set_io -nowarn P13     69          # DAT[6] 69
-set_io -nowarn P14     71          # DAT[7] 71
-set_io -nowarn P15     72          # DAT[8] 72
-set_io -nowarn P16     60          # DAT[9] 60
-set_io -nowarn P17     59          # DAT[10] 59
-set_io -nowarn P18     57          # DAT[11] 57
-set_io -nowarn P19     56          # DAT[12] 56
-set_io -nowarn P20     54          # DAT[13] 54
-set_io -nowarn P21     53          # DAT[14] 53
-set_io -nowarn P22     52          # DAT[15] 52
-set_io -nowarn P23     79          # ADR[ 0] 79
-set_io -nowarn P24     80          # ADR[ 1] 80
-set_io -nowarn P25     81          # ADR[ 2] 81
-set_io -nowarn P26     82          # ADR[ 3] 82
-set_io -nowarn P27     83          # ADR[ 4] 83
-set_io -nowarn P28     85          # ADR[ 5] 85
-set_io -nowarn P29     86          # ADR[ 6] 86
-set_io -nowarn P30     87          # ADR[ 7] 87
-set_io -nowarn P31     89          # ADR[ 8] 89
-set_io -nowarn P32     90          # ADR[ 9] 90
-set_io -nowarn P33     91          # ADR[10] 91
-set_io -nowarn P34     93          # ADR[11] 93
-set_io -nowarn P35     94          # ADR[12] 94
-set_io -nowarn P36     95          # ADR[13] 95
-set_io -nowarn P37     96          # ADR[14] 96
-set_io -nowarn P38     97          # ADR[15] 97
-set_io -nowarn P39     99          # ADR[16] 99
-set_io -nowarn P40     100         # ADR[17] 100
+set_io --warn-no-port DAT[0] 62
+set_io --warn-no-port DAT[1] 63
+set_io --warn-no-port DAT[2] 64
+set_io --warn-no-port DAT[3] 65
+set_io --warn-no-port DAT[4] 66
+set_io --warn-no-port DAT[5] 68
+set_io --warn-no-port DAT[6] 69
+set_io --warn-no-port DAT[7] 71
+set_io --warn-no-port DAT[8] 72
+set_io --warn-no-port DAT[9] 60
+set_io --warn-no-port DAT[10] 59
+set_io --warn-no-port DAT[11] 57
+set_io --warn-no-port DAT[12] 56
+set_io --warn-no-port DAT[13] 54
+set_io --warn-no-port DAT[14] 53
+set_io --warn-no-port DAT[15] 52
+
+set_io --warn-no-port ADR[0] 79
+set_io --warn-no-port ADR[1] 80
+set_io --warn-no-port ADR[2] 81
+set_io --warn-no-port ADR[3] 82
+set_io --warn-no-port ADR[4] 83
+set_io --warn-no-port ADR[5] 85
+set_io --warn-no-port ADR[6] 86
+set_io --warn-no-port ADR[7] 87
+set_io --warn-no-port ADR[8] 89
+set_io --warn-no-port ADR[9] 90
+set_io --warn-no-port ADR[10] 91
+set_io --warn-no-port ADR[11] 93
+set_io --warn-no-port ADR[12] 94
+set_io --warn-no-port ADR[13] 95
+set_io --warn-no-port ADR[14] 96
+set_io --warn-no-port ADR[15] 97
+set_io --warn-no-port ADR[16] 99
+set_io --warn-no-port ADR[17] 100
+
+set_io --warn-no-port RAMOE 74
+set_io --warn-no-port RAMWE 73
+set_io --warn-no-port RAMCS 78
 
 #
 # Expansion header on the olimex board
