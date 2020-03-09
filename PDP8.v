@@ -720,7 +720,6 @@ InstructionIOT600x theInterrupt(
   //Inputs
   .clk(clk),
   .reset(reset),
-  .CLEAR(sw_CLEAR),
   .EN(IOT00),
   .IR(busIR[2:0]),
   .AC(accout1),

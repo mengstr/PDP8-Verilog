@@ -62,7 +62,6 @@
 module InstructionIOT600x(
   input clk,
   input reset,
-  input CLEAR,
   input EN,                             // High when this module is to be activated
   input [2:0] IR,
   /* verilator lint_off UNUSED */
@@ -128,7 +127,7 @@ wire instCAF= (EN & (IR==3'o7));
 wire AC8=~AC[8];
 
 always @(posedge clk) begin
-  if (CLEAR | reset)       begin IE<=0; IEdly1<=0; IEdly2<=0; irqActive<=0; end
+  if (reset)       begin IE<=0; IEdly1<=0; IEdly2<=0; irqActive<=0; end
   if (ckFetch & ~stbFetchA & ~stbFetchB & preIrq)    begin irqActive<=1; end
   if (stb1 & instCAF)      begin IE<=0; IEdly1<=0; IEdly2<=0; end
   if (stb1 & instIOF)      begin IE<=0; IEdly1<=0; IEdly2<=0; end
