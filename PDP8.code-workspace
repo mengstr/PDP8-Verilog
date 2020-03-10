@@ -15,6 +15,9 @@
 		"todo-tree.general.tags": [
 			"FIXME",
 			"TODO"
-		]
+		],
+		"files.exclude": {
+			"**/*.code-workspace": true
+		}
 	}
 }
